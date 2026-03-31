@@ -1,0 +1,1064 @@
+AI-Engineering Master Process v4
+Page 1
+AI-Engineering Master Process
+Version 4 · A unified, step-by-step methodology integrating Documentation-Driven Development,
+the 7-Phase AI Framework, Big-Tech design-doc standards, industry research on AI-assisted
+development, and field-tested improvement notes
+Sources: DDD Series (3-part) · 7 Phases of AI-Driven Development · How Big Tech Writes Production-Grade Design Docs ·
+Improvement Notes v1 & v2 · AI-Assisted Development Best Practices: Repository Design and Agent Workflows (2024–2026)
+How to Read This Document
+This process synthesises five sources into a single, opinionated workflow for building software with AI coding agents. It is
+structured as 8 phases (0–7), each subdivided into lettered steps. Phases 0–3 are largely sequential; Phases 4–5 form a
+tight iterative loop that repeats per endpoint/feature; Phases 6–7 run in the background throughout.
+Colour coding: blue callouts are informational notes, amber are warnings/pitfalls, green are actionable tips from the
+improvement notes, and purple callouts mark additions introduced in v4.
+Overall Process Map
+P
+ha
+se
+Name
+When
+Key Output
+0
+Foundation & Tooling
+Once per project
+Repo structure, AGENTS.md/CLAUDE.md, Docker stack,
+pre-commit script
+1
+Discovery & Design
+Before any code
+Figma designs, ERD, research.md, schema/model split defined
+2
+Production-Grade
+Documentation
+Before first ticket
+PRD, Goals/Non-Goals, ADRs, Overleaf TDD, SDD decision,
+Kanban seeded
+3
+Planning & Dependency
+Ordering
+After docs are ready
+Ordered kanban board, steering/delegating decision,
+specialist-agent review, base-first sequence
+4
+Per-Endpoint TDD Loop
+For every endpoint —
+repeated
+Factories, failing tests, implementation, passing tests, context
+hygiene, hallucination audit, docs updated
+5
+Integration, QA & Audit
+After every batch of
+endpoints
+Full suite green, AI-specific metrics, C.L.E.A.R. review, security
+audit, perf baseline, human QA
+6
+Observability &
+Deployment
+Parallel to
+development
+Health checks, structured logging, SLOs, CI/CD pipeline
+7
+Process Evolution
+Continuous — after
+every session
+Updated CLAUDE.md/AGENTS.md, updated SOPs, continuation
+prompt, session reset
+ 0
+Phase 0 — Foundation & Tooling
+Set up the project skeleton before touching any business logic.
+Sources: DDD §6, Improvement Notes v1 & v2, AI-Assisted Development Best Practices 2024–2026
+
+AI-Engineering Master Process v4
+Page 2
+Everything built in this phase is reusable across projects. Invest time here once and every subsequent project starts
+faster.
+A Repository Structure
+Create the standard folder layout before writing any code:
+docs/
+  requirements/   # PRD, overview, MVP scope
+  tasks/          # epics (folders) + standalone stories (.md)
+  best-practices/ # SOPs, coding standards, agent workflows
+  adr/            # Architecture Decision Records (MADR format)
+  schemas/        # API schema definitions per endpoint
+  context/        # agent_docs/ — progressive disclosure files
+assets/
+  figmas/         # exported PNGs from Figma
+  calls/          # discovery call transcripts
+  research/       # sprint-scoped research.md files
+[framework-docs]/ # local copy of boilerplate/framework docs
+tests/
+  unit/
+  integration/
+  e2e/
+  fixtures/       # modular conftest fixtures (db.py, mocks.py ...)
+  factories/      # test data factories (one file per model)
+scripts/          # pre-commit, audit, check scripts
+AGENTS.md         # canonical agent instructions (all tools read)
+CLAUDE.md         # reads @AGENTS.md or symlink
+✔■ Commit this skeleton as the very first commit — it anchors the agent's mental model of the project from
+session 1.
+B Docker Stack & Environment Variables
+Define docker-compose.yml with all services before writing application code. This forces you to think about infrastructure
+dependencies early.
+ Include: app service, database (Postgres), cache/broker (Redis), any third-party service mocks.
+ Create a minimal working docker compose up that starts all services and passes a health check — even before any
+endpoints exist.
+ Separate env files: .env.dev, .env.test, .env.prod. Commit the templates, never the secrets.
+ Document in docs/best-practices/env-management.md: which variables go in which file, how to load them locally vs.
+in CI, rotation policy.
+■■ Never hardcode secrets or connection strings. Define the pattern in best-practices/ so every agent session
+knows the rule.
+C CLAUDE.md — Agent Entry-Point File
+CLAUDE.md is read automatically by Claude Code at the start of every session. Keep it structured, concise, and
+evolvable. Define a fixed section format so update prompts preserve the structure and never rewrite the whole file freely.
+
+AI-Engineering Master Process v4
+Page 3
+# CLAUDE.md
+## Project Overview
+[2-sentence description of what the system does and for whom]
+## Canonical Agent Instructions
+Read @AGENTS.md for build steps, test commands, and conventions.
+## Tech Stack
+[language, framework, DB, broker, hosting]
+## Repository Structure
+[one-liner per folder]
+## Coding Standards
+[naming, formatting, import order, typing rules]
+## Mandatory Verification Steps (run after EVERY task)
+1. ruff check .
+2. mypy .
+3. pytest tests/ -x --tb=short
+4. docker compose up --build -d && curl localhost:PORT/health
+## Session Protocol
+[one-task-per-session rule, continuation prompt requirement]
+## Known Constraints
+[env vars approach, secrets strategy, external APIs]
+## Common Hurdles
+# Log every problem that took >30 min, any unexpected API behaviour,
+# and any architectural decision change.
+✔■ Keep CLAUDE.md under 200 lines. Once Common Hurdles grows beyond ~20 entries, move it to
+docs/best-practices/common-hurdles.md and reference it with an @filename link.
+D Pre-Commit Quality Script
+Create scripts/check.sh — the single command that must pass before every commit and before every CI run:
+#!/usr/bin/env bash
+set -e
+echo '=== Ruff (lint + format) ==='
+ruff check . && ruff format --check .
+echo '=== MyPy (type check) ==='
+mypy .
+echo '=== Security — pip-audit ==='
+pip-audit
+echo '=== Security — Bandit ==='
+bandit -r src/ -ll
+echo '=== Tests + Coverage ==='
+pytest tests/ -x --tb=short --cov=src --cov-report=term-missing
+echo 'All checks passed.'
+✔■ Wire into pre-commit hooks (pre-commit library) AND GitHub Actions. Output format: document in
+best-practices/ so the agent knows how to interpret errors from each tool.
+
+AI-Engineering Master Process v4
+Page 4
+E Single Claude Project — Virtual Product Owner
+Create a single dedicated Claude (browser) project that acts as the Virtual Product Owner for the entire engagement.
+Upload all discovery assets to it once and keep it as the central requirements oracle:
+ Upload: Figma PNGs, ERD, user flow diagrams, call transcripts, any stakeholder notes.
+ Add custom instructions that tell it how to synthesise multiple calls on the same feature, always using the latest
+update.
+ Use this project to generate: project overview, phased MVP scope, epic list, and the requirements overview
+markdown.
+■■ From Improvement Notes v2: 'Create a single project in Claude.' This prevents context fragmentation across
+multiple ad-hoc conversations.
+
+AI-Engineering Master Process v4
+Page 5
+■ NEW IN v4
+F AGENTS.md — The Cross-Tool Agent Standard
+■ NEW IN v4 — Industry standard adopted by 60,000+ repositories, now stewarded by the Agentic AI Foundation
+under the Linux Foundation. Supported by Claude Code, Cursor, GitHub Copilot, Gemini CLI, Jules, and Devin.
+AGENTS.md is the single source of truth for agent instructions across all coding tools. CLAUDE.md should contain only a
+pointer to it. The recommended cross-tool repository layout is:
+/root
+■■■ AGENTS.md                    # Canonical instructions (all tools read)
+■■■ CLAUDE.md                    # 'Read @AGENTS.md' — or symlink
+■■■ .cursor/rules/core.mdc       # Cursor-specific MDC features
+■■■ .github/
+    ■■■ copilot-instructions.md  # References AGENTS.md content
+AGENTS.md must cover six core sections (GitHub's analysis of 2,500+ repositories):
+ Exact build/test/lint commands.
+ Testing patterns and marker strategy.
+ Tech stack with pinned versions.
+ Code style via real code snippets (not prose descriptions).
+ Git workflow conventions.
+ Three-tier behavioural boundaries: 'always do', 'ask first', 'never do'.
+Use progressive disclosure — keep the root AGENTS.md under 200 lines and point to focused files in docs/context/ for
+deeper content:
+# AGENTS.md (root — concise)
+## Build
+just check   # runs ruff + mypy + pytest + pip-audit
+## Test commands
+pytest -m 'not database'   # fast path (every commit)
+pytest                     # full suite (CI)
+## Extended context
+For API conventions, see @docs/context/api-patterns.md
+For architecture, see @docs/context/architecture.md
+■■ Anti-patterns to avoid: growing AGENTS.md to 400+ lines by appending a rule for every agent mistake;
+documenting file paths that will change; telling agents what NOT to do without providing alternatives; embedding
+entire files via @-mentions on every invocation.
+
+AI-Engineering Master Process v4
+Page 6
+■ NEW IN v4
+G Conftest Modularisation Rule
+■ NEW IN v4 — A monolithic conftest.py is a maintenance hazard for any project with 15+ fixtures or 200+ lines.
+Modularise proactively.
+The threshold for splitting a conftest.py is 15+ fixtures or 200+ lines. Use a pytest_plugins list in the root conftest to import
+from a fixtures/ package:
+# tests/conftest.py  — root (minimal, only imports)
+pytest_plugins = [
+    "tests.fixtures.db",
+    "tests.fixtures.clients",
+    "tests.fixtures.factories",
+    "tests.fixtures.mocks",
+]
+# tests/fixtures/db.py — database engine + session fixtures
+# tests/fixtures/clients.py — sync_client, async_client
+# tests/fixtures.factories.py — User/asset/transaction factories
+# tests/fixtures/mocks.py — all external mock fixtures
+ Subdirectory conftest.py files hold domain-specific fixtures and overrides — pytest searches upward for fixtures
+automatically.
+ The factories/ folder at tests/factories/ follows entity-named modules: users.py, orders.py, incidents.py.
+✔■ Document in tests/fixtures/README.md: what each fixture file contains and what markers gate it. This file
+becomes the first thing a new developer (or agent) reads about the test infrastructure.
+
+AI-Engineering Master Process v4
+Page 7
+ 1
+Phase 1 — Discovery & Design
+Resolve uncertainty before writing specs. Prototype before documenting.
+Sources: 7-Phase Framework §1–3, DDD §7, Improvement Notes v2
+The costliest mistakes happen when documentation is written before the design is understood. This phase front-loads
+that understanding.
+A Idea Definition
+State the project intent clearly: full application, new feature, bug fix, or refactor. Answer three questions in writing:
+ What is the core problem being solved?
+ Who are the users and what do they do?
+ What does success look like (measurable outcomes)?
+■■ This becomes the seed for the PRD in Phase 2. Write it in docs/requirements/overview.md as a rough draft —
+even 5 sentences is enough.
+B Research Phase (when needed)
+Run a research phase whenever the idea involves external APIs, uncommon libraries, or explore phases that would be
+expensive to repeat in each fresh context window:
+ Use an agent to gather API docs, integration patterns, and gotchas.
+ Write assets/research/[topic]-research.md and commit it.
+ Sprint-scope all research: mark each file with '# Valid until: [feature name] ships' and archive it on completion.
+■■ Research that stays in the repo permanently rots and causes agents to take wrong turns. Never let it become
+permanent documentation.
+C Figma Design — Use Religiously
+Create Figma assets for every user-facing element and every key system diagram before implementation. Export all as
+PNGs into assets/figmas/.
+ Information Architecture: all screens and how they connect.
+ User Flow Diagrams: what each user type can do, step by step.
+ Entity-Relationship Diagram (ERD): all entities and their relationships.
+ API Flow Diagrams: request/response flows for key endpoints.
+ Architecture diagrams: C4 L1 context and C4 L2 container maps.
+✔■ A diagram the agent can see = dramatically fewer structural mistakes. Upload all PNGs to the Virtual Product
+Owner project (Phase 0E) alongside call transcripts to generate requirements.
+D Prototype (when imposing taste)
+Before writing the PRD, prototype any decision where the right approach is not yet clear — UI layouts, architectural
+patterns, or external service integrations:
+ Create a throwaway branch or route. Ask the agent to show multiple variants.
+
+AI-Engineering Master Process v4
+Page 8
+ Iterate across 1–2 sessions. Pick the best approach.
+ Commit the winning prototype to the repo so the execution agent has a concrete reference during implementation.
+■■ Prototyping before the PRD prevents overly abstract specs. The PRD should describe something you have
+already seen, not imagined.
+E Schema vs. Model Separation
+Define the separation between database models and API schemas explicitly before writing any code. Document the
+pattern in docs/best-practices/schema-model-separation.md:
+ Models (SQLAlchemy / ORM): represent database entities. Fields map 1:1 to DB columns.
+ Schemas (Pydantic / FastAPI): represent API input, output, and update payloads. Each endpoint gets its own
+schemas: Request, Response, Update.
+class UserModel(Base):          # database entity
+    id: UUID
+    email: str
+class UserCreateSchema(BaseModel):  # API input
+    email: EmailStr
+class UserResponseSchema(BaseModel): # API output
+    id: UUID
+    email: str
+class UserUpdateSchema(BaseModel):   # PATCH payload
+    email: EmailStr | None = None
+
+AI-Engineering Master Process v4
+Page 9
+ 2
+Phase 2 — Production-Grade Documentation
+Write the spec before the code. Trade-offs are the core content.
+Sources: DDD §7–8, 7-Phase §4, Big Tech Design Docs, AI-Assisted Development Best Practices
+This phase produces the authoritative written foundation the agent reads at the start of every session. Quality here
+compounds across the entire project.
+A Goals & Non-Goals (Google pattern)
+Add this section first — before any other documentation. It prevents scope creep and aligns every reviewer:
+ Goals: what this project/sprint/feature will accomplish, stated as measurable outcomes.
+ Non-Goals: things that could reasonably be goals but are explicitly out of scope.
+ Commit to docs/requirements/overview.md.
+■■ Non-goals are often more valuable than goals. They answer every reviewer's question: 'Did they think about X?'
+— Yes, and they chose not to.
+B PRD — Product Requirements Document
+Use a dedicated 'write PRD' prompt/skill that grills you on every decision branch. The agent must ask clarifying questions
+before generating content:
+ User flows per role: what each user type can do and cannot do.
+ Edge cases, error states, and boundary conditions per feature.
+ API contract sketches: endpoints, HTTP methods, Query/Path/Body parameters explicitly labelled, request/response
+shape.
+ Alternatives considered: why this design over others. This is the single most important section per
+Google/Amazon/Stripe.
+✔■ Prompt: 'Grill me on every decision in this PRD. Ask one question at a time and wait for my answer before
+proceeding.'
+C Architecture Decision Records (ADRs)
+One ADR per major technical decision. Use MADR format. Store in docs/adr/. Minimum ADRs:
+ ADR-001: Framework choice — drivers, trade-offs, consequences.
+ ADR-002: Database — ACID, ORM support, JSONB, full-text search.
+ ADR-003: Task queue (Celery/Redis vs BackgroundTasks) — reliability, retry logic.
+ ADR-004: Hosting/deployment — Docker Compose vs Kubernetes vs managed PaaS.
+ ADR-005: Secrets management strategy.
+D Technical Design Document (TDD) in Overleaf
+Using the established Overleaf project structure, produce the full TDD. Sections to complete before coding begins:
+ 01 Introduction · 02 Goals & Non-Goals · 03 Requirements (functional + NFRs as measurable quality attribute
+scenarios).
+ 05 Database (ER diagram, data dictionary, migration strategy).
+
+AI-Engineering Master Process v4
+Page 10
+ 06 Technical Design: C4 L1 context + C4 L2 container, 3-layer architecture, task state machine if applicable.
+ 08 Cross-cutting concerns: logging, error handling, caching, transaction management.
+ 09 ADRs · 10 Testing Strategy · 11 Observability · 12 Risks & Tech Debt.
+ 13 API Spec: every endpoint with path, HTTP method, Query/Path/Body parameters explicitly labelled,
+request/response schema, error catalogue, example curl.
+■■ The API spec is the contract the agent codes to. Detail = fewer hallucinations. Always label: Query param, Path
+param, Body field.
+E Observability Design (designed here, implemented in Phase 6)
+Document the observability plan before implementation in docs/requirements/observability.md and Overleaf §11:
+ Define 2 SLIs: Availability (% responses < 500) and Latency (p99 < threshold).
+ Set SLO targets and error budget policy.
+ Define 4 alert severity tiers: P1 page immediately → P2 30 min → P3 4 hrs → P4 next BD.
+ Specify 3 health check endpoints: /health/live, /health/ready, /health/deep.
+ Define structured JSON log schema: timestamp, level, service, correlation_id, message, env. Explicitly document
+what NOT to log: PII, secrets, tokens.
+■ NEW IN v4
+F Spec-Driven Development — Maturity Decision
+■ NEW IN v4 — SDD is the dominant structured methodology for AI-assisted development (GitHub Spec Kit, AWS
+Kiro, JetBrains Junie). Knowing when to apply it is as important as knowing how.
+Before opening any Phase 4 ticket, classify the task on the SDD maturity spectrum and choose the appropriate workflow
+depth:
+Task type
+SDD depth
+Workflow
+Bounded, well-understood
+(bug fix, CRUD endpoint
+from existing schema)
+Spec-First (light)
+Go directly to Phase 4. Story file + acceptance criteria are sufficient.
+Medium complexity, some
+ambiguity (new feature,
+external API integration)
+Spec-Anchored
+Run /specify → /plan before Phase 4. Maintain spec for governance as
+code evolves.
+Cross-cutting,
+architecturally significant, or
+novel domain
+Full Spec Kit
+Run the four-phase loop: /specify → /plan → /tasks → /implement.
+Spec becomes the contract.
+■■ ThoughtWorks Technology Radar warning: SDD workflows can be 'overly rigid'. For medium tasks, the time to
+run and review a full spec can equal the time to implement with plain AI-assisted coding. Calibrate depth to task
+complexity — do not apply the full spec loop to every ticket by default.
+
+AI-Engineering Master Process v4
+Page 11
+ 3
+Phase 3 — Planning & Dependency Ordering
+Break the PRD into ordered tickets. Base features first, always.
+Sources: 7-Phase §5, DDD §8, Improvement Notes v1 & v2, AI-Assisted Dev Best Practices
+A Database Models First
+Before any endpoint work, implement and migrate all database models. This resolves import dependencies that would
+block every subsequent task:
+ Generate models from the ERD (Phase 1C). One model class per entity.
+ Apply migrations. Verify DB connectivity via /health/ready.
+ Write model-level unit tests (field validation, constraints, relationships).
+ Create tests/factories/ — one factory file per model. This is a prerequisite for all subsequent tests.
+■■ Never start endpoint implementation before models are migrated and factories exist. Tests written without
+factories produce untestable, fragile test data.
+B Kanban Board Construction
+Use the PRD-to-issues skill to generate the kanban board. Use Linear (preferred) or GitHub Issues:
+ One ticket per endpoint (or per logical unit of work).
+ Assign explicit blocking relationships: no endpoint ticket can be opened until its dependency tickets are closed.
+ Label tickets by layer: Model → Schema → Endpoint → Test → Docs.
+ Each ticket must state: path, HTTP method, request params (labelled Query/Path/Body), response schema
+reference, acceptance criteria.
+C Dependency Ordering — Base Features First
+Priority
+Type
+Rationale
+1st
+Auth & User management
+Every other endpoint depends on auth middleware
+2nd
+Core entity CRUD (no FK to other
+app entities)
+Base data that other features reference
+3rd
+Relationship endpoints (FK to
+already-built entities)
+Dependencies are now resolvable
+4th
+Complex flows (multi-entity, async,
+external API)
+All building blocks exist
+Last
+Admin / reporting endpoints
+Depend on all other data being present
+D Specialist Agent Review (optional but recommended)
+Before execution begins, optionally invoke specialist AI agents to review the plan from different methodological
+perspectives:
+ Architecture agent: 'Review this plan against SOLID principles and identify coupling risks.'
+ Security agent: 'Identify authentication, authorisation, and injection risks in the endpoint plan.'
+
+AI-Engineering Master Process v4
+Page 12
+ TDD agent: 'Review the test ordering. Are dependencies respected? Are acceptance criteria testable?'
+ Capture any changes as ADR updates or best-practice amendments.
+■■ From Improvement Notes: 'Create agents of specialists in certain project methodologies to opine on the best
+way to program a project.'
+■ NEW IN v4
+E Steering vs. Delegating — Autonomy Decision
+■ NEW IN v4 — Before assigning any ticket to an agent, classify it on the autonomy spectrum. This decision
+determines session structure, review requirements, and risk tolerance.
+For each ticket, apply this decision rule before opening a Phase 4 session:
+Mode
+When to use
+Session structure
+Steering (pair-pro
+gramming)
+Ambiguous scope; cross-cutting
+concerns; architecturally significant;
+requires judgment calls the agent
+cannot make alone.
+Interactive back-and-forth. Human approves each sub-step.
+Agent proposes, human decides.
+Delegating (write
+spec → assign →
+review PR)
+Well-defined, bounded scope; bug fixes;
+feature-flag cleanup; reference-based
+changes; anything with complete
+acceptance criteria.
+Agent runs Phase 4 A–H autonomously. Human reviews the
+completed PR before merge.
+Anthropic's research found that developers can fully delegate only 0–20% of tasks without supervision. When in doubt,
+steer.
+■■ Mistaking a steering task for a delegating task is the most common source of long sessions with compounding
+context errors. Apply this classification before every ticket, not after a session has gone wrong.
+
+AI-Engineering Master Process v4
+Page 13
+ 4
+Phase 4 — Per-Endpoint TDD Loop
+One endpoint at a time. Tests before code. Document after each chunk.
+Sources: DDD §9, 7-Phase §6, Improvement Notes v1 & v2 (extensive)
+This is the core execution loop. It repeats for every single endpoint. Do not batch multiple endpoints in one session. Do
+not skip the test step. Do not skip the documentation step.
+Quantitative backing (METR research): doubling task duration quadruples the failure rate — a non-linear relationship.
+Sub-400 lines of code per increment is the practical target. This is why the one-endpoint-per-session rule is non-negotiable.
+A Start a Fresh Agent Session
+Open a new Claude Code session. Provide the continuation prompt from the previous session (or generate a seed
+prompt for the first):
+Implement the endpoint described in @docs/tasks/[epic]/[story].md
+Follow the workflow defined in @docs/best-practices/ai-agent-task-workflow.md
+Coding standards are in CLAUDE.md. Extended context is in AGENTS.md.
+Do NOT proceed to implementation until you have asked clarifying questions.
+ Agent reads AGENTS.md, CLAUDE.md, the story file, and the best-practices workflow.
+ Agent asks clarifying questions before writing any code.
+ Human resolves ambiguities concisely and explicitly.
+■■ Never chain multiple endpoints in one session. The hallucination rate increases with context length. One
+endpoint = one session.
+B Define Test Cases Before Implementation
+Before the agent writes any implementation code, define all test cases for the endpoint. Order: simple → complex,
+respecting dependencies:
+Test category
+What to cover
+Example
+Happy path
+Successful request with valid data
+POST /users → 201 + UserResponseSchema
+Input validation
+Each required field missing or
+malformed
+POST /users missing email → 422
+Auth & permissions
+Unauthenticated, wrong role
+GET /admin/users without token → 401
+Business rules
+Domain constraints (unique email,
+etc.)
+POST /users duplicate email → 409
+Database interaction
+Confirm DB write/read occurred
+correctly
+User row exists after POST
+Error handling
+External dependency failure,
+timeout
+DB unavailable → 503, not 500
+■■ Document the test plan in the story file before generating test code.
+
+AI-Engineering Master Process v4
+Page 14
+C Create Factory & Write Failing Tests
+Factories come first. Tests come second. Implementation comes third:
+ Factory: create or update the factory class in tests/factories/ for any model this endpoint reads or writes.
+ Test file: one file per path. Write all test functions as defined in Step B. Use factories for all test data — no inline dict
+literals.
+ Run the tests: all must fail (RED). If any pass without implementation, the test is wrong.
+✔■ 'Add a step for building factories for test data creation — Factory creation!!!' (Improvement Notes v1)
+D Implement the Endpoint
+Now the agent implements the endpoint. It has: the story file (acceptance criteria), the failing tests (contract), the factory
+(data patterns), the schema definitions, and the model:
+ Agent implements router, service/handler, schema, and any DB query.
+ Agent does NOT change the test file during implementation.
+ Agent runs mandatory verification steps from CLAUDE.md after implementation: ruff, mypy, pytest.
+ Agent self-fixes any lint or type errors before requesting human review. Error messages should be explained with
+choices and rationale, not just corrected silently.
+■■ From Improvement Notes v2: 'Execute one route at a time. Do not forget TDD first!' and 'Detail how to determine
+each part of the request patterns (explicitly put Query, Body, …)'
+E Verify & Document
+Once all tests pass (GREEN), complete verification then document:
+ Human reviews: does the endpoint behave correctly in the running app? Does the response shape match the TDD
+API spec?
+ Agent updates the story file: marks story Done, notes any deviations.
+ Documentation chunk: agent creates or updates docs/schemas/[path-name].md.
+ Agent updates Overleaf TDD §13 if implementation deviated from design.
+✔■ From Improvement Notes v1: 'Create, document, create, document…. Add a documentation step after each
+chunk of work.'
+F Commit & Generate Continuation Prompt
+After docs are updated:
+ Agent stages all changes (code + tests + docs + story status update).
+ Agent generates a detailed commit message: what was implemented, what tests cover it, what docs were updated.
+ Agent generates the continuation prompt for the next session, referencing the next story file and the task-workflow
+best-practices doc.
+ Human copies the prompt. Agent session ends. New session starts with the prompt — new agent onboarded
+instantly.
+
+AI-Engineering Master Process v4
+Page 15
+■ NEW IN v4
+G Context Management Protocol
+■ NEW IN v4 — Context management is the new performance engineering. Every frontier LLM degrades as context
+grows — beginning well below claimed context limits. Managing this proactively is as important as writing good
+prompts.
+Apply these protocols during every Phase 4 session:
+ Start fresh or compact at 50–70% context capacity for complex reasoning tasks — not at 95%. Claude Code's
+auto-compact triggers at 95% but that is often too late.
+ Use Document and Clear: have the agent dump its plan and progress into a .md file, run /clear, start a fresh
+session pointing at the file. This creates durable external memory that survives resets.
+ Use /compact for mid-task compression — it retains files being worked on, decisions made, and task state while
+discarding conversational back-and-forth.
+ Use Plan mode (Shift+Tab in Claude Code) to separate thinking from execution. This reduces token consumption
+by 40–60% on complex tasks.
+The four context failure modes to recognise and name:
+Failure mode
+What it looks like
+Response
+Poisoning
+A hallucination entered context early
+and is being repeated as fact across
+subsequent steps.
+Stop. Run /clear. Restart from last known-good checkpoint in git.
+Distraction
+Agent repeats past actions or
+solutions instead of synthesising a
+new approach.
+Compact context (/compact). Explicitly re-state the current task goal.
+Confusion
+Irrelevant context from unrelated files
+or sessions generates low-quality
+responses.
+Start a fresh session. Load only the files directly relevant to this task.
+Clash
+Contradictory information in different
+parts of context (e.g. old spec vs.
+new spec).
+Resolve the contradiction in writing before proceeding. Update
+AGENTS.md if it is a recurring source of conflict.
+■■ Context poisoning is the most insidious failure mode — it can take many subsequent steps to undo.
+Prevention: frequent fresh sessions, progress checkpointed to external files and git after every meaningful
+increment.
+
+AI-Engineering Master Process v4
+Page 16
+■ NEW IN v4
+H Dependency Hallucination Audit
+■ NEW IN v4 — USENIX Security 2025 found a 19.7% average package hallucination rate across 576,000 code
+samples. Prompts asking for libraries 'from 2025' produce hallucinated packages in up to 84% of tasks.
+Before the commit in step F, perform a mandatory dependency audit on every new library reference the agent introduced
+in this session:
+# Verify every new package the agent introduced actually exists
+pip-audit                          # checks for known CVEs too
+pip install --dry-run <package>    # confirms package exists on PyPI
+# For Node.js projects
+npm audit                          # security scan
+npm install --dry-run <package>    # confirms package exists on npm
+ Check that the agent did not invent a plausible-sounding package name that does not exist ('slopsquatting' attack
+surface).
+ Verify that pinned versions exist — agents frequently reference version numbers that were never published.
+ For any library the agent cited from context files or research docs, verify the citation against the actual library's
+current documentation.
+■■ This audit takes under 2 minutes but prevents 'slopsquatting' supply-chain risks — where a hallucinated
+package name is later registered by a malicious actor. Make it a non-negotiable gate, not an optional step.
+
+AI-Engineering Master Process v4
+Page 17
+ 5
+Phase 5 — Integration, QA & Audit
+Human-driven quality gates after every batch of endpoints.
+Sources: 7-Phase §7, Big Tech Design Docs, Improvement Notes v1, AI-Assisted Dev Best Practices
+Run this phase after every meaningful batch of endpoints (typically after closing a full epic). It feeds new tickets back into
+the Phase 4 loop.
+A Full Test Suite Run
+ Run scripts/check.sh — all checks must pass (ruff, mypy, pip-audit, bandit, pytest).
+ Review coverage report: aim for 80%+ on business logic layers.
+ Run integration tests against a real DB and real Redis (not mocks).
+ Run contract tests if external APIs are involved (Pact framework).
+ Run e2e tests for critical user journeys: login flow, primary CRUD, async task lifecycle.
+ File new kanban tickets for any failing tests or coverage gaps.
+B Security Audit
+ pip-audit: check all dependencies for known CVEs.
+ bandit: static analysis for SQL injection, hardcoded secrets, unsafe deserialization.
+ Semgrep (if in CI): pattern-based security scanning.
+ Manual check: verify all endpoints enforce authentication and authorisation.
+ Verify .env files are not committed: git log --all --full-history -- .env
+■■ From Improvement Notes: 'Create a specific agent to run tests and diagnose problems (security, latency).'
+Agents that explain choices and why are more useful than agents that fix silently.
+C Performance Baseline
+ Run a basic load test (Locust or k6) against the running Docker stack.
+ Record p50/p95/p99 latency per endpoint. Compare against SLO targets from Phase 2E.
+ Flag any endpoint exceeding the latency budget. File a kanban ticket.
+ Document results in docs/requirements/performance-baseline.md.
+D Agent QA Plan + Human Walkthrough
+Ask the agent to produce a structured QA checklist for all completed endpoints. A human (not the agent) then walks
+through it:
+ Does the running app match the PRD and the Figma designs?
+ Are all user flows from the information architecture reachable?
+ Do error messages match the error catalogue in the API spec?
+ Is the UI/response shape consistent across similar endpoints?
+ File every finding as a new kanban ticket. Re-enter Phase 4 loop for each ticket.
+
+AI-Engineering Master Process v4
+Page 18
+■ NEW IN v4
+E AI Code Review Protocol — C.L.E.A.R. Checklist
+■ NEW IN v4 — AI-generated code requires a different review approach than human-written code. Three unique
+failure modes: comprehension gap (reviewer wasn't in the prompting session), false confidence (AI code looks
+professional regardless of correctness), and bulk-generation fatigue (more code per PR than a human would write).
+Apply the C.L.E.A.R. framework to every PR containing AI-generated code:
+Dimension
+What to verify
+C — Context
+Does the implementation match the original intent? Does the reviewer understand what the agent was
+prompted to do? Check the story file and the commit message.
+L — Logic
+Is the business logic correct — not just syntactically valid? Trace through the happy path and at least one error
+path manually.
+E — Efficiency
+Are there N+1 queries, unnecessary loops, or repeated DB calls? AI agents frequently generate
+working-but-inefficient patterns.
+A —
+Architecture
+Does the code respect the established patterns (schema/model split, service layer, dependency injection)?
+Check for coupling violations.
+R — Reliability
+Are error cases handled? Are exceptions caught at the right layer? Are timeouts, retries, and fallbacks present
+where needed?
+Additional checklist items for AI-generated code specifically:
+ Verify all library references introduced in this PR actually exist (cross-reference with the Phase 4H dependency
+audit).
+ Check for duplicated logic — AI agents have a measured eightfold increase in code duplication compared to pre-AI
+baselines.
+ Verify test assertions are substantive: status code + body structure + field values + DB state. Status-code-only tests
+are 'security theatre testing'.
+ Never skip human review for code touching authentication, payments, or security. This is a non-negotiable rule
+regardless of AI confidence levels.
+F Documentation Sync
+After QA, synchronise all documentation with the actual implementation:
+ Update Overleaf TDD §13 (API Spec) with any deviations found during QA.
+ Update ADRs if implementation decisions changed during development.
+ Update Risks & Tech Debt register (Overleaf §12) with new tech debt.
+ Update AGENTS.md / CLAUDE.md and any best-practices docs with lessons learned.
+ Commit all documentation changes before starting the next batch.
+
+AI-Engineering Master Process v4
+Page 19
+ 6
+Phase 6 — Observability & Deployment
+Implement what was designed in Phase 2E. Run in parallel with development.
+Sources: Big Tech Design Docs (observability section), DDD §6, Improvement Notes v2
+These tasks do not block endpoint development but must be completed before any production deployment. Wire them
+into CI/CD from the start.
+A Health Check Endpoints
+ /health/live: liveness — process is running, no dependency checks. Returns 200 always.
+ /health/ready: readiness — verifies DB, Redis, and critical services. Returns 200 or 503.
+ /health/deep: returns JSON with individual dependency status and latency. Used for debugging.
+ Wire all three into docker-compose healthcheck config.
+B Structured Logging
+ Use structlog (Python) or equivalent. Output: pretty-printed in dev, JSON in production.
+ Every log entry must include: timestamp (ISO 8601 UTC), level, service name, correlation_id, message,
+environment.
+ Propagate correlation_id from HTTP request headers into all downstream calls.
+ Document what NOT to log: passwords, tokens, API keys, PII, full request bodies with secrets.
+C CI/CD Pipeline
+Trigger
+Stage
+Tests run
+Every push to any branch
+Fast feedback
+ruff, mypy, unit tests only
+Pull Request to main
+Full CI
+All checks: ruff, mypy, pip-audit, bandit, integration tests, coverage
+Merge to main
+Deploy to staging
+All CI + e2e tests against staging environment
+Manual / tag
+Deploy to
+production
+Smoke tests against production health endpoints
+D Alerting & Runbooks
+ Implement the 4-tier alerting strategy from Phase 2E.
+ Every alert must have: owner, severity, linked runbook, and be actionable. Alert on symptoms.
+ Key alert rules: API error rate > 5% for 5 min (P1), p99 latency > 2s for 10 min (P2), queue depth > 1000 for 15 min
+(P2), disk > 90% (P2), DB pool > 80% (P3).
+ Critical runbooks: deployment, rollback, DB migration, worker scaling, disaster recovery.
+ Incident response: Detection → Triage → Communication → Containment → Resolution → Recovery →
+Post-Incident Review (blameless postmortem within 48 hours).
+
+AI-Engineering Master Process v4
+Page 20
+ 7
+Phase 7 — Process Evolution
+Every mistake is a trigger to improve the SOP that governs that behaviour.
+Sources: DDD §12, 7-Phase §rationale, Improvement Notes v1 & v2
+This phase is continuous — it runs after every session, not just at the end of the project. It is what transforms a one-time
+workflow into a compounding advantage.
+A Session Reset Discipline
+ End every agent session as soon as its single task is complete.
+ Before ending: generate the continuation prompt. Before generating: ask the agent to review whether AGENTS.md
+or CLAUDE.md needs updating based on the session.
+ Use /compact with a targeted instruction before the final context grows too large.
+ Copy the continuation prompt. Open a new session. Paste it. New agent onboarded in seconds.
+■■ Fewer tokens in context = fewer errors, higher accuracy, better ROI. One task per session is the target.
+B AGENTS.md / CLAUDE.md Update Protocol
+When any agent makes a mistake, misses a step, or produces inconsistent output, update AGENTS.md or the relevant
+best-practices doc:
+ Identify which SOP governs the behaviour that failed.
+ Update the SOP. Use the agent to help write the new instruction.
+ Ask the agent to amend-commit the change to the previous commit.
+# Update prompt pattern
+Update AGENTS.md to add/modify [specific rule].
+Preserve the existing section structure exactly.
+Only change the [section name] section.
+Amend-commit the change to the previous commit.
+✔■ Split into multiple files if AGENTS.md grows beyond ~200 lines. Reference sub-files with @filename links from
+the root.
+C Post-Sprint Documentation Debt
+At the end of every sprint or feature batch, audit documentation completeness:
+ Are all implemented endpoints documented in docs/schemas/?
+ Is the Overleaf TDD updated to reflect the actual implementation?
+ Are all ADRs current? Did any decisions change?
+ Is the risks register updated with new tech debt?
+ Is the kanban board clean: closed tickets closed, new tickets filed?
+ Does AGENTS.md reflect the current project state accurately?
+D Automation Roadmap
+The long-term vision is to automate parts of this process using dedicated specialist agents. Prioritise in this order:
+
+AI-Engineering Master Process v4
+Page 21
+Priority
+Automation target
+How
+1st
+Pre-commit check agent
+Runs check.sh and explains each error with choices and rationale before commit
+2nd
+TDD generation agent
+Given a story file, auto-generates the test skeleton and factory stub
+3rd
+Documentation sync agent
+After each commit, updates the relevant schema doc and story status
+4th
+Security diagnosis agent
+Specialist agent for interpreting bandit/pip-audit output and suggesting fixes, including
+dependency hallucination checks
+5th
+Performance diagnosis
+agent
+Interprets Locust/k6 output and suggests optimisations
+6th
+Full project orchestrator
+Manages the kanban board, assigns tasks, and triggers sub-agents per Phase 4 loop
+
+AI-Engineering Master Process v4
+Page 22
+Quick Reference: Core Loop at a Glance
+Step
+Action
+Who?
+Output
+0A–G
+Repo, Docker, AGENTS.md, CLAUDE.md,
+check.sh, Claude project, conftest rule
+Human seeds,
+Agent helps
+Project foundation
+1A–E
+Idea, research, Figma, prototype,
+schema/model split
+Human drives,
+Agent assists
+Design clarity
+2A–F
+Goals/Non-Goals, PRD, ADRs, TDD,
+Observability design, SDD decision
+Agent drafts, Human
+approves
+Documentation foundation
+3A–E
+DB models + factories, kanban, dependency
+order, specialist review, steering decision
+Human orders,
+Agent generates
+Ordered kanban board
+4A
+Paste continuation prompt — new session
+Human
+Fresh agent context
+4B
+Define all test cases before any code
+Human defines,
+Agent documents
+Test plan in story file
+4C
+Create factory, write failing tests (RED)
+Agent writes, Human
+verifies RED
+Failing test suite
+4D
+Agent codes endpoint; runs ruff/mypy/pytest
+Agent
+Passing tests (GREEN)
+4E
+Human reviews app; agent docs endpoint
+Human verifies,
+Agent documents
+Endpoint doc + story Done
+4F
+Commit with detailed message; generate next
+prompt
+Agent
+Committed code + next session seed
+4G
+Context hygiene check — compact or clear if
+>50–70%
+Agent + Human
+Clean context for next sub-task
+4H
+Dependency hallucination audit — verify all
+new libs
+Human
+Confirmed dependencies
+5A–F
+Full suite, AI metrics, C.L.E.A.R. review,
+security, perf, human QA, doc sync
+Agent plans, Human
+walks
+New tickets + updated TDD
+6A–D
+Health checks, logging, CI/CD, alerting
+Agent implements,
+Human wires CI
+Observable, deployable app
+7A–D
+Session reset, AGENTS.md updates, debt
+audit, automation
+Human
+orchestrates, Agent
+updates
+Compounding process improvement
+
+AI-Engineering Master Process v4
+Page 23
+Development-Process Health Dashboard
+Review at the start of every Phase 5 (QA batch) and at the end of every sprint. Any metric in the Alert column signals a
+process problem, not just a quality gap. Metrics in purple are new in v4.
+Metric
+Target
+Alert threshold
+What it signals when triggered
+CI pipeline time
+< 60 s
+> 2 min
+Tests are too slow or too many — developers stop running
+them locally
+Test / code ratio
+> 1.5×
+< 1.0×
+Under-tested codebase; agent changes become undetected
+regressions
+Line coverage
+> 80%
+< 70%
+Business logic paths are unverified; QA phase will find many
+issues
+Branch coverage
+> 70%
+< 60%
+Edge cases and error branches are untested
+Business-logic coverage
+95%+
+< 85%
+Core domain rules are not enforced by tests — critical for
+correctness
+Maximum file size (LOC)
+< 300
+> 500
+Agent is stacking code. Trigger immediate refactoring before
+continuing
+Time between commits
+< 30 min
+> 2 h
+Tasks are too large, or the agent loop is stuck. Reset
+session and decompose
+Security warnings
+0
+Any
+undocumented
+Vulnerability introduced. Must be resolved or risk-accepted
+before next commit
+Duplicate method count
+0
+> 1
+DRY violation. Extract to shared concern before the pattern
+spreads
+Nesting depth
+≤ 3
+> 3
+Complex conditional logic. Refactor to early returns or
+extracted methods
+Code acceptance rate
+25–35%
+< 25% or > 45%
+Below 25%: agent suggestions are low quality. Above
+45%: developers accepting AI output without critical
+evaluation.
+Code churn rate (rework)
+Baseline ±
+10%
++40% above
+baseline
+AI-generated code has a measured 41% higher churn
+rate. Rework rate is the canary for AI-induced quality
+debt.
+Assertion depth
+(endpoint tests)
+Status +
+body + DB
+state
+Status code only
+'Security theatre testing' — 90%+ coverage that only
+proves code runs, not that it is correct. Apply C.L.E.A.R.
+checklist (Phase 5E).
+Duplication count
+0 duplicate
+blocks
+> 2 identical
+blocks
+AI tools produce an eightfold increase in duplicated
+code. Track this explicitly — do not rely on subjective
+code review alone.
+✔■ Akita rule of thumb: Frequent 2-minute surgical refactoring beats an emergency hours-long surgery every time.
+If file size or nesting depth exceeds the alert threshold mid-session, stop the current task and refactor before
+continuing.
+
+AI-Engineering Master Process v4
+Page 24
+Non-Negotiable Rules
+Rules marked ■ NEW were added in v4 based on 2024–2026 industry research.
+Rule
+Why
+One endpoint per agent session
+Context length drives hallucination rate. One task = shorter context = fewer errors.
+Tests before implementation —
+always
+Tests written after implementation are green by accident. RED → GREEN is the only
+valid sequence.
+Factories before tests
+Inline test data creates invisible coupling. Factories make data patterns explicit and
+reusable.
+Figma before code
+An agent that can see a design makes far fewer structural mistakes than one working
+blind.
+Models before endpoints
+Import dependencies flow upward. Models must exist before schemas, schemas
+before endpoints.
+Document each chunk
+Documentation written weeks after implementation is always wrong. Write it
+immediately.
+Never commit without check.sh
+passing
+Every broken commit that reaches CI costs more to fix than it would have cost to
+prevent.
+AGENTS.md has a fixed section
+format
+Unstructured updates produce agents that misread their own instructions. Use the
+update prompt pattern.
+Log every hard problem in
+Common Hurdles
+Any problem that took >30 min or any unexpected API behaviour must be logged. The
+next agent session starts already knowing the answer.
+Research is sprint-scoped
+Stale research causes agents to take wrong turns. Archive it when the feature ships.
+Trade-offs must be documented
+The lasting value of a design doc is not what was built, but why this over alternatives.
+Specialist agents for diagnosis
+Error-fixing agents that explain choices and rationale outperform those that fix silently.
+Refactor before the file hits 300
+LOC
+At 500 LOC the agent starts stacking code in the existing file instead of extracting
+concerns. Refactor early — 2 minutes now beats 2 hours later.
+■ NEW — Never skip human review
+for auth, payments, or security
+AI code looks clean regardless of correctness. False confidence is the failure mode —
+professional appearance is not a proxy for correctness.
+■ NEW — Measure rework rate, not
+just velocity
+Individual speed gains (20–55% faster) consistently fail to translate to organisational
+delivery improvements. Rework rate (unplanned deployments to fix issues) is the early
+warning signal for AI-induced quality debt.
+■ NEW — Name context failure
+modes before long sessions
+Poisoning, distraction, confusion, clash. Naming them makes them detectable
+mid-session. When you recognise a failure mode, apply the Phase 4G protocol
+immediately — do not continue into deeper context.
+■ NEW — Audit every new
+dependency the agent introduces
+19.7% average package hallucination rate (USENIX 2025). Verify every new library
+exists at the pinned version before committing. This takes 2 minutes and prevents
+supply-chain risk.
+Version 4 — Synthesised from: Documentation-Driven Development (3-part series) · The 7 Phases of AI-Driven Development · How Big
+Tech Writes Production-Grade Design Docs · Overleaf TDD Project README · Improvement Notes v1 & v2 · Framework Akita (Fábio
+Akita, AkitaOnRails.com, fev/2026) · AI-Assisted Development Best Practices: Repository Design and Agent Workflows (2024–2026
+industry research synthesis).

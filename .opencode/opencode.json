@@ -1,0 +1,11 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "tools": {
+    "bash": true,
+    "edit": true,
+    "read": true,
+    "list": true,
+    "grep": true,
+    "delete": false
+  }
+}
