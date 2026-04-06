@@ -1,0 +1,50 @@
+{
+  "date": "2026-04-06",
+  "ticket": "Ticket 1: API Client Infrastructure",
+  "verdict": "NEEDS_WORK",
+  "findings": [
+    {
+      "id": "L2",
+      "severity": "CRITICAL",
+      "category": "Logical",
+      "title": "Metrics accumulation across requests",
+      "location": "client.py:120, 194",
+      "description": "self.metrics.attempts is initialized once and never reset. Every call to request() appends to the same list, causing unbounded memory growth.",
+      "fix_needed": "Reset metrics.attempts at the start of each request() call"
+    },
+    {
+      "id": "R1",
+      "severity": "Medium",
+      "category": "Robust",
+      "title": "Connection errors not retried",
+      "location": "client.py:182-185",
+      "description": "Only httpx.TimeoutException is caught. Network errors (DNS, connection refused) propagate without retry.",
+      "fix_needed": "Document behavior or add retry for connection errors"
+    },
+    {
+      "id": "L1",
+      "severity": "Low",
+      "category": "Logical",
+      "title": "Unused TimeoutError class",
+      "location": "client.py:73-77",
+      "description": "Custom TimeoutError defined but never used. Code re-raises httpx.TimeoutException directly.",
+      "fix_needed": "Remove or use the TimeoutError class"
+    },
+    {
+      "id": "E1",
+      "severity": "Low",
+      "category": "Efficient",
+      "title": "get_wait_time() reads state without lock",
+      "location": "rate_limiter.py:140-149",
+      "description": "Diagnostic method reads tokens_available without holding lock. Low risk since it's not in critical path.",
+      "fix_needed": "Consider adding lock or document as diagnostic-only"
+    }
+  ],
+  "clear_checklist": {
+    "correctness": "PASS - Token bucket, retry logic, backoff all match spec",
+    "logical": "NEEDS_WORK - Metrics accumulation critical issue",
+    "efficient": "PASS - No significant concerns",
+    "adaptable": "PASS - Well-structured with dataclasses and factory functions",
+    "robust": "NEEDS_WORK - Connection errors not retried"
+  }
+}
