@@ -15,10 +15,10 @@ from src.collect.rate_limiter import TokenBucketRateLimiter
 if TYPE_CHECKING:
     from httpx._types import (
         AuthTypes,
-        Content,
         CookieTypes,
         HeaderTypes,
-        QueryParamsTypes,
+        QueryParamTypes,
+        RequestContent,
     )
 
 
@@ -68,13 +68,6 @@ class RetryableHTTPError(Exception):
     def __init__(self, attempts: list[dict[str, Any]]) -> None:
         self.attempts = attempts
         super().__init__(f"Failed after {len(attempts)} attempts")
-
-
-class TimeoutError(Exception):
-    """Raised when a request exceeds the configured timeout."""
-
-    def __init__(self, message: str = "Request timed out") -> None:
-        super().__init__(message)
 
 
 class RetryableHTTPClient:
@@ -162,6 +155,7 @@ class RetryableHTTPClient:
         client: httpx.AsyncClient,
         method: str,
         url: str,
+        request_attempts: list[dict[str, Any]],
         **kwargs: Any,
     ) -> httpx.Response:
         """Execute a single HTTP request and record metrics.
@@ -170,6 +164,7 @@ class RetryableHTTPClient:
             client: The httpx AsyncClient to use.
             method: HTTP method (GET, POST, etc.).
             url: Request URL.
+            request_attempts: List to accumulate attempt details for this request.
             **kwargs: Additional arguments passed to httpx.request.
 
         Returns:
@@ -191,7 +186,7 @@ class RetryableHTTPClient:
             "status_code": response.status_code,
             "duration": duration,
         }
-        self.metrics.attempts.append(attempt_info)
+        request_attempts.append(attempt_info)
 
         return response
 
@@ -200,9 +195,9 @@ class RetryableHTTPClient:
         method: str,
         url: str,
         *,
-        params: QueryParamsTypes | None = None,
+        params: QueryParamTypes | None = None,
         headers: HeaderTypes | None = None,
-        content: Content | None = None,
+        content: RequestContent | None = None,
         data: dict[str, Any] | None = None,
         json: dict[str, Any] | None = None,
         auth: AuthTypes | None = None,
@@ -234,6 +229,8 @@ class RetryableHTTPClient:
             httpx.TimeoutException: If the request times out.
         """
         client = await self._ensure_client()
+        request_attempts: list[dict[str, Any]] = []
+        last_exception: Exception | None = None
 
         for attempt in range(self.retry_config.max_attempts):
             await self._rate_limiter.acquire()
@@ -243,6 +240,7 @@ class RetryableHTTPClient:
                     client,
                     method,
                     url,
+                    request_attempts,
                     params=params,
                     headers=headers,
                     content=content,
@@ -252,26 +250,32 @@ class RetryableHTTPClient:
                     cookies=cookies,
                     follow_redirects=follow_redirects,
                 )
-            except httpx.TimeoutException:
-                raise
+            except httpx.TransportError as exc:
+                last_exception = exc
+                if attempt < self.retry_config.max_attempts - 1:
+                    delay = self._calculate_delay(attempt)
+                    await asyncio.sleep(delay)
+                continue
 
             if response.is_success:
                 return response
 
             if not self._is_retryable(response.status_code):
-                raise RetryableHTTPError(self.metrics.attempts)
+                raise RetryableHTTPError(request_attempts)
 
             if attempt < self.retry_config.max_attempts - 1:
                 delay = self._calculate_delay(attempt)
                 await asyncio.sleep(delay)
 
-        raise RetryableHTTPError(self.metrics.attempts)
+        if last_exception is not None:
+            raise RetryableHTTPError(request_attempts) from last_exception
+        raise RetryableHTTPError(request_attempts)
 
     async def get(
         self,
         url: str,
         *,
-        params: QueryParamsTypes | None = None,
+        params: QueryParamTypes | None = None,
         headers: HeaderTypes | None = None,
         **kwargs: Any,
     ) -> httpx.Response:

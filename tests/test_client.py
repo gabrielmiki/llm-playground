@@ -75,7 +75,6 @@ class TestRetryableHTTPClient:
 
         assert response.status_code == 200
         assert mock_client.request.call_count == 1
-        assert len(client.metrics.attempts) == 1
 
     @pytest.mark.asyncio
     async def test_retry_on_503_then_success(
@@ -92,9 +91,6 @@ class TestRetryableHTTPClient:
 
         assert response.status_code == 200
         assert mock_client.request.call_count == 2
-        assert len(client.metrics.attempts) == 2
-        assert client.metrics.attempts[0]["status_code"] == 503
-        assert client.metrics.attempts[1]["status_code"] == 200
 
     @pytest.mark.asyncio
     async def test_retry_on_429_then_success(
@@ -140,6 +136,40 @@ class TestRetryableHTTPClient:
 
         assert len(exc_info.value.attempts) == 1
         assert mock_client.request.call_count == 1
+
+    @pytest.mark.asyncio
+    async def test_retry_on_connect_error_then_success(
+        self,
+        client: RetryableHTTPClient,
+        mock_client: AsyncMock,
+    ) -> None:
+        mock_client.request.side_effect = [
+            httpx.ConnectError("Connection refused"),
+            self._create_response(200),
+        ]
+
+        response = await client.get("https://api.example.com/data")
+
+        assert response.status_code == 200
+        assert mock_client.request.call_count == 2
+
+    @pytest.mark.asyncio
+    async def test_retry_on_network_error_max_attempts(
+        self,
+        client: RetryableHTTPClient,
+        mock_client: AsyncMock,
+    ) -> None:
+        mock_client.request.side_effect = [
+            httpx.NetworkError("Network failure"),
+            httpx.ConnectError("Connection refused"),
+            httpx.WriteError("Write failed"),
+        ]
+
+        with pytest.raises(RetryableHTTPError) as exc_info:
+            await client.get("https://api.example.com/data")
+
+        assert mock_client.request.call_count == 3
+        assert exc_info.value.__cause__ is not None
 
     @pytest.mark.asyncio
     async def test_rate_limiter_called_per_attempt(
