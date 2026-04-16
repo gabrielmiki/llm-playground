@@ -9,6 +9,13 @@ from unittest.mock import AsyncMock, MagicMock
 import httpx
 import pytest
 
+pytest_plugins = [
+    "tests.fixtures.http_client",
+    "tests.fixtures.market_data",
+    "tests.fixtures.rate_limiter",
+    "tests.fixtures.resource_tracker",
+]
+
 
 @pytest.fixture(scope="session")
 def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
