@@ -2,7 +2,6 @@
 name: pre-commit-checker
 description: Explains lint/test errors with structured output and resolution options
 mode: subagent
-model: anthropic/claude-3-5-sonnet
 tools:
   bash: true
   read: true
