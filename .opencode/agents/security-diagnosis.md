@@ -2,7 +2,6 @@
 name: security-diagnosis
 description: Detects hallucinated packages, verifies dependencies exist on PyPI
 mode: subagent
-model: anthropic/claude-3-5-sonnet
 tools:
   bash: true
   read: true
