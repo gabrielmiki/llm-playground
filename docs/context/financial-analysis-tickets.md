@@ -251,7 +251,7 @@ class NewsDataUnavailableError(NewsDataError):  # All providers exhausted
 - Given HTTP 200 with `"status": "error"` in body (NewsAPI), When response is parsed, Then `NewsDataAPIError` is raised with the error message from API
 - Given Finnhub returns HTTP 429 (rate limit), When after 3 retries, Then fallback to NewsAPI automatically
 - Given Finnhub + NewsAPI both fail (3 retries each), When exhausted, Then fallback to NewsDataUnavailableError
-- Given all three providers fail, When `fetch_news` is called, Then `NewsDataUnavailableError` is raised after exhausting all fallbacks
+- Given both providers fail, When `fetch_news` is called, Then `NewsDataUnavailableError` is raised after exhausting all fallbacks
 - Given articles older than 365 days from requested date, When processing, Then they are filtered out and WARNING level log entry is emitted with count of excluded articles
 - Given no articles for a ticker, When fetching, Then empty list is returned (not an error)
 - Given weekend date (Saturday), When `fetch_news` is called, Then adjusts to previous Friday and returns valid articles
