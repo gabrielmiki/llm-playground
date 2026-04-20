@@ -155,9 +155,10 @@ def transform_alpha_vantage(
         if not available_dates:
             error_msg = "Alpha Vantage time series is empty"
             raise MarketDataParseError(error_msg)
+        original_target_date = target_date
         target_date = available_dates[0]
         logger.warning(
-            f"[AlphaVantage] Date {target_date} not found, using {target_date}"
+            f"[AlphaVantage] Date {original_target_date} not found, using {target_date}"
         )
 
     day_data = time_series[target_date]

@@ -2,7 +2,6 @@
 name: code-reviewer
 description: C.L.E.A.R. framework review for AI-generated code
 mode: subagent
-model: anthropic/claude-3-5-sonnet
 tools:
   read: true
   glob: true

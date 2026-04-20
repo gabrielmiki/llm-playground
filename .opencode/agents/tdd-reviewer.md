@@ -2,7 +2,6 @@
 name: tdd-reviewer
 description: Validates test plans against acceptance criteria and infrastructure readiness
 mode: subagent
-model: opencode/big-pickle
 tools:
   read: true
   glob: true

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 import pytest
 
 from src.collect.exceptions import MarketDataAPIError, MarketDataParseError
@@ -52,7 +54,9 @@ class TestTransformYahooFinance:
 
     def test_transform_yahoo_invalid_structure(self) -> None:
         """Yahoo Finance invalid structure raises MarketDataParseError."""
-        with pytest.raises(MarketDataParseError, match="missing 'chart.result'"):
+        with pytest.raises(
+            MarketDataParseError, match=re.escape("missing 'chart.result'")
+        ):
             transform_yahoo_finance({"error": "test"}, "2024-01-15")
 
 
