@@ -237,9 +237,8 @@ class NewsCollector:
 
         try:
             articles = await self._fetch_finnhub(ticker, adjusted_date)
-            if articles:
-                logger.info(f"[Finnhub] Retrieved {len(articles)} article(s)")
-                return articles
+            logger.info(f"[Finnhub] Retrieved {len(articles)} article(s)")
+            return articles  # Return even if empty - provider succeeded
         except NewsDataError as e:
             error_msg = f"Finnhub failed: {e}"
             logger.warning(f"[Fallback] {error_msg}")
@@ -251,9 +250,8 @@ class NewsCollector:
 
         try:
             articles = await self._fetch_newsapi(ticker, adjusted_date)
-            if articles:
-                logger.info(f"[NewsAPI] Retrieved {len(articles)} article(s)")
-                return articles
+            logger.info(f"[NewsAPI] Retrieved {len(articles)} article(s)")
+            return articles  # Return even if empty - provider succeeded
         except NewsDataError as e:
             error_msg = f"NewsAPI failed: {e}"
             logger.warning(f"[Fallback] {error_msg}")
