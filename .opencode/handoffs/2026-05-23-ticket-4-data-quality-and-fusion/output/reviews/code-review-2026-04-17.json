@@ -1,0 +1,57 @@
+{
+  "verdict": "APPROVE",
+  "clear_analysis": {
+    "context": {
+      "status": "ALIGNED",
+      "notes": "All 8 modules from the implementation plan are present. The 49 tests pass (matching the ticket's total), 12 fixtures match exactly. The 380-line ticket spec is closely followed — all classes, methods, dataclass fields, and exception hierarchy match the API spec. Minor discrepancy: individual test counts differ from the plan (e.g., text_preprocessor has 9 vs planned 6; validator has 13 vs planned 12; fusion has 7 vs planned 8), but the total of 49 matches and the extra coverage is a net positive. The orchestrated `run_preprocessing()` and `run_preprocessing_batch()` functions from the API spec's Tier 4 are not implemented — these are design notes, not implementation requirements in the plan."
+    },
+    "logic": {
+      "status": "CORRECT",
+      "issues": [
+        "LanguageFilter: LangDetectException always reports reason='too_short', even when text length is sufficient. The ticket spec says 'If langdetect.lang_detect_exception.Error (text too short), treat as unknown' — so this matches the spec, but the reason string is technically imprecise for non-length-related detection failures."
+      ]
+    },
+    "efficiency": {
+      "status": "IMPROVABLE",
+      "notes": "Fuse_many, clean_many, filter_many are all lazy generators — good. OutputWriter.write_many collects into list[str] which is by design. Two minor issues: (1) os.makedirs(..., exist_ok=True) called on every write_record call — in a batch of thousands, this adds syscall overhead. (2) MarketDataValidator repeats the same validation pattern for each price field — acceptable for clarity but 8 nearly-identical blocks."
+    },
+    "architecture": {
+      "status": "COMPLIANT",
+      "notes": "Layer separation is respected: src/preprocess/ imports from src/collect/ (MarketData dataclass, ValidationWarning) — never the reverse. No circular imports. All streaming methods follow the Generator[Result] pattern consistently across modules. Exception hierarchy (PreprocessingError → LanguageFilterError | FusionError) mirrors the src/collect/ pattern. Output dir `data/processed/fused/` follows the pipeline spec."
+    },
+    "reliability": {
+      "status": "ROBUST",
+      "gaps": [
+        "No test coverage for AC-26 (full pipeline: validated market data → failing article validation → fused record with warning). This requires the orchestrated `run_preprocessing()` function which is noted as Tier 4 design but not yet implemented.",
+        "OutputWriter.write_record can raise uncaught OSError on disk full/permission errors — acceptable at this layer but should be noted for the orchestrated pipeline."
+      ]
+    }
+  },
+  "ai_specific_issues": [
+    {
+      "type": "DUPLICATION",
+      "location": "tests/test_cleaner.py:78-91 and tests/test_fusion.py:77-90",
+      "evidence": "Same TrackingIterable class defined in both files with only type annotation difference (list[str] vs list). The classes are byte-for-byte equivalent in behavior: __init__, __iter__, __next__, call_count tracking.",
+      "recommendation": "Extract TrackingIterable into a shared test helper, e.g., tests/fixtures/tracking_iterable.py, and import it in both test files."
+    },
+    {
+      "type": "MISSING_GUARD",
+      "location": "src/preprocess/fusion.py:86",
+      "evidence": "_extract_date(article) calls article.get('published_at', '') — if article is not a dict, this raises AttributeError instead of a FusionError. The function is only called internally with validated dicts, but a guard would improve robustness.",
+      "recommendation": "Wrap the extraction in try/except TypeError and return '' for non-dict inputs, or add isinstance check."
+    },
+    {
+      "type": "INCONSISTENT_PATTERN",
+      "location": "src/preprocess/validator.py:26-154",
+      "evidence": "MarketDataValidator and NewsValidator lack validate_many() generator methods, while all other modules (cleaner: clean_many, language_filter: filter_many, fusion: fuse_many, output_writer: write_many) follow the streaming pattern. This breaks consistency for batch validation pipelines.",
+      "recommendation": "Add validate_many(items: Iterable[MarketData | dict]) → Generator[ValidationResult] methods to both validators for consistency with the codebase pattern."
+    },
+    {
+      "type": "SHALLOW_TEST",
+      "location": "tests/test_output_writer.py:30-33",
+      "evidence": "test_write_record_creates_json_file reads back the file and asserts ticker, date, news_articles length — good. But does not verify market_data serialization format or warnings field in the JSON output.",
+      "recommendation": "Add assertions for market_data structure and warnings array in the deserialized JSON to ensure the full serialization round-trip is correct."
+    }
+  ],
+  "summary": "Strong implementation of Ticket 4: all 8 modules implemented correctly, all 49 tests pass, lint is clean, and the code faithfully mirrors the 380-line specification. The streaming patterns are consistent, exception hierarchy is well-structured, and dataclasses match the design exactly. Minor findings: test duplication (TrackingIterable in two files), one untested AC (requires pipeline orchestration function not yet implemented), and inconsistent validate_many() pattern on validators. Recommend APPROVE with follow-up for AC-26 when the orchestrated pipeline is built in Ticket 5."
+}
