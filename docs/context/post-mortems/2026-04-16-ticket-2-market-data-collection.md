@@ -177,7 +177,7 @@ FALLBACK_SEQUENCE:
 
 ### Files Created
 
-```
+```text
 src/collect/
 ├── __init__.py              # Updated with market data exports
 ├── exceptions.py            # Custom exception hierarchy (4 classes)

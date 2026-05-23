@@ -49,7 +49,7 @@ class MarketData:
     low: float
     close: float
     volume: int
-    adjusted_close: float
+    adjusted_close: float | None
     timestamp: str
 
     def to_dict(self) -> dict[str, Any]:
@@ -80,10 +80,12 @@ class MarketDataCollector:
         http_client: RetryableHTTPClient | None = None,
         alpha_vantage_key: str | None = None,
         finnhub_key: str | None = None,
+        yahoo_key: str | None = None,
     ) -> None:
         self._client = http_client or RetryableHTTPClient()
         self._alpha_vantage_key = alpha_vantage_key or os.getenv("ALPHAVANTAGE_API_KEY")
         self._finnhub_key = finnhub_key or os.getenv("FINNHUB_API_KEY")
+        self._yahoo_key = yahoo_key or os.getenv("YAHOO_API_KEY")
 
     def _adjust_to_trading_day(self, target_date: date) -> date:
         """Adjust date to previous trading day if weekend or holiday."""
@@ -119,8 +121,12 @@ class MarketDataCollector:
         }
 
         logger.info(f"[Yahoo Finance] Fetching {ticker} for {date_str}")
+        headers: dict[str, str] | None = None
+        if self._yahoo_key:
+            headers = {"X-Yahoo-API-Key": self._yahoo_key}
+            logger.info("[Yahoo Finance] Using API key for authenticated request")
         try:
-            response = await self._client.get(url, params=params)
+            response = await self._client.get(url, params=params, headers=headers)
             if response.status_code == 429:
                 logger.warning("[Yahoo Finance] Rate limited (429)")
                 return None

@@ -6,8 +6,13 @@ from src.collect.exceptions import (
     MarketDataError,
     MarketDataParseError,
     MarketDataUnavailableError,
+    NewsDataAPIError,
+    NewsDataError,
+    NewsDataParseError,
+    NewsDataUnavailableError,
 )
 from src.collect.market_data import MarketData, MarketDataCollector, fetch_market_data
+from src.collect.news_collector import NewsCollector, fetch_news
 from src.collect.rate_limiter import RateLimitConfig, TokenBucketRateLimiter
 
 __all__ = [
@@ -17,8 +22,14 @@ __all__ = [
     "MarketDataAPIError",
     "MarketDataParseError",
     "MarketDataUnavailableError",
+    "NewsCollector",
+    "NewsDataError",
+    "NewsDataAPIError",
+    "NewsDataParseError",
+    "NewsDataUnavailableError",
     "RetryableHTTPClient",
     "RateLimitConfig",
     "TokenBucketRateLimiter",
     "fetch_market_data",
+    "fetch_news",
 ]
