@@ -12,8 +12,11 @@ import pytest
 pytest_plugins = [
     "tests.fixtures.http_client",
     "tests.fixtures.market_data",
+    "tests.fixtures.news_data",
     "tests.fixtures.rate_limiter",
     "tests.fixtures.resource_tracker",
+    "tests.fixtures.preprocess_data",
+    "tests.fixtures.tracking_iterable",
 ]
 
 
