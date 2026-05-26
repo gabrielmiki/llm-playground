@@ -17,6 +17,7 @@ pytest_plugins = [
     "tests.fixtures.resource_tracker",
     "tests.fixtures.preprocess_data",
     "tests.fixtures.tracking_iterable",
+    "tests.fixtures.sentiment_data",
 ]
 
 
