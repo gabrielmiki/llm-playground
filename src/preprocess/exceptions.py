@@ -17,3 +17,9 @@ class FusionError(PreprocessingError):
     """Raised when data fusion correlation fails."""
 
     pass
+
+
+class TokenizerError(PreprocessingError):
+    """Raised when tokenizer initialization or operation fails."""
+
+    pass
