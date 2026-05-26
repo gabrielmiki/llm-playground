@@ -88,8 +88,17 @@ for cleaned in cleaner.clean(raw_texts):
 ```python
 from src.preprocess.tokenizer import TokenizerFactory
 
-tokenizer = TokenizerFactory.create("tiktoken", vocab_size=8192)
+# Fixed-encoding backend (tiktoken, no vocab_size)
+tokenizer = TokenizerFactory.create("tiktoken")
 tokens = tokenizer.encode("Hello, world!")
+
+# Trainable backend accepts vocab_size
+hf_tokenizer = TokenizerFactory.create("tokenizers", vocab_size=16384)
+sp_tokenizer = TokenizerFactory.create("sentencepiece", vocab_size=8192)
+
+# Tokenize fused analysis text
+fused_text = TokenizerFactory.fused_record_to_text(fused_record)
+tokens = tokenizer.encode(fused_text)
 ```
 
 ## Testing
