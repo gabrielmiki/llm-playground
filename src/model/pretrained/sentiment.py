@@ -10,14 +10,16 @@ logger = logging.getLogger(__name__)
 
 try:
     import torch
+except ImportError:
+    torch = None  # type: ignore[assignment]
 
+try:
     from transformers import (
         AutoConfig,
         AutoModelForSequenceClassification,
         AutoTokenizer,
     )
 except ImportError:
-    torch = None  # type: ignore[assignment]
     AutoConfig = None  # type: ignore[assignment]
     AutoModelForSequenceClassification = None  # type: ignore[assignment]
     AutoTokenizer = None  # type: ignore[assignment]
@@ -38,11 +40,12 @@ class SentimentResult:
     breakdown: list[ArticleSentiment]
 
 
-_NEUTRAL_RESULT = SentimentResult(
-    sentiment_score=0.0,
-    confidence=0.0,
-    breakdown=[],
-)
+def _neutral_result() -> SentimentResult:
+    return SentimentResult(
+        sentiment_score=0.0,
+        confidence=0.0,
+        breakdown=[],
+    )
 
 
 class FinBertSentiment:
@@ -56,6 +59,10 @@ class FinBertSentiment:
         if torch is None:
             raise ModelLoadError(
                 "torch is not installed. Install with: uv sync --extra model"
+            )
+        if AutoConfig is None:
+            raise ModelLoadError(
+                "transformers is not installed. Install with: uv sync --extra model"
             )
 
         self.model_name = model_name
@@ -73,17 +80,28 @@ class FinBertSentiment:
             self.model.to(self.device)
             self.model.eval()
             self.id2label = AutoConfig.from_pretrained(model_name).id2label
+            self._pos_idx = 0
+            self._neg_idx = 1
+            self._neu_idx = 2
+            for idx, label in self.id2label.items():
+                lower = label.lower()
+                if "positive" in lower:
+                    self._pos_idx = idx
+                elif "negative" in lower:
+                    self._neg_idx = idx
+                elif "neutral" in lower:
+                    self._neu_idx = idx
         except Exception as exc:
             raise ModelLoadError(
                 f"Failed to load model from HuggingFace: {exc}"
             ) from exc
 
     def analyze(self, record: FusedRecord) -> SentimentResult:
-        if record is None:
+        if not isinstance(record, FusedRecord):
             raise TypeError("fused_record must be a FusedRecord")
 
         if not record.news_articles:
-            return _NEUTRAL_RESULT
+            return _neutral_result()
 
         texts: list[str] = []
         article_indexes: list[int] = []
@@ -100,11 +118,15 @@ class FinBertSentiment:
             article_indexes.append(i)
 
         if not texts:
-            return _NEUTRAL_RESULT
+            return _neutral_result()
 
         breakdown: list[ArticleSentiment] = []
         total_weighted_score = 0.0
         total_confidence = 0.0
+
+        pos_idx = self._pos_idx
+        neg_idx = self._neg_idx
+        neu_idx = self._neu_idx
 
         for start in range(0, len(texts), self.batch_size):
             batch_texts = texts[start : start + self.batch_size]
@@ -129,9 +151,9 @@ class FinBertSentiment:
 
             for j, probs in enumerate(probabilities):
                 probs_cpu = probs.cpu()
-                pos = float(probs_cpu[0])
-                neg = float(probs_cpu[1])
-                neu = float(probs_cpu[2])
+                pos = float(probs_cpu[pos_idx])
+                neg = float(probs_cpu[neg_idx])
+                neu = float(probs_cpu[neu_idx])
 
                 score = pos - neg
                 confidence = max(pos, neg, neu)
