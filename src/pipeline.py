@@ -6,6 +6,8 @@ Usage:
 
 from __future__ import annotations
 
+import warnings
+
 import argparse
 import asyncio
 import logging
@@ -19,6 +21,12 @@ from src.preprocess.fusion import DataFusionEngine
 from src.preprocess.language_filter import LanguageFilter
 from src.preprocess.output_writer import FusedRecordWriter
 from src.preprocess.validator import MarketDataValidator, NewsValidator
+
+# Suppress torch's user warning about NumPy ABI mismatch. The
+# "compiled using NumPy 1.x" message from NumPy's C code bypasses
+# Python's warnings system entirely and cannot be silenced here;
+# pin numpy<2 in pyproject.toml to eliminate both.
+warnings.filterwarnings("ignore", message=".*Failed to initialize NumPy.*")
 
 logger = logging.getLogger("pipeline")
 
@@ -152,6 +160,16 @@ async def run_pipeline(ticker: str, target_date: str) -> None:
     logger.info("=" * 60)
 
 
+def _parse_cli_date(value: str) -> str:
+    try:
+        datetime.strptime(value, "%Y-%m-%d")
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(
+            "Expected date format YYYY-MM-DD"
+        ) from exc
+    return value
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Run the full data pipeline: collect -> preprocess -> fuse -> sentiment"
@@ -163,6 +181,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--date",
+        type=_parse_cli_date,
         default=date.today().isoformat(),
         help="Target date in YYYY-MM-DD format (default: today)",
     )

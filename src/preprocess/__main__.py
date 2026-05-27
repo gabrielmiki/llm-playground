@@ -4,4 +4,5 @@ Runs the pipeline from the preprocessing stage.
 """
 from src.pipeline import main
 
-main()
+if __name__ == "__main__":
+    main()

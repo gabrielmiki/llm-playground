@@ -111,7 +111,7 @@ tokens = tokenizer.encode(fused_text)
 An orchestration script (`src/pipeline.py`) wires the existing stages into a
 single command:
 
-```
+```text
 collect → preprocess (clean, validate, language-filter) → fuse → write output → sentiment
 ```
 
