@@ -172,7 +172,7 @@ class MarketDataCollector:
         except (httpx.HTTPError, RetryableHTTPError) as exc:
             logger.warning(f"[Alpha Vantage] Request failed: {exc}")
             return None
-        except MarketDataParseError, MarketDataAPIError:
+        except (MarketDataParseError, MarketDataAPIError):
             return None
 
     async def _fetch_from_finnhub(
