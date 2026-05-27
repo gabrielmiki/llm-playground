@@ -168,7 +168,7 @@ def transform_alpha_vantage(
             return None
         try:
             return float(value)
-        except ValueError, TypeError:
+        except (ValueError, TypeError):
             return None
 
     def _safe_int(value: str | None) -> int:
@@ -176,7 +176,7 @@ def transform_alpha_vantage(
             return 0
         try:
             return int(float(value))
-        except ValueError, TypeError:
+        except (ValueError, TypeError):
             return 0
 
     ohlcv = {

@@ -53,7 +53,7 @@ class SocketInspector:
                 else:
                     stats.established_count += 1
                 stats.total_connections += 1
-        except subprocess.TimeoutExpired, FileNotFoundError:
+        except (subprocess.TimeoutExpired, FileNotFoundError):
             pass
         return stats
 
@@ -75,7 +75,7 @@ class SocketInspector:
                 elif "established" in line_lower:
                     stats.established_count += 1
                 stats.total_connections += 1
-        except subprocess.TimeoutExpired, FileNotFoundError:
+        except (subprocess.TimeoutExpired, FileNotFoundError):
             pass
         return stats
 
