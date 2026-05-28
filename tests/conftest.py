@@ -19,6 +19,7 @@ pytest_plugins = [
     "tests.fixtures.tracking_iterable",
     "tests.fixtures.tokenizer_data",
     "tests.fixtures.sentiment_data",
+    "tests.fixtures.signal_data",
 ]
 
 
