@@ -1,4 +1,4 @@
-"""End-to-end pipeline: collect -> preprocess -> fuse -> sentiment analysis.
+"""End-to-end pipeline: collect -> preprocess -> fuse -> sentiment -> signal.
 
 Usage:
     uv run python -m src.pipeline --ticker AAPL --date 2026-05-22
@@ -13,6 +13,10 @@ import asyncio
 import logging
 from datetime import date, datetime
 
+from src.collect.exceptions import (
+    MarketDataUnavailableError,
+    NewsDataUnavailableError,
+)
 from src.collect.market_data import MarketDataCollector
 from src.collect.news_collector import NewsCollector
 from src.model.exceptions import ModelLoadError
@@ -49,20 +53,28 @@ async def run_pipeline(ticker: str, target_date: str) -> None:
     logger.info("--- Stage 1: Data Collection ---")
     parsed_date = datetime.strptime(target_date, "%Y-%m-%d").date()
 
-    async with MarketDataCollector() as md_collector:
-        market_data = await md_collector.fetch(ticker, parsed_date)
-    logger.info(
-        "Market data: open=%.2f close=%.2f high=%.2f low=%.2f volume=%d",
-        market_data.open,
-        market_data.close,
-        market_data.high,
-        market_data.low,
-        market_data.volume,
-    )
+    try:
+        async with MarketDataCollector() as md_collector:
+            market_data = await md_collector.fetch(ticker, parsed_date)
+        logger.info(
+            "Market data: open=%.2f close=%.2f high=%.2f low=%.2f volume=%d",
+            market_data.open,
+            market_data.close,
+            market_data.high,
+            market_data.low,
+            market_data.volume,
+        )
+    except MarketDataUnavailableError as e:
+        logger.warning("Market data unavailable: %s", e)
+        market_data = None
 
-    async with NewsCollector() as news_collector:
-        news_articles = await news_collector.fetch_news(ticker, target_date)
-    logger.info("News articles: %d raw articles fetched", len(news_articles))
+    try:
+        async with NewsCollector() as news_collector:
+            news_articles = await news_collector.fetch_news(ticker, target_date)
+        logger.info("News articles: %d raw articles fetched", len(news_articles))
+    except NewsDataUnavailableError as e:
+        logger.warning("News data unavailable: %s", e)
+        news_articles = []
 
     # Stage 2: Preprocessing
     logger.info("")
@@ -130,16 +142,17 @@ async def run_pipeline(ticker: str, target_date: str) -> None:
     # Stage 5: Sentiment Analysis
     logger.info("")
     logger.info("--- Stage 5: Sentiment Analysis ---")
+    sentiment_result = None
     try:
         from src.model.pretrained.sentiment import FinBertSentiment
 
         sentiment = FinBertSentiment()
-        result = sentiment.analyze(fused)
-        logger.info("Aggregated sentiment score: %+.4f", result.sentiment_score)
-        logger.info("Aggregated confidence:      %.4f", result.confidence)
+        sentiment_result = sentiment.analyze(fused)
+        logger.info("Aggregated sentiment score: %+.4f", sentiment_result.sentiment_score)
+        logger.info("Aggregated confidence:      %.4f", sentiment_result.confidence)
         logger.info("")
         logger.info("Per-article breakdown:")
-        for article in result.breakdown:
+        for article in sentiment_result.breakdown:
             logger.info(
                 "  [%8s] %+.4f (confidence: %.2f) %s",
                 article.label,
@@ -153,6 +166,20 @@ async def run_pipeline(ticker: str, target_date: str) -> None:
     except ImportError as e:
         logger.warning("Sentiment analysis skipped: %s", e)
         logger.warning("Install torch: uv sync --extra model")
+
+    # Stage 6: Signal Generation
+    logger.info("")
+    logger.info("--- Stage 6: Signal Generation ---")
+    if sentiment_result is not None:
+        from src.model.pretrained.signals import TradingSignalGenerator
+
+        generator = TradingSignalGenerator()
+        signal = generator.generate(ticker, sentiment_result, fused.market_data)
+        logger.info("Signal: %s", signal.signal)
+        logger.info("Confidence: %.4f", signal.confidence)
+        logger.info("Rationale: %s", signal.rationale)
+    else:
+        logger.warning("Signal generation skipped: no sentiment result")
 
     logger.info("")
     logger.info("=" * 60)
@@ -172,7 +199,7 @@ def _parse_cli_date(value: str) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Run the full data pipeline: collect -> preprocess -> fuse -> sentiment"
+        description="Run the full data pipeline: collect -> preprocess -> fuse -> sentiment -> signal"
     )
     parser.add_argument(
         "--ticker",
