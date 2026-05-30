@@ -1,7 +1,10 @@
-"""End-to-end pipeline: collect -> preprocess -> fuse -> sentiment -> signal.
+"""End-to-end pipeline: collect -> preprocess -> fuse -> sentiment -> signal -> report.
 
 Usage:
     uv run python -m src.pipeline --ticker AAPL --date 2026-05-22
+    uv run python -m src.pipeline --all --date 2026-05-22
+    uv run python -m src.pipeline --all --report --date 2026-05-22
+    uv run python -m src.pipeline --report --date 2026-05-22
 """
 
 from __future__ import annotations
@@ -24,6 +27,7 @@ from src.preprocess.cleaner import TextCleaner
 from src.preprocess.fusion import DataFusionEngine
 from src.preprocess.language_filter import LanguageFilter
 from src.preprocess.output_writer import FusedRecordWriter
+from src.generate.config import TICKERS
 from src.preprocess.validator import MarketDataValidator, NewsValidator
 
 # Suppress torch's user warning about NumPy ABI mismatch. The
@@ -148,7 +152,9 @@ async def run_pipeline(ticker: str, target_date: str) -> None:
 
         sentiment = FinBertSentiment()
         sentiment_result = sentiment.analyze(fused)
-        logger.info("Aggregated sentiment score: %+.4f", sentiment_result.sentiment_score)
+        logger.info(
+            "Aggregated sentiment score: %+.4f", sentiment_result.sentiment_score
+        )
         logger.info("Aggregated confidence:      %.4f", sentiment_result.confidence)
         logger.info("")
         logger.info("Per-article breakdown:")
@@ -187,13 +193,31 @@ async def run_pipeline(ticker: str, target_date: str) -> None:
     logger.info("=" * 60)
 
 
+async def run_all(target_date: str, generate_report: bool = False) -> None:
+    for ticker in TICKERS:
+        await run_pipeline(ticker, target_date)
+
+    if generate_report:
+        logger.info("")
+        logger.info("--- Stage 7: Report Generation ---")
+        try:
+            from src.generate.orchestrate import run_report_generation
+
+            result = run_report_generation(target_date)
+            logger.info(
+                "Report %s generated -> data/processed/reports/%s.{txt,json,html}",
+                result.report_id,
+                result.report_id,
+            )
+        except Exception as e:
+            logger.warning("Report generation skipped: %s", e)
+
+
 def _parse_cli_date(value: str) -> str:
     try:
         datetime.strptime(value, "%Y-%m-%d")
     except ValueError as exc:
-        raise argparse.ArgumentTypeError(
-            "Expected date format YYYY-MM-DD"
-        ) from exc
+        raise argparse.ArgumentTypeError("Expected date format YYYY-MM-DD") from exc
     return value
 
 
@@ -204,7 +228,7 @@ def main() -> None:
     parser.add_argument(
         "--ticker",
         default="AAPL",
-        help="Stock ticker symbol (default: AAPL)",
+        help="Stock ticker symbol (default: AAPL). Ignored when --all is set.",
     )
     parser.add_argument(
         "--date",
@@ -212,10 +236,39 @@ def main() -> None:
         default=date.today().isoformat(),
         help="Target date in YYYY-MM-DD format (default: today)",
     )
+    parser.add_argument(
+        "--all",
+        action="store_true",
+        help="Run pipeline for all configured tickers in sequence",
+    )
+    parser.add_argument(
+        "--report",
+        action="store_true",
+        help="Generate multi-format report after pipeline completes. "
+        "When used with --all, runs after all tickers. "
+        "When used without --all, generates report from existing fused records.",
+    )
     args = parser.parse_args()
 
     _setup_logging()
-    asyncio.run(run_pipeline(args.ticker.upper(), args.date))
+
+    if args.all:
+        asyncio.run(run_all(args.date, generate_report=args.report))
+    elif args.report:
+        logger.info("--- Standalone Report Generation ---")
+        try:
+            from src.generate.orchestrate import run_report_generation
+
+            result = run_report_generation(args.date)
+            logger.info(
+                "Report %s generated -> data/processed/reports/%s.{txt,json,html}",
+                result.report_id,
+                result.report_id,
+            )
+        except Exception as e:
+            logger.warning("Report generation failed: %s", e)
+    else:
+        asyncio.run(run_pipeline(args.ticker.upper(), args.date))
 
 
 if __name__ == "__main__":

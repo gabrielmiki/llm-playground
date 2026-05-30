@@ -20,6 +20,7 @@ pytest_plugins = [
     "tests.fixtures.tokenizer_data",
     "tests.fixtures.sentiment_data",
     "tests.fixtures.signal_data",
+    "tests.fixtures.report_data",
 ]
 
 
