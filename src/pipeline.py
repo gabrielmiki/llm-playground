@@ -28,7 +28,16 @@ from src.preprocess.fusion import DataFusionEngine
 from src.preprocess.language_filter import LanguageFilter
 from src.preprocess.output_writer import FusedRecordWriter
 from src.generate.config import TICKERS
-from src.preprocess.validator import MarketDataValidator, NewsValidator
+from src.generate.degradation import (
+    build_degradation_warning,
+    build_insufficient_data_warning,
+    find_historical_fallback,
+)
+from src.preprocess.validator import (
+    MarketDataValidator,
+    NewsValidator,
+    ValidationWarning,
+)
 
 # Suppress torch's user warning about NumPy ABI mismatch. The
 # "compiled using NumPy 1.x" message from NumPy's C code bypasses
@@ -57,6 +66,8 @@ async def run_pipeline(ticker: str, target_date: str) -> None:
     logger.info("--- Stage 1: Data Collection ---")
     parsed_date = datetime.strptime(target_date, "%Y-%m-%d").date()
 
+    degradation_warnings: list[ValidationWarning] = []
+
     try:
         async with MarketDataCollector() as md_collector:
             market_data = await md_collector.fetch(ticker, parsed_date)
@@ -70,7 +81,14 @@ async def run_pipeline(ticker: str, target_date: str) -> None:
         )
     except MarketDataUnavailableError as e:
         logger.warning("Market data unavailable: %s", e)
-        market_data = None
+        historical = find_historical_fallback(ticker, target_date, "market")
+        market_data = (
+            historical.market_data if historical and historical.market_data is not None
+            else None
+        )
+        degradation_warnings.append(
+            build_degradation_warning("market", historical, ticker, target_date)
+        )
 
     try:
         async with NewsCollector() as news_collector:
@@ -78,17 +96,33 @@ async def run_pipeline(ticker: str, target_date: str) -> None:
         logger.info("News articles: %d raw articles fetched", len(news_articles))
     except NewsDataUnavailableError as e:
         logger.warning("News data unavailable: %s", e)
-        news_articles = []
+        historical = find_historical_fallback(ticker, target_date, "news")
+        news_articles = (
+            historical.news_articles
+            if historical and historical.news_articles
+            else []
+        )
+        degradation_warnings.append(
+            build_degradation_warning("news", historical, ticker, target_date)
+        )
+
+    if not market_data and not news_articles:
+        degradation_warnings.append(
+            build_insufficient_data_warning(ticker, target_date)
+        )
 
     # Stage 2: Preprocessing
     logger.info("")
     logger.info("--- Stage 2: Preprocessing ---")
 
     md_validator = MarketDataValidator()
-    md_result = md_validator.validate(market_data)
-    if not md_result.is_valid:
-        for w in md_result.warnings:
-            logger.warning("  Market data warning: %s", w.message)
+    if market_data is not None:
+        md_result = md_validator.validate(market_data)
+        if not md_result.is_valid:
+            for w in md_result.warnings:
+                logger.warning("  Market data warning: %s", w.message)
+    else:
+        logger.warning("  Market data: None — skipping validation")
 
     news_validator = NewsValidator()
     cleaner = TextCleaner()
@@ -128,6 +162,7 @@ async def run_pipeline(ticker: str, target_date: str) -> None:
     logger.info("--- Stage 3: Data Fusion ---")
     engine = DataFusionEngine()
     fused = engine.fuse(ticker, target_date, market_data, valid_articles)
+    fused.warnings.extend(degradation_warnings)
     logger.info(
         "Fused record: %d matching articles, %d warnings",
         len(fused.news_articles),

@@ -21,6 +21,7 @@ pytest_plugins = [
     "tests.fixtures.sentiment_data",
     "tests.fixtures.signal_data",
     "tests.fixtures.report_data",
+    "tests.fixtures.degradation_data",
 ]
 
 

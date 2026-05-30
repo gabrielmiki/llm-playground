@@ -4,12 +4,11 @@ import json
 import os
 from datetime import datetime
 
-from src.collect.market_data import MarketData
 from src.generate.config import TICKERS
 from src.generate.models import ReportInput, ReportResult
 from src.generate.reporter import ReportGenerator
 from src.model.pretrained import FinBertSentiment, TradingSignalGenerator
-from src.preprocess.fusion import FusedRecord
+from src.preprocess.fusion import FusedRecord, decode_fused_record
 from src.preprocess.validator import ValidationWarning
 
 
@@ -22,27 +21,11 @@ def _validate_date(date: str) -> None:
         raise ValueError(f"date must be in YYYY-MM-DD format, got {date!r}")
 
 
-def _decode_fused_record(data: dict) -> FusedRecord:
-    md_data = data.get("market_data")
-    market_data = None
-    if md_data is not None:
-        md_data["volume"] = int(md_data["volume"])
-        market_data = MarketData(**md_data)
-    warnings = [ValidationWarning(**w) for w in data.get("warnings", [])]
-    return FusedRecord(
-        ticker=data["ticker"],
-        date=data["date"],
-        market_data=market_data,
-        news_articles=data.get("news_articles", []),
-        warnings=warnings,
-    )
-
-
 def load_fused_record(ticker: str, date: str) -> FusedRecord:
     file_path = os.path.join("data/processed/fused", f"{ticker}_{date}.json")
     with open(file_path) as f:
         data = json.load(f)
-    return _decode_fused_record(data)
+    return decode_fused_record(data)
 
 
 def run_report_generation(date: str) -> ReportResult:

@@ -8,6 +8,27 @@ from datetime import datetime
 from src.collect.market_data import MarketData
 from src.preprocess.validator import ValidationWarning
 
+def decode_fused_record(data: dict) -> FusedRecord:
+    """Deserialize a FusedRecord from a JSON dict.
+
+    Mirrors the format written by ``FusedRecordWriter._fused_record_to_dict()``.
+    """
+    md_data = data.get("market_data")
+    market_data = None
+    if md_data is not None:
+        md_data["volume"] = int(md_data["volume"])
+        market_data = MarketData(**md_data)
+
+    warnings = [ValidationWarning(**w) for w in data.get("warnings", [])]
+
+    return FusedRecord(
+        ticker=data["ticker"],
+        date=data["date"],
+        market_data=market_data,
+        news_articles=data.get("news_articles", []),
+        warnings=warnings,
+    )
+
 logger = logging.getLogger(__name__)
 
 

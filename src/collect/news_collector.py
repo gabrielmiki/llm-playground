@@ -10,6 +10,7 @@ from typing import Any
 import httpx
 
 from src.collect.client import RetryableHTTPClient, RetryConfig
+from src.collect.date_utils import get_weekday_adjustment
 from src.collect.exceptions import (
     NewsDataError,
     NewsDataParseError,
@@ -32,33 +33,6 @@ FINNHUB_BASE_URL = "https://finnhub.io/api/v1"
 NEWSAPI_BASE_URL = "https://newsapi.org/v2"
 
 DEFAULT_MAX_AGE_DAYS = 365
-
-
-def _get_weekday_adjustment(target_date: str) -> str:
-    """Adjust date if it falls on weekend or holiday.
-
-    Args:
-        target_date: Date string in YYYY-MM-DD format.
-
-    Returns:
-        Adjusted date string in YYYY-MM-DD format.
-    """
-    dt = datetime.strptime(target_date, "%Y-%m-%d")
-
-    if dt.weekday() == 5:
-        adjusted = dt - timedelta(days=1)
-        logger.info(
-            f"Date {target_date} is Saturday, adjusted to {adjusted.strftime('%Y-%m-%d')}"
-        )
-    elif dt.weekday() == 6:
-        adjusted = dt - timedelta(days=2)
-        logger.info(
-            f"Date {target_date} is Sunday, adjusted to {adjusted.strftime('%Y-%m-%d')}"
-        )
-    else:
-        adjusted = dt
-
-    return adjusted.strftime("%Y-%m-%d")
 
 
 class NewsCollector:
@@ -230,7 +204,7 @@ class NewsCollector:
         Raises:
             NewsDataUnavailableError: When all providers fail.
         """
-        adjusted_date = _get_weekday_adjustment(target_date)
+        adjusted_date = get_weekday_adjustment(target_date)
         logger.info(f"Fetching news for {ticker} on {adjusted_date}")
 
         errors: list[str] = []

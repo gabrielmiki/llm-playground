@@ -5,10 +5,10 @@ from __future__ import annotations
 import pytest
 from unittest.mock import AsyncMock, patch, MagicMock
 
+from src.collect.date_utils import get_weekday_adjustment
 from src.collect.news_collector import (
     NewsCollector,
     fetch_news,
-    _get_weekday_adjustment,
 )
 from src.collect.news_transformers import (
     transform_finnhub_news,
@@ -27,17 +27,17 @@ class TestWeekdayAdjustment:
 
     def test_saturday_adjusts_to_friday(self):
         """Given Saturday date, When adjusted, Then returns previous Friday."""
-        result = _get_weekday_adjustment("2024-01-13")
+        result = get_weekday_adjustment("2024-01-13")
         assert result == "2024-01-12"
 
     def test_sunday_adjusts_to_friday(self):
         """Given Sunday date, When adjusted, Then returns previous Friday."""
-        result = _get_weekday_adjustment("2024-01-14")
+        result = get_weekday_adjustment("2024-01-14")
         assert result == "2024-01-12"
 
     def test_weekday_returns_same(self):
         """Given weekday date, When adjusted, Then returns same date."""
-        result = _get_weekday_adjustment("2024-01-15")
+        result = get_weekday_adjustment("2024-01-15")
         assert result == "2024-01-15"
 
 
