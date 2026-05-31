@@ -1,0 +1,149 @@
+{
+  "ac_validation": [
+    {
+      "criterion": "AC-01",
+      "text": "Given sentiment_score=+0.7, sentiment.confidence=0.8, market return=+5%, When generate() is called, Then signal is \"buy\", confidence > 0.5, and rationale contains both sentiment and market contributions",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-02",
+      "text": "Given sentiment_score=-0.6, sentiment.confidence=0.8, market return=-3%, When generate() is called, Then signal is \"sell\", confidence > 0.5",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-03",
+      "text": "Given sentiment_score=+0.05, sentiment.confidence=0.4, market return=0%, When generate() is called, Then signal is \"hold\"",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-04",
+      "text": "Given market_data is None, sentiment_score=+0.7, sentiment.confidence=0.8, When generate() is called, Then signal is derived from sentiment alone and confidence equals sentiment.confidence",
+      "testable": true,
+      "issues": ["'derived from sentiment alone' is slightly vague — can be verified indirectly via confidence == sentiment.confidence and market_return_str == 'N/A' in rationale"],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-05",
+      "text": "Given sentiment_score=+0.8, sentiment.confidence=0.2, market return=0%, When generate() is called, Then signal is \"hold\" (combined_confidence < confidence_threshold overrides directional score)",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-06",
+      "text": "Given sentiment_score=+0.9, sentiment.confidence=0.8, market return=-5%, When generate() is called, Then confidence is halved (due to disagreement), combined_score < threshold, signal is \"hold\", and rationale mentions the disagreement",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-07",
+      "text": "Given market_data with open=0.0, When generate() is called, Then no division-by-zero error occurs and daily_return safely defaults to 0.0",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-08",
+      "text": "Given None as SentimentResult, When generate() is called, Then TypeError is raised with descriptive message",
+      "testable": true,
+      "issues": ["Requires implementation to add explicit `if sentiment is None: raise TypeError(...)` check — not shown in signal_logic pseudocode but required by the AC"],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-09",
+      "text": "Given market_data is None and sentiment.confidence=0.25 (below threshold), When generate() is called, Then signal is \"hold\" (low-confidence guard applies even with sentiment-only)",
+      "testable": true,
+      "issues": ["Does not specify sentiment_score — but outcome is deterministic regardless of score because confidence=0.25 < 0.3 always triggers hold"],
+      "suggested_fix": "Consider adding a note like '(sentiment_score is irrelevant since confidence is below threshold)' for clarity"
+    },
+    {
+      "criterion": "AC-10",
+      "text": "Given a generated signal, When rationale is inspected, Then it contains sentiment_label, sentiment_score, confidence, market_return (or \"N/A\"), combined_score, and the signal label",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    }
+  ],
+  "infrastructure_readiness": [
+    {
+      "requirement": "SentimentResult dataclass",
+      "status": "EXISTS",
+      "location": "src/model/pretrained/sentiment.py:37",
+      "notes": "Simple dataclass with sentiment_score, confidence, breakdown. Trivially constructable in tests."
+    },
+    {
+      "requirement": "MarketData dataclass",
+      "status": "EXISTS",
+      "location": "src/collect/market_data.py:44",
+      "notes": "Simple dataclass with open, high, low, close, volume, adjusted_close, timestamp. Trivially constructable in tests."
+    },
+    {
+      "requirement": "TradingSignal dataclass",
+      "status": "MISSING",
+      "location": "src/model/pretrained/signals.py (to be created)",
+      "notes": "Will be created as part of this ticket. Expected: ticker, signal, confidence, rationale, sentiment_score, market_return."
+    },
+    {
+      "requirement": "TradingSignalGenerator class",
+      "status": "MISSING",
+      "location": "src/model/pretrained/signals.py (to be created)",
+      "notes": "System under test. Pure computation class — no external dependencies (no HTTP, GPU, or file I/O)."
+    },
+    {
+      "requirement": "clamp() utility function",
+      "status": "MISSING",
+      "location": "TBD — needs implementation",
+      "notes": "Referenced in signal_logic for normalization. Trivial implementation: max(min(x, hi), lo). Could live in signals.py or a shared util."
+    },
+    {
+      "requirement": "Mock patterns for external services",
+      "status": "N/A",
+      "location": null,
+      "notes": "No external services needed. TradingSignalGenerator is pure float computation."
+    },
+    {
+      "requirement": "GPU availability handling",
+      "status": "N/A",
+      "location": null,
+      "notes": "No PyTorch/GPU dependency in signal generation."
+    },
+    {
+      "requirement": "Test data patterns",
+      "status": "EXISTS (adequate)",
+      "location": "tests/fixtures/",
+      "notes": "SentimentResult and MarketData can be constructed inline as dataclass literals. No new fixture file strictly required, but a signals_data.py helper could reduce boilerplate."
+    }
+  ],
+  "coverage_analysis": {
+    "happy_path": "COVERED",
+    "error_cases": "COVERED",
+    "edge_cases": "COVERED",
+    "details": {
+      "happy_path": "AC-01 (buy, sentiment+market agree), AC-02 (sell), AC-04 (sentiment-only with None market_data)",
+      "error_cases": "AC-07 (division by zero with open=0.0), AC-08 (TypeError on None SentimentResult)",
+      "edge_cases": "AC-03 (neutral sentiment + 0 return → hold), AC-05 (low-confidence override neutralizes directional signal), AC-06 (sentiment/market sign disagreement → halved confidence + hold), AC-09 (low-confidence guard even with no market data)"
+    }
+  },
+  "signal_logic_consistency": {
+    "paths_verified": 3,
+    "path_1_market_data_none": "combined_score=sentiment.score, combined_confidence=sentiment.confidence, market_return_str='N/A'. No access to undefined market_signal. SAFE.",
+    "path_2_market_data_present_open_nonzero": "daily_return=(close-open)/open, full weighted computation, possible disagreement halving. SAFE.",
+    "path_3_market_data_present_open_zero": "daily_return=0.0, market_signal=0, zero market contribution. No division by zero. SAFE.",
+    "ac_alignment": "ALL ACS MAP TO DETERMINISTIC PATHS IN SIGNAL_LOGIC"
+  },
+  "verdict": "READY",
+  "blocking_issues": [],
+  "non_blocking_recommendations": [
+    "Implement `clamp()` helper before or alongside signal logic",
+    "Ensure AC-08's TypeError check for None SentimentResult is present in generate() — not shown in pseudocode but required",
+    "AC-09 tests should use a sentiment_score > 0.3 (e.g., 0.7) to prove confidence override triggers regardless of score direction",
+    "Consider a `signals_data.py` fixture file to reduce boilerplate if multiple test functions share identical MarketData/SentimentResult configurations"
+  ]
+}

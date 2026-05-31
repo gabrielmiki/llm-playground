@@ -1,0 +1,86 @@
+{
+  "report_id": "0a79e442",
+  "date": "2026-05-22",
+  "signals": [
+    {
+      "ticker": "AAPL",
+      "signal": "hold",
+      "confidence": 0.44717219529444896,
+      "sentiment_score": 0.007545830455316285,
+      "market_return": 0.008820070560564447,
+      "rationale": "Sentiment positive (0.01) with confidence 0.81. Market return: +0.88%. Combined score: 0.05. Signal: hold."
+    },
+    {
+      "ticker": "MSFT",
+      "signal": "hold",
+      "confidence": 0.20462089188890323,
+      "sentiment_score": 0.16254023627338343,
+      "market_return": -0.002300165659599394,
+      "rationale": "Sentiment positive (0.16) with confidence 0.80. Market return: -0.23%. Combined score: 0.07. Sentiment and market disagree \u2014 confidence halved. Signal: hold."
+    },
+    {
+      "ticker": "GOOGL",
+      "signal": "hold",
+      "confidence": 0.23043619672586474,
+      "sentiment_score": 0.142938380524536,
+      "market_return": -0.011294840516851902,
+      "rationale": "Sentiment positive (0.14) with confidence 0.81. Market return: -1.13%. Combined score: 0.01. Sentiment and market disagree \u2014 confidence halved. Signal: hold."
+    },
+    {
+      "ticker": "AMZN",
+      "signal": "hold",
+      "confidence": 0.21966698841025017,
+      "sentiment_score": 0.047906239333011434,
+      "market_return": -0.008691444417561481,
+      "rationale": "Sentiment positive (0.05) with confidence 0.79. Market return: -0.87%. Combined score: -0.02. Sentiment and market disagree \u2014 confidence halved. Signal: hold."
+    },
+    {
+      "ticker": "META",
+      "signal": "hold",
+      "confidence": 0.2132538565259451,
+      "sentiment_score": -0.022136538676542174,
+      "market_return": 0.003915246430216483,
+      "rationale": "Sentiment negative (-0.02) with confidence 0.81. Market return: +0.39%. Combined score: 0.01. Sentiment and market disagree \u2014 confidence halved. Signal: hold."
+    },
+    {
+      "ticker": "TSLA",
+      "signal": "hold",
+      "confidence": 0.44035332337306776,
+      "sentiment_score": 0.013488912523401566,
+      "market_return": 0.00791406906178645,
+      "rationale": "Sentiment positive (0.01) with confidence 0.80. Market return: +0.79%. Combined score: 0.05. Signal: hold."
+    },
+    {
+      "ticker": "NVDA",
+      "signal": "hold",
+      "confidence": 0.266649108356464,
+      "sentiment_score": 0.21070840596055168,
+      "market_return": -0.025232680259298083,
+      "rationale": "Sentiment positive (0.21) with confidence 0.81. Market return: -2.52%. Combined score: -0.02. Sentiment and market disagree \u2014 confidence halved. Signal: hold."
+    },
+    {
+      "ticker": "JPM",
+      "signal": "hold",
+      "confidence": 0.438812876494597,
+      "sentiment_score": 0.10454264985095635,
+      "market_return": 0.005579624524090812,
+      "rationale": "Sentiment positive (0.10) with confidence 0.82. Market return: +0.56%. Combined score: 0.08. Signal: hold."
+    },
+    {
+      "ticker": "V",
+      "signal": "hold",
+      "confidence": 0.42778856804031296,
+      "sentiment_score": -0.26241858711240595,
+      "market_return": -0.004961878252450643,
+      "rationale": "Sentiment negative (-0.26) with confidence 0.81. Market return: -0.50%. Combined score: -0.16. Signal: hold."
+    },
+    {
+      "ticker": "JNJ",
+      "signal": "hold",
+      "confidence": 0.42960928180954494,
+      "sentiment_score": 0.20048181538656676,
+      "market_return": 0.005751072961373405,
+      "rationale": "Sentiment positive (0.20) with confidence 0.80. Market return: +0.58%. Combined score: 0.13. Signal: hold."
+    }
+  ]
+}

@@ -1,0 +1,321 @@
+{
+  "review_metadata": {
+    "ticket": "Ticket 7 v2",
+    "title": "Trading Signal Generation",
+    "reviewer": "TDD Reviewer Agent",
+    "date": "2026-05-28",
+    "spec_file": "docs/context/financial-analysis-ticket-7.md"
+  },
+
+  "v1_blocking_issues_resolution": [
+    {
+      "id": "B1",
+      "description": "Data model mismatch: 'price trends' ambiguous",
+      "status": "RESOLVED ✅",
+      "evidence": "Switched to single-day features with explicit formulas (daily_return, daily_range, market_signal)"
+    },
+    {
+      "id": "B2",
+      "description": "No formula for signal derivation",
+      "status": "RESOLVED ✅",
+      "evidence": "signal_logic section provides complete formulas for market_signal, combined_score, signal decision, combined_confidence, disagreement penalty"
+    },
+    {
+      "id": "B3",
+      "description": "No confidence derivation formula",
+      "status": "RESOLVED ✅",
+      "evidence": "combined_confidence formula with market_confidence component and disagreement halving rule"
+    },
+    {
+      "id": "B4",
+      "description": "Missing Ticket 2 dependency",
+      "status": "RESOLVED ✅",
+      "evidence": "dependencies: [Ticket 2, Ticket 6] added"
+    },
+    {
+      "id": "B5",
+      "description": "Dict output instead of typed dataclass",
+      "status": "RESOLVED ✅",
+      "evidence": "TradingSignal dataclass defined with typed fields"
+    },
+    {
+      "id": "B6",
+      "description": "Only 3 acceptance criteria",
+      "status": "RESOLVED ✅",
+      "evidence": "10 ACs covering happy path, error cases, edge cases, and rationale format"
+    },
+    {
+      "id": "B7",
+      "description": "No rationale format",
+      "status": "RESOLVED ✅",
+      "evidence": "Template rationale string provided with all required fields"
+    }
+  ],
+
+  "ac_validation": [
+    {
+      "criterion": "AC-01",
+      "text": "Given positive sentiment (+0.7) and positive market return (+2%), When generate() is called, Then signal is 'buy', confidence > 0.5, and rationale contains both sentiment and market data contributions",
+      "testable": false,
+      "issues": [
+        "Missing SentimentResult.confidence value: AC specifies sentiment_score=+0.7 but not sentiment.confidence. The output TradingSignal.confidence = 0.5 * sentiment.confidence + 0.5 * market_confidence (=0.2). For output > 0.5, need sentiment.confidence > 0.8. Without this value, the AC is underdetermined and may spuriously pass or fail depending on the test's choice of sentiment.confidence.",
+        "The output confidence assertion (0.5) and the signal decision threshold (0.3) are different values, which is fine, but the input needed to achieve them must be explicit."
+      ],
+      "suggested_fix": "Add sentiment.confidence to the Given clause: 'Given positive sentiment (score=+0.7, confidence=0.9) and positive market return (+2%), When generate() is called, Then signal is \"buy\", confidence > 0.5, and rationale contains both sentiment and market data contributions'"
+    },
+    {
+      "criterion": "AC-02",
+      "text": "Given negative sentiment (-0.6) and negative market return (-1%), When generate() is called, Then signal is 'sell', confidence > 0.5",
+      "testable": false,
+      "issues": [
+        "Same as AC-01: missing sentiment.confidence. For output > 0.5, need sentiment.confidence > 0.9 (since market_confidence = 0.1, output = 0.5*sc + 0.05 > 0.5 → sc > 0.9). The AC is underdetermined without this value."
+      ],
+      "suggested_fix": "Add sentiment.confidence to the Given clause: 'Given negative sentiment (score=-0.6, confidence=0.95) and negative market return (-1%), ...'"
+    },
+    {
+      "criterion": "AC-03",
+      "text": "Given neutral sentiment (+0.05, confidence 0.4) and flat market return (0%), When generate() is called, Then signal is 'hold'",
+      "testable": true,
+      "issues": [],
+      "notes": "Numerical verification: combined_score = 0.5*0.05 + 0.5*0 = 0.025, which is between -0.3 and 0.3 → 'hold' ✅. Good AC that includes both sentiment_score and confidence."
+    },
+    {
+      "criterion": "AC-04",
+      "text": "Given market_data is None, When generate() is called, Then signal is derived from sentiment alone and confidence equals sentiment.confidence",
+      "testable": false,
+      "issues": [
+        "The signal_logic formula section does not define what happens when market_data is None. The formula starts with 'daily_return = (close - open) / open' which would crash with AttributeError on None.",
+        "No conditional logic in the spec to handle this case. The AC and the formula are contradictory."
+      ],
+      "suggested_fix": "Add a conditional path in signal_logic: 'If market_data is None: combined_score = sentiment.sentiment_score (or sentiment_weight * sentiment.sentiment_score), combined_confidence = sentiment.confidence, signal = \"buy\" if combined_score > +confidence_threshold, \"sell\" if combined_score < -confidence_threshold, \"hold\" otherwise.' Clarify whether sentiment_weight still applies when market_data is None."
+    },
+    {
+      "criterion": "AC-05",
+      "text": "Given strong sentiment (+0.8) but low confidence (0.2), When generate() is called, Then signal is 'hold' (low confidence overrides directional signal)",
+      "testable": false,
+      "issues": [
+        "NUMERICAL CONTRADICTION: With default params and daily_return=0%: combined_score = 0.5*0.8 + 0.5*0 = 0.4 > 0.3 → formula produces 'buy', not 'hold'. With market_data=None: no path defined, but if score is 0.5*0.8=0.4 → still 'buy'.",
+        "The 'low confidence overrides directional signal' rule does NOT exist in the signal_logic formula. The formula only uses confidence_threshold for the combined_score comparison, not for a minimum confidence check.",
+        "This is a BLOCKING contradiction between the ACs and the formula."
+      ],
+      "suggested_fix": "Option A: Add a rule to signal_logic: 'If combined_confidence < confidence_threshold, signal defaults to \"hold\" regardless of combined_score.' Then verify: combined_confidence = 0.5*0.2 + 0.5*0 = 0.1 < 0.3 → 'hold' ✅. Option B: Use a separate min_confidence parameter. Update AC-01/02 to ensure combined_confidence > confidence_threshold for directional signals."
+    },
+    {
+      "criterion": "AC-06",
+      "text": "Given conflicting signals — sentiment (+0.9) and negative market return (-5%), When generate() is called, Then confidence is halved and rationale mentions the disagreement",
+      "testable": true,
+      "issues": [
+        "The AC doesn't specify the expected output signal. Numerical verification: combined_score = 0.5*0.9 + 0.5*(-0.5) = 0.20, which is between -0.3 and 0.3 → 'hold'. This is reasonable for conflicting signals but should be documented for test writers."
+      ],
+      "suggested_fix": "Either add the expected signal ('hold') to the AC, or add a note that the signal is determined by combined_score and may be 'hold' for strongly conflicting signals."
+    },
+    {
+      "criterion": "AC-07",
+      "text": "Given market_data with zero volume, When generate() is called, Then no division-by-zero error occurs and signal is safely produced",
+      "testable": true,
+      "issues": [
+        "Volume is NOT used in any computation in the signal_logic formula. This AC is trivially satisfied and arguably irrelevant. If the concern is division by zero, the actual risk is open=0.0 in '(close - open) / open'.",
+        "As written, this AC doesn't test anything the formula actually needs to guard against."
+      ],
+      "suggested_fix": "Option A: Remove and replace with 'Given market_data where open=0.0, When generate() is called, Then no division-by-zero occurs (handle gracefully).' Option B: If volume is intended to be used in the formula, add it to signal_logic first."
+    },
+    {
+      "criterion": "AC-08",
+      "text": "Given None as SentimentResult, When generate() is called, Then TypeError is raised with descriptive message",
+      "testable": true,
+      "issues": [],
+      "notes": "Clear and testable. Follows the pattern from sentiment.py (test_none_input_raises_type_error). ✅"
+    },
+    {
+      "criterion": "AC-09",
+      "text": "Given positive sentiment but market_data is None, When generate() is called, Then signal is produced from sentiment alone with no error",
+      "testable": false,
+      "issues": [
+        "Same root issue as AC-04: the formula hasn't defined the market_data=None code path. Duplicates AC-04 with a minor variant (positive sentiment)."
+      ],
+      "suggested_fix": "Resolve AC-04 first (define None path), then AC-09 becomes a specific test case of that path. Could merge into AC-04 or keep as a variant."
+    },
+    {
+      "criterion": "AC-10",
+      "text": "Given a generated signal, When rationale is inspected, Then it follows a template format containing sentiment_score, confidence, market_return, and final signal label",
+      "testable": true,
+      "issues": [
+        "The rationale template in signal_logic also includes 'sentiment_label' (not mentioned in AC-10) and 'combined_score' (also not mentioned in AC-10). Test writers need to know exactly what to assert.",
+        "The AC should align with the template: mention all fields that must be present."
+      ],
+      "suggested_fix": "Update AC-10 to match the template: '...containing sentiment_score, sentiment_label, confidence, market_return, combined_score, and final signal label' or simplify the template to only include what AC-10 requires."
+    }
+  ],
+
+  "infrastructure_readiness": [
+    {
+      "requirement": "SentimentResult test fixtures",
+      "status": "MISSING",
+      "location": "tests/fixtures/ (new file needed, e.g., tests/fixtures/signal_data.py)",
+      "notes": "Need factory functions or fixtures that create SentimentResult objects with controlled score, confidence, and breakdown values. Existing sentiment_data.py creates FusedRecord objects for the sentiment module itself, not SentimentResult instances. The signal generator takes SentimentResult directly, not FusedRecord. Need: sample_sentiment_positive(), sample_sentiment_negative(), sample_sentiment_neutral(), sample_sentiment_low_confidence() etc."
+    },
+    {
+      "requirement": "MarketData object fixtures (not raw API responses)",
+      "status": "MISSING",
+      "location": "tests/fixtures/signal_data.py or tests/fixtures/market_data.py",
+      "notes": "Existing market_data.py fixtures return raw API response dicts (Yahoo, Alpha Vantage, Finnhub formats). The signal generator needs MarketData dataclass instances. Need: sample_market_data_up(), sample_market_data_down(), sample_market_data_flat(), sample_market_data_zero_volume(), etc. Low complexity — just dataclass construction."
+    },
+    {
+      "requirement": "TradingSignalGenerator fixture",
+      "status": "MISSING",
+      "location": "tests/fixtures/signal_data.py or in test_signals.py inline",
+      "notes": "A fixture creating the default TradingSignalGenerator instance. Simple: TradingSignalGenerator() with defaults. Could be parametrized for custom thresholds."
+    },
+    {
+      "requirement": "TradingSignal dataclass import",
+      "status": "MISSING",
+      "location": "src/model/pretrained/signals.py (doesn't exist yet)",
+      "notes": "The signal file doesn't exist. It will be created during implementation. Testing it requires it to exist first — this is expected."
+    },
+    {
+      "requirement": "torch mocking",
+      "status": "NOT NEEDED",
+      "location": null,
+      "notes": "Signal generation is pure math (no torch dependency). No GPU concerns. No MockTensor or conditional import needed. This is significantly simpler than Ticket 6's test setup."
+    },
+    {
+      "requirement": "pytest conftest registration",
+      "status": "MISSING",
+      "location": "tests/conftest.py",
+      "notes": "If a new tests/fixtures/signal_data.py is created, it must be added to the pytest_plugins list in conftest.py (currently has 9 plugins)."
+    },
+    {
+      "requirement": "Mock pattern for external dependencies",
+      "status": "NOT NEEDED",
+      "location": null,
+      "notes": "No external APIs or I/O. Pure data transformation from SentimentResult + MarketData → TradingSignal. All mocking is just dataclass construction."
+    }
+  ],
+
+  "signal_logic_gaps": [
+    {
+      "gap": "market_data=None path undefined",
+      "severity": "BLOCKING",
+      "detail": "The formula always executes 'daily_return = (close - open) / open' but AC-04 and AC-09 require handling market_data=None. The conditional logic for this case must be added to signal_logic.",
+      "fix": "Add: 'If market_data is None: combined_score = sentiment.sentiment_score * sentiment_weight; combined_confidence = sentiment.confidence; market_signal = None (skip disagreement check).' Or clarify if sentiment_weight still applies."
+    },
+    {
+      "gap": "Low-confidence override rule missing",
+      "severity": "BLOCKING",
+      "detail": "AC-05 requires that low confidence (0.2) overrides a strong directional signal. The formula has no such rule — only the combined_score vs threshold comparison determines the signal.",
+      "fix": "Add: 'If combined_confidence < confidence_threshold, signal = \"hold\".' This resolves AC-05 (combined_confidence=0.1 < 0.3 → hold) and doesn't break AC-01/02 (combined_confidence > 0.5 > 0.3 → directional signals pass through). Update AC-01/02 to specify input confidence that yields output > 0.3 and > 0.5 respectively."
+    },
+    {
+      "gap": "daily_range computed but unused",
+      "severity": "MODERATE",
+      "detail": "Line 'daily_range = (high - low) / open' is defined but never referenced in any subsequent formula. Dead code or incomplete spec.",
+      "fix": "Either remove it or explain its intended use (e.g., incorporate into market_confidence or as a volatility adjustment)."
+    },
+    {
+      "gap": "market_weight * market_signal when market_data=None",
+      "severity": "MODERATE",
+      "detail": "When market_data is None, is the combined_score = sentiment_weight * score (ignoring market_weight)? Or should weights be renormalized to sum to 1? AC-04 says 'confidence equals sentiment.confidence' implying pure sentiment path, but score computation is unspecified.",
+      "fix": "Explicitly state: 'If market_data is None: combined_score = sentiment.sentiment_score * sentiment_weight; combined_confidence = sentiment.confidence; signal = \"buy\" if combined_score > +confidence_threshold ...'"
+    },
+    {
+      "gap": "disagreement halving with market_data=None",
+      "severity": "LOW",
+      "detail": "The disagreement check 'if sentiment.sentiment_score * market_signal < 0' would crash if market_signal is undefined (market_data=None).",
+      "fix": "Guard the disagreement check: only apply when market_data is not None."
+    }
+  ],
+
+  "coverage_analysis": {
+    "happy_path": "COVERED",
+    "notes": "AC-01 (buy with both signals aligned) and AC-02 (sell with both signals aligned) cover the primary happy paths for directional signals.",
+    "error_cases": "COVERED",
+    "notes": "AC-08 (None SentimentResult → TypeError) is a clear error case. AC-07 (zero volume) is technically safe but tests nothing meaningful.",
+    "edge_cases": "PARTIALLY COVERED",
+    "notes": "Covered: neutral signals (AC-03), market_data=None (AC-04, AC-09), low confidence override (AC-05), conflicting signals (AC-06), rationale format (AC-10). Missing: open=0 (div by zero), edge of threshold boundaries (combined_score exactly at ±0.3), extreme values (sentiment=±1.0, huge daily_return), empty breakdown list in SentimentResult, negative volume."
+  },
+
+  "missing_edge_cases": [
+    {
+      "case": "open=0.0 in MarketData",
+      "severity": "MODERATE",
+      "detail": "daily_return = (close - open) / open would cause ZeroDivisionError if open=0.0. This is a real-world edge case (e.g., after stock split, data error). Should be handled with a guard or default.",
+      "example": "MarketData(open=0.0, high=100, low=90, close=95, volume=1000, ...)"
+    },
+    {
+      "case": "combined_score exactly at threshold boundary",
+      "severity": "LOW",
+      "detail": "When combined_score == +confidence_threshold (0.3) or == -confidence_threshold (-0.3), the signal decision uses strict > and < comparisons. The boundary behavior should be documented (falls to 'hold').",
+      "example": "sentiment_score=0.5, daily_return=+1% → combined_score = 0.5*0.5 + 0.5*0.1 = 0.3. Not > 0.3, so 'hold'."
+    },
+    {
+      "case": "Empty breakdown in SentimentResult",
+      "severity": "LOW",
+      "detail": "SentimentResult with breakdown=[] is a valid state (from sentiment.py's _neutral_result). Should the signal generator handle this? If sentiment_score=0.0 and confidence=0.0 with empty breakdown, the signal should be 'hold'.",
+      "example": "SentimentResult(sentiment_score=0.0, confidence=0.0, breakdown=[])"
+    },
+    {
+      "case": "Extreme sentiment_score values",
+      "severity": "LOW",
+      "detail": "SentimentResult score is already clamped to [-1, 1] by design, but extreme values combined with extreme market returns could produce combined_score outside the [-1, 1] range (e.g., 0.5*1.0 + 0.5*1.0 = 1.0, or 0.5*(-1.0) + 0.5*(-1.0) = -1.0). Should the signal or confidence be clamped?",
+      "example": "sentiment_score=1.0, daily_return=+10% → market_signal=1.0, combined_score=1.0"
+    }
+  ],
+
+  "verdict": "NEEDS_REVISION",
+
+  "blocking_issues": [
+    "AC-05 contradicts signal_logic: formula produces 'buy' but AC expects 'hold'. The 'low confidence overrides' rule is missing from the formula. Must add: if combined_confidence < confidence_threshold, signal = 'hold'.",
+    "AC-04 and AC-09 require handling market_data=None, but the signal_logic formula only defines a path assuming market_data is provided. Must add conditional logic for market_data=None in signal_logic.",
+    "AC-01 and AC-02 are underdetermined: they don't specify sentiment.confidence, making the 'confidence > 0.5' assertion unverifiable. Must add sentiment.confidence values to the Given clauses."
+  ],
+
+  "moderate_issues": [
+    "AC-07 (zero volume) tests a field that isn't used in any computation. Replace with open=0.0 test or make volume relevant to the formula.",
+    "daily_range is defined but never used. Remove or incorporate.",
+    "The rationale template uses sentiment_label but AC-10 checks don't mention it. Align AC-10 with the actual template.",
+    "Market data None path needs clarification on whether both weights still apply or if only sentiment_weight is used.",
+    "Disagreement halving check (sentiment.sentiment_score * market_signal < 0) needs to be guarded against market_data=None."
+  ],
+
+  "low_issues": [
+    "AC-04 and AC-09 are mostly redundant (both test market_data=None). Consider merging.",
+    "AC-06 doesn't specify expected signal for conflicting inputs. Add 'hold' as the expected signal.",
+    "Boundary behavior at combined_score == ±confidence_threshold not documented (falls to 'hold' by strict comparison).",
+    "empty breakdown list in SentimentResult not tested as input."
+  ],
+
+  "implementation_readiness": {
+    "overall": "NOT READY",
+    "spec_precision": "The API spec (dataclass + method signatures) is precise and ready. The TradingSignal dataclass and TradingSignalGenerator class signatures are well-defined.",
+    "signal_logic_ambiguity": "The signal_logic formula is precise but incomplete: missing market_data=None branch, missing low-confidence override rule, and the daily_range variable is dead code.",
+    "test_infrastructure_complexity": "Low — no torch, no GPU, no external APIs. Pure data transformation. Significantly simpler than Ticket 6 (which needed MockTensor, AutoModel/AutoTokenizer mocking). Need 2-3 new fixture factories.",
+    "dependency_chain_risk": "Depends on Ticket 2 (MarketData) and Ticket 6 (SentimentResult). Both already exist in the codebase. No risk."
+  },
+
+  "implementation_plan_outline": {
+    "phase_1_fix_spec": [
+      "Add to signal_logic: 'If market_data is None: combined_score = sentiment.sentiment_score (renormalized weights implied), combined_confidence = sentiment.confidence, skip disagreement check.'",
+      "Add to signal_logic: 'If combined_confidence < confidence_threshold: signal = \"hold\" (low-confidence override).'",
+      "Remove or use daily_range in the formula.",
+      "Update AC-01/02 with explicit sentiment.confidence values.",
+      "Align AC-10 with the template (add sentiment_label, combined_score).",
+      "Resolve AC-07 (replace with open=0.0 test)."
+    ],
+    "phase_2_fixtures": [
+      "Create tests/fixtures/signal_data.py with: sample_sentiment_positive(), sample_sentiment_negative(), sample_sentiment_neutral(), sample_sentiment_low_confidence(), sample_market_data_up(), sample_market_data_down(), sample_market_data_flat(), sample_market_data_zero_open(), signal_generator fixture.",
+      "Register signal_data in conftest.py pytest_plugins."
+    ],
+    "phase_3_implementation": [
+      "Create src/model/pretrained/signals.py with TradingSignal dataclass and TradingSignalGenerator class.",
+      "Implement generate() with the clarified signal_logic (including market_data=None, low-confidence override).",
+      "Export from src/model/pretrained/__init__.py."
+    ],
+    "phase_4_tests": [
+      "Create tests/test_signals.py.",
+      "Test all 10 ACs (after revision), plus missing edge cases (open=0, boundary thresholds, empty breakdown).",
+      "No torch mock needed; simpler mock setup than test_sentiment.py."
+    ]
+  },
+
+  "summary": "Ticket 7 v2 resolved all 7 blocking issues from v1 (✅ B1-B7). However, v2 introduced 3 new blocking issues: (1) AC-05 contradicts the formula — the low-confidence override rule is missing from signal_logic, (2) market_data=None path is undefined in signal_logic despite being required by two ACs, (3) AC-01/02 lack required sentiment.confidence inputs. Additionally, there are 5 moderate issues and 4 low issues. The API surface and code structure are clean; the issues are in the signal_logic formula and AC specification, not the architecture. The implementation is straightforward once the spec is corrected — no torch mocking needed, pure math transformation."
+}

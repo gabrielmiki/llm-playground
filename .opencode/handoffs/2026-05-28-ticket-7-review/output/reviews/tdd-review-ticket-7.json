@@ -1,0 +1,184 @@
+{
+  "spec_file": "docs/context/financial-analysis-ticket-7.md",
+  "review_timestamp": "2026-05-28T12:00:00+00:00",
+  "prior_ticket_initial_blocking_issues": 12,
+  "prior_ticket_initial_moderate_issues": 5,
+
+  "verdict": "NEEDS_REVISION",
+  "blocking_issues": [
+    "B1: Data model mismatch — MarketData is single-day OHLCV, but 'price trends' requires multi-day time series",
+    "B2: No signal generation formula or threshold specification for buy/sell/hold classification",
+    "B3: No confidence score derivation formula — AC-02 mandates a [0,1] score but doesn't specify how it's computed",
+    "B4: Missing dependency on Ticket 2 (MarketData dataclass) — api_spec consumes MarketData but only declares [Ticket 6] as dependency",
+    "B5: No concrete output type — returns bare dict instead of dataclass, violating the pattern established in Tickets 2, 4, and 6",
+    "B6: Only 3 ACs with zero edge case or error coverage — identical to Ticket 6's insufficient initial state which required 12 blocking fixes",
+    "B7: Rationale format unspecified — 'human-readable rationale' is vague; no template, schema, or required content defined"
+  ],
+  "moderate_issues": [
+    "M1: No class/module naming convention or file placement specified",
+    "M2: Conflicting signal handling undefined — what happens when sentiment (positive) contradicts market trend (negative)?",
+    "M3: MarketData is a single day, but a single day's OHLCV cannot produce 'trend' — requires specifying whether caller provides multiple MarketData objects or whether trend features are computed internally",
+    "M4: No import guard pattern specified — does this module need conditional torch support or is it pure Python logic?",
+    "M5: No specification of whether the signal generator wraps/uses FinBertSentiment internally or receives pre-computed SentimentResult",
+    "M6: 'complex' complexity rating is likely overestimated for a rule-based prototype — risks over-scoping"
+  ],
+  "low_issues": [
+    "L1: No existing test fixtures combine SentimentResult + MarketData — all sentiment_data fixtures use market_data=None",
+    "L2: No constructor parameters specified (e.g., confidence threshold, lookback window, weights)",
+    "L3: The pipeline.py currently ends after sentiment analysis — no integration point for signal generation is shown",
+    "L4: Should error handling produce a dedicated exception type (e.g., SignalGenerationError) following ModelLoadError precedent?"
+  ],
+
+  "ac_validation": [
+    {
+      "criterion": "AC-01 (original)",
+      "text": "Given sentiment score and market data, When signal is generated, Then result is buy, sell, or hold",
+      "testable": false,
+      "issues": [
+        "Cannot deterministically test because no thresholds distinguish buy vs sell vs hold",
+        "No specification of what market data fields are used or how",
+        "No definition of what 'combine sentiment analysis with market data' means algorithmically",
+        "Single MarketData object cannot produce 'price trends' — trend requires multiple time points"
+      ],
+      "suggested_fix": "Remove aspirational 'price trends' language. Define concrete features (e.g., daily return = (close - open) / open, volume change vs previous day). Specify thresholds: e.g., score > 0.3 → buy, score < -0.3 → sell, else hold. Add requirement for lookback window or accept the limitation of single-day features."
+    },
+    {
+      "criterion": "AC-02 (original)",
+      "text": "Given signal, When generated, Then confidence score (0-1) is provided",
+      "testable": false,
+      "issues": [
+        "No formula specified for confidence derivation",
+        "Is it the sentiment confidence directly? A weighted combination?",
+        "Should confidence reflect agreement between sentiment and market signal? Disagreement?",
+        "Cannot write a meaningful assertion — any value in [0,1] would pass"
+      ],
+      "suggested_fix": "Specify formula: e.g., `confidence = sentiment.confidence * market_agreement_factor` where market_agreement_factor ∈ [0.5, 1.0] based on alignment. Or simplify: confidence = sentiment.confidence (delegating to existing AC from Ticket 6)."
+    },
+    {
+      "criterion": "AC-03 (original)",
+      "text": "Given signal, When generated, Then human-readable rationale is included",
+      "testable": false,
+      "issues": [
+        "'Human-readable' is an ambiguous qualifier — violates guideline 'No ambiguous qualifiers'",
+        "No minimum content requirements: what must the rationale mention?",
+        "No format defined: sentence? bullet points? structured dict with explanation field?",
+        "Any non-empty string would trivially pass"
+      ],
+      "suggested_fix": "Specify: 'rationale is a string containing at least: the sentiment score, the confidence, the signal direction, and the market data summary (open/close/change%).' Template example: 'Sentiment {label} ({score:.2f}) with confidence {sent_conf:.2f} combined with market return of {return:.2%} → {signal} with combined confidence {conf:.2f}'"
+    }
+  ],
+
+  "infrastructure_readiness": [
+    {
+      "requirement": "MarketData dataclass",
+      "status": "EXISTS",
+      "location": "src/collect/market_data.py:44-53",
+      "notes": "MarketData(open, high, low, close, volume, adjusted_close, timestamp) — single-day OHLCV. Multi-day trend computation would need list[MarketData] or a different data structure."
+    },
+    {
+      "requirement": "SentimentResult dataclass",
+      "status": "EXISTS",
+      "location": "src/model/pretrained/sentiment.py:37-40",
+      "notes": "SentimentResult(sentiment_score, confidence, breakdown) — correct output of Ticket 6."
+    },
+    {
+      "requirement": "ArticleSentiment dataclass",
+      "status": "EXISTS",
+      "location": "src/model/pretrained/sentiment.py:29-33",
+      "notes": "ArticleSentiment(article_title, score, confidence, label) — per-article detail from Ticket 6."
+    },
+    {
+      "requirement": "MockTensor infrastructure",
+      "status": "EXISTS",
+      "location": "tests/test_sentiment.py:20-54",
+      "notes": "MockTensor + _MOCK_TORCH sys.modules injection exists. Signal generation may not need torch at all if it consumes pre-computed SentimentResult — this depends on architecture decision."
+    },
+    {
+      "requirement": "Test fixtures combining SentimentResult + MarketData",
+      "status": "MISSING",
+      "location": "N/A",
+      "notes": "All 6 sentiment_data fixtures use market_data=None. Need new fixture module (e.g., tests/fixtures/signal_data.py) with combined data. Also need fixtures for edge cases: zero volume, flat prices, extreme returns, None market_data."
+    },
+    {
+      "requirement": "Signal generation class/module structure",
+      "status": "MISSING",
+      "location": "N/A",
+      "notes": "No file path or module specified. Based on prior patterns: src/model/pretrained/signals.py or src/model/signals.py. Needs __init__.py exports."
+    },
+    {
+      "requirement": "Signal output dataclass",
+      "status": "MISSING",
+      "location": "N/A",
+      "notes": "Should be a dataclass like TradingSignal(ticker, signal, confidence, rationale) following Ticket 2/4/6 precedent."
+    }
+  ],
+
+  "coverage_analysis": {
+    "happy_path": "COVERED",
+    "error_cases": "MISSING",
+    "edge_cases": "MISSING"
+  },
+
+  "recommended_acs": [
+    "AC-01: Given a SentimentResult with sentiment_score=0.7, confidence=0.8, and MarketData with daily_return=+0.02, When generate_signal(sentiment, market_data) is called, Then returns TradingSignal with signal='buy', confidence > 0.5, and non-empty rationale containing both sentiment and return values",
+    "AC-02: Given SentimentResult with sentiment_score=-0.6, confidence=0.9, and MarketData with daily_return=-0.01, When generate_signal() is called, Then signal='sell' and confidence > 0.5",
+    "AC-03: Given SentimentResult with sentiment_score=0.05 (neutral), confidence=0.4, and MarketData with daily_return=0.0, When generate_signal() is called, Then signal='hold'",
+    "AC-04: Given market_data=None (missing market data), When generate_signal() is called, Then signal is derived from sentiment alone with a warning and confidence uses only sentiment.confidence",
+    "AC-05: Given SentimentResult with sentiment_score=0.8 but confidence=0.2 (low confidence), When generate_signal() is called, Then signal='hold' because low confidence overrides direction",
+    "AC-06: Given strong positive sentiment (score=0.9) but strongly negative market return (-5%), When generate_signal() is called, Then signal reflects the conflict (e.g., 'hold' or whichever dominates) and the rationale explicitly mentions the disagreement",
+    "AC-07: Given MarketData with volume=0 (zero volume), When generate_signal() is called, Then signal is derived safely without division-by-zero error",
+    "AC-08: Given ticker='' (empty string), When generate_signal() is called, Then signal is still produced with empty ticker or raises appropriate error",
+    "AC-09: Given None as SentimentResult, When generate_signal() is called, Then TypeError is raised with descriptive message",
+    "AC-10: Given None as MarketData, When generate_signal() is called, Then TypeError is raised with descriptive message (if MarketData is required) or signal is derived from sentiment alone (if optional)"
+  ],
+
+  "recommended_api_spec": {
+    "module": "src/model/pretrained/signals.py",
+    "class": "TradingSignalGenerator",
+    "constructor": {
+      "params": [
+        "confidence_threshold: float = 0.3 — minimum threshold for buy/sell (below = hold)",
+        "sentiment_weight: float = 0.5 — weight of sentiment vs market in combined score",
+        "market_weight: float = 0.5 — weight of market vs sentiment in combined score"
+      ]
+    },
+    "input_type": {
+      "name": "SignalInput",
+      "fields": {
+        "ticker": "str",
+        "sentiment": "SentimentResult",
+        "market_data": "MarketData | None"
+      }
+    },
+    "output_type": {
+      "name": "TradingSignal",
+      "fields": {
+        "ticker": "str",
+        "signal": "str  # enum Literal['buy', 'sell', 'hold']",
+        "confidence": "float  # [0.0, 1.0], combined from sentiment and market signal",
+        "rationale": "str  # template-based explanation",
+        "sentiment_score": "float  # pass-through from SentimentResult for transparency",
+        "market_return": "float | None  # daily return if market_data available"
+      }
+    },
+    "method": "def generate(self, sentiment: SentimentResult, market_data: MarketData | None) -> TradingSignal",
+    "exception": "SignalGenerationError (optional, for critical failures)",
+    "import_pattern": "try/except ImportError guard if torch-dependent; file-based import if pure Python"
+  },
+
+  "recommended_threshold_spec": {
+    "signal_logic": "combined_score = sentiment_weight * sentiment.sentiment_score + market_weight * market_signal, where market_signal = clamp(daily_return * 10, -1, 1)",
+    "thresholds": "combined_score > +confidence_threshold → 'buy'; combined_score < -confidence_threshold → 'sell'; else 'hold'",
+    "confidence_formula": "combined_confidence = (sentiment_weight * sentiment.confidence + market_weight * market_confidence_factor) where market_confidence_factor = min(1.0, abs(daily_return) * 10)",
+    "rationale_template": "'Sentiment {label} ({score:.2f}) with confidence {sent_conf:.2f}. Market return: {return:+.2%} (volume: {volume}). Combined signal: {signal} with confidence {conf:.2f}.'",
+    "market_agreement": "If sentiment and market signals disagree (one positive, one negative), reduce combined confidence by 50% and prefer 'hold' if absolute disagreement > 1.0 in combined terms"
+  },
+
+  "risk_assessment": {
+    "comparison_to_ticket_6_initial": "Ticket 7's initial state is comparable to Ticket 6's initial state (3 vague ACs, missing types, no edge cases). Ticket 6 had 12 blocking + 5 moderate issues at first review. Ticket 7 has 7 blocking + 6 moderate + 4 low issues — slightly better but still in NEEDS_REVISION territory.",
+    "critical_gap": "The 'price trends' vs single-day MarketData mismatch is the most fundamental design issue. Resolving this requires a decision: (a) accept single-day features only (daily return, intraday range), (b) require a list[MarketData] for lookback, or (c) add trend features to MarketData.",
+    "signal_algorithm_maturity": "Without any formula, thresholds, or decision logic, the ticket cannot be meaningfully implemented or tested. Even a simple rule-based approach needs specific parameters.",
+    "mock_complexity_estimate": "Low — the signal generator likely does not need torch (it consumes pre-computed SentimentResult). This means no MockTensor dependency and simpler test setup than Ticket 6.",
+    "fixture_estimate": "Need 6-8 fixtures in a new tests/fixtures/signal_data.py module (registered in conftest.py), plus TradingSignal dataclass and TradingSignalGenerator class."
+  }
+}

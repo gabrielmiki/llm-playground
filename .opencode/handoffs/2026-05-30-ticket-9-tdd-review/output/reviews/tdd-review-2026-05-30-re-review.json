@@ -1,0 +1,292 @@
+{
+  "verdict": "READY",
+  "re_review_of": "tdd-review-2026-05-30.json (NEEDS_REVISION → now ready)",
+  "previous_blocking_issues_resolution": [
+    {
+      "issue": "BLOCKING: 'historical data' undefined — no source, selection criteria, or loading mechanism specified",
+      "resolution": "RESOLVED. Now specifies: source = data/processed/fused/, scan strategy = look back 5 trading days using existing trading-day adjustment logic, selective substitution (only replace the failed field), first-run behavior = fallback_failed warning."
+    },
+    {
+      "issue": "BLOCKING: 'insufficient_data status' doesn't exist — no status field on any data model",
+      "resolution": "RESOLVED. Removed the status field concept entirely. Now uses existing ValidationWarning infrastructure with category='insufficient_data' — no new dataclass fields needed."
+    },
+    {
+      "issue": "BLOCKING: Zero edge case coverage — 3 ACs only cover idealized scenarios",
+      "resolution": "RESOLVED. Expanded to 8 ACs covering: market-only fail (AC-01), news-only fail (AC-02), fallback-unavailable (AC-03), both-fail (AC-04), mixed single-source fail (AC-05/06), multi-ticker batch (AC-07), and report rendering (AC-08)."
+    }
+  ],
+  "previous_moderate_issues_resolution": [
+    {
+      "issue": "MODERATE: Layer placement ambiguous",
+      "resolution": "RESOLVED. src/generate/degradation.py created in generate layer, src/pipeline.py modified for catch logic."
+    },
+    {
+      "issue": "MODERATE: Missing dependency (Ticket 8)",
+      "resolution": "RESOLVED. Ticket 8 now listed as a dependency."
+    },
+    {
+      "issue": "MODERATE: Degradation warning format unspecified",
+      "resolution": "RESOLVED. 4 warning categories defined in clear table: degraded_market, degraded_news, fallback_failed, insufficient_data."
+    },
+    {
+      "issue": "MODERATE: Pipeline already silent — no warning generated",
+      "resolution": "RESOLVED. Explicit pseudocode for catch → fallback → warn → continue pattern provided."
+    },
+    {
+      "issue": "MODERATE: No test structure guidance",
+      "resolution": "RESOLVED. Files listed: test_degradation.py (12-15 tests), fixtures/degradation_data.py (~5 fixtures), conftest.py registration."
+    }
+  ],
+  "ac_validation": [
+    {
+      "criterion": "AC-01",
+      "text": "Given market data fails (all 3 providers exhausted) and historical cache exists for a recent trading day, When pipeline processes ticker, Then historical market_data is substituted and a degraded_market warning is appended to FusedRecord.warnings",
+      "testable": true,
+      "issues": [
+        "The mechanism for appending degradation warnings to FusedRecord.warnings is implied but not explicitly specified (handoff from collection stage to fusion stage). Two viable approaches: (a) pass degradation_warnings to DataFusionEngine.fuse() as a parameter, or (b) append to fused.warnings after fusion returns. Either works but should be stated to avoid ambiguity.",
+        "\"recent trading day\" is slightly ambiguous — defined in the Historical Fallback Definition as \"up to 5 previous trading days\" using existing trading-day adjustment logic, but should cross-reference that definition more tightly."
+      ],
+      "suggested_fix": "Add a one-liner in the Implementation Notes: 'Degradation warnings from collection stage are appended to FusedRecord.warnings after fusion (e.g., fused.warnings.extend(degradation_warnings)).'"
+    },
+    {
+      "criterion": "AC-02",
+      "text": "Given news data fails (both providers exhausted) and historical cache exists for a recent trading day, When pipeline processes ticker, Then historical news_articles are substituted and a degraded_news warning is appended to FusedRecord.warnings",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-03",
+      "text": "Given market data fails and no historical cache exists within 5-day lookback, When pipeline processes ticker, Then market_data remains None, a fallback_failed warning is appended, and pipeline continues to next stage",
+      "testable": true,
+      "issues": [
+        "Test must verify pipeline continues past the preprocessing stage. The MarketDataValidator currently accesses data.open (line 31 of validator.py) which would raise AttributeError on None market_data. This is a pre-existing bug (exists in current pipeline.py) but would be exposed by this test. The ticket should optionally note that the validator guard needs to handle None, or the pipeline should skip validation for None market_data.",
+        "This interaction is pre-existing and not created by this ticket, but the degradation tests will expose it."
+      ],
+      "suggested_fix": "Add a brief note: 'Note: When market_data is None, the pipeline should skip MarketDataValidator.validate() to avoid AttributeError, or the validator's None case should be handled gracefully.'"
+    },
+    {
+      "criterion": "AC-04",
+      "text": "Given both market AND news data fail and fallback is unavailable, When pipeline processes ticker, Then insufficient_data warning is appended, and pipeline continues to completion with None/empty values",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-05",
+      "text": "Given market data fails but news succeeds, When pipeline processes ticker, Then market uses historical fallback, news runs normal, and both degraded_market + normal processing reflected in warnings and output",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-06",
+      "text": "Given news data fails but market succeeds, When pipeline processes ticker, Then news uses historical fallback, market runs normal, and both degraded_news + normal processing reflected in warnings and output",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-07",
+      "text": "Given multiple tickers with mixed failure modes, When running batch pipeline, Then each ticker independently handles degradation and aggregated warnings appear in final report",
+      "testable": true,
+      "issues": [
+        "This is an integration-level AC requiring end-to-end mock setup: multiple async collectors, historical cache files, and report generation. Testable but will be the most complex test to set up. Recommend verifying the mock infrastructure for multi-ticker async scenarios exists in the test fixture design. The conftest.py already has event_loop and mock_httpx_client fixtures which can be composed.",
+        "The 'final report' check implies degradation warnings survive the write-to-disk-and-reload cycle: pipeline → fused JSON file → orchestrate.load_fused_record() → ReportInput → ReportGenerator. This flow works because FusedRecord.warnings are serialized in JSON and reloaded via ValidationWarning(**w) in _decode_fused_record()."
+      ],
+      "suggested_fix": "Add a note that this AC requires the fused JSON serialization pathway — already confirmed functional by inspecting orchestrate.py lines 31 (warnings decode) and reporter.py (warnings rendering)."
+    },
+    {
+      "criterion": "AC-08",
+      "text": "Given any degradation occurred during processing, When report is generated (via existing ReportGenerator), Then warnings section clearly lists all issues with category, field, and message per existing ValidationWarning rendering in text/JSON/HTML formats",
+      "testable": true,
+      "issues": [
+        "The text format (_format_text in reporter.py) only renders w.message, not w.category or w.field. The JSON format renders all four fields. If the AC requires category/field to appear in text format, a reporter change is needed. If the AC means 'whatever the existing ValidationWarning rendering is, the warnings appear there,' it's fine as-is. The wording 'category, field, and message per existing ValidationWarning rendering' is ambiguous but likely means the second interpretation.",
+        "Recommend clarifying: 'category, field, and message present as attributes of each ValidationWarning — rendered in whatever format the existing ReportGenerator supports (message in text, all fields in JSON, message in HTML).'"
+      ],
+      "suggested_fix": "Minor rewording: 'Then warnings section in the report includes each degradation warning, appearing in the output formats per the existing ReportGenerator rendering conventions.'"
+    }
+  ],
+  "infrastructure_readiness": [
+    {
+      "requirement": "ValidationWarning dataclass (category, field, message, value) for degradation warnings",
+      "status": "EXISTS",
+      "location": "src/preprocess/validator.py:13-18",
+      "notes": "All four degradation categories (degraded_market, degraded_news, fallback_failed, insufficient_data) use this existing dataclass. No new fields needed."
+    },
+    {
+      "requirement": "FusedRecord with warnings list — target for degradation warnings",
+      "status": "EXISTS",
+      "location": "src/preprocess/fusion.py:14-20",
+      "notes": "FusedRecord.warnings flow through to ReportInput.warnings via orchestrate.py line 62: all_warnings.extend(fused.warnings)."
+    },
+    {
+      "requirement": "MarketDataUnavailableError / NewsDataUnavailableError — exceptions to catch",
+      "status": "EXISTS",
+      "location": "src/collect/exceptions.py:22-25, 46-48",
+      "notes": "Well-defined exception hierarchy. Pipeline.py already imports these (lines 19-22)."
+    },
+    {
+      "requirement": "load_fused_record() for loading historical cache files",
+      "status": "EXISTS",
+      "location": "src/generate/orchestrate.py:41-45",
+      "notes": "Loads by {TICKER}_{DATE}.json from data/processed/fused/. Can be reused by find_historical_fallback(). Currently no function exists for iterating past dates — that must be built in degradation.py."
+    },
+    {
+      "requirement": "Trading-day adjustment logic for 5-day lookback",
+      "status": "EXISTS",
+      "location": "src/collect/market_data.py:90-103 (_adjust_to_trading_day), src/collect/news_collector.py:37-53 (_get_weekday_adjustment)",
+      "notes": "Two adjustments exist with slightly different implementations (one uses date objects, one uses strings). The degradation.py find_historical_fallback() should use or replicate this logic for scanning past trading days."
+    },
+    {
+      "requirement": "Fused JSON serialization/deserialization for warning persistence",
+      "status": "EXISTS",
+      "location": "src/preprocess/output_writer.py and src/generate/orchestrate.py:31",
+      "notes": "ValidationWarning round-trips through JSON via dict-based constructor ValidationWarning(**w). Verified functional: fused JSON files contain a 'warnings' array."
+    },
+    {
+      "requirement": "ReportGenerator warning rendering for degradation warnings",
+      "status": "EXISTS",
+      "location": "src/generate/reporter.py:70-74 (text), 94-103 (JSON), 124-129 (HTML)",
+      "notes": "All three formats already render warnings. Text format only shows w.message; JSON shows all four fields. No reporter changes needed for new warning categories to appear."
+    },
+    {
+      "requirement": "Test infrastructure for async collector mocking",
+      "status": "EXISTS",
+      "location": "tests/conftest.py:48-58 (mock_httpx_client)",
+      "notes": "Async mocks are established patterns. MarketDataCollector and NewsCollector both accept async HTTP clients. Tests can either mock the collector directly (patching fetch/fetch_news) or mock the underlying HTTP client layer."
+    },
+    {
+      "requirement": "Test fixtures for cached FusedRecords (historical data)",
+      "status": "MISSING — to be created",
+      "location": "tests/fixtures/degradation_data.py",
+      "notes": "Per the ticket, ~5 fixtures need to be created: sample FusedRecords for multiple dates (T-1 through T-5), with varying market_data/news_articles content. Existing market_data.py and news_data.py fixtures can be composed to build these."
+    },
+    {
+      "requirement": "conftest.py registration for new fixture plugin",
+      "status": "MISSING — to be modified",
+      "location": "tests/conftest.py",
+      "notes": "Needs 'tests.fixtures.degradation_data' added to pytest_plugins list. Straightforward registration."
+    }
+  ],
+  "coverage_analysis": {
+    "happy_path": "COVERED",
+    "description": "AC-05 (market fails, news succeeds → historical fallback + normal) and AC-06 (news fails, market succeeds) are the main happy-path flow-through cases where one source works normally and the other degrades gracefully.",
+    "error_cases": "COVERED",
+    "description": "AC-03 (fallback_failed) and AC-04 (insufficient_data) cover the two main error dimensions: single-source failure without cache, and total failure without cache.",
+    "edge_cases": "COVERED",
+    "description": "AC-01/02 (single-source fail with fallback), AC-07 (multi-ticker mixed), AC-08 (report integration) cover edge cases around selective substitution, multi-ticker independence, and end-to-end warning pipeline."
+  },
+  "remaining_moderate_issues": [
+    {
+      "issue": "Degradation-warning-to-FusedRecord handoff unspecified",
+      "severity": "MODERATE",
+      "description": "The pseudocode shows 'warnings.append(ValidationWarning(...))' but doesn't specify how this local warnings list gets merged into FusedRecord.warnings. The DataFusionEngine.fuse() creates its own internal warnings list and returns FusedRecord with those warnings. The degradation warnings from the collection stage must be passed in or appended afterward.",
+      "impact": "Low — two obvious solutions exist: (a) pass degradation_warnings list to engine.fuse() as optional parameter, or (b) append after fusion: fused.warnings.extend(degradation_warnings). Both work without changing any dataclass definitions.",
+      "suggested_fix": "Add a brief implementation note: 'Degradation warnings are appended to FusedRecord.warnings after DataFusionEngine.fuse() returns (e.g., fused.warnings.extend(degradation_warnings)).'"
+    },
+    {
+      "issue": "find_historical_fallback() signature informally defined",
+      "severity": "MODERATE",
+      "description": "The pseudocode shows 'find_historical_fallback(ticker, date, \"market\")' with the third parameter being a target identifier ('market' or 'news'). The return value is used as 'if historical:' implying Optional[FusedRecord]. The semantics of the third parameter are: it determines which field to extract from the historical record, or possibly which field must be non-None for the historical record to be considered 'valid'.",
+      "impact": "Low — the usage in the pseudocode makes the intent clear enough for implementation.",
+      "suggested_fix": "Add a brief docstring for find_historical_fallback: 'def find_historical_fallback(ticker: str, date: date, target: Literal[\"market\", \"news\"]) -> FusedRecord | None: ...'"
+    },
+    {
+      "issue": "Historical file 'validity' criterion undefined",
+      "severity": "MODERATE",
+      "description": "The ticket says 'Use the first valid FusedRecord file found' but doesn't define 'valid'. A file that parses correctly? A file with non-None market_data (if market target) or non-empty news_articles (if news target)? What if the historical record has market_data=None but we need market fallback?",
+      "impact": "Low — the 'valid' definition can follow the selective substitution logic: if target='market', the historical record must have non-None market_data. If target='news', the historical record must have non-empty news_articles.",
+      "suggested_fix": "Add: 'A FusedRecord is considered valid for fallback if: for target=\"market\", market_data is not None; for target=\"news\", news_articles is non-empty.'"
+    },
+    {
+      "issue": "Pre-existing bug: pipeline crashes on None market_data during validation",
+      "severity": "LOW (pre-existing, not in scope)",
+      "description": "When market_data is None (from MarketDataUnavailableError catch), the current pipeline calls MarketDataValidator.validate(None) which accesses data.open and crashes with AttributeError. This bug exists in the current codebase and is exposed by any degradation scenario where fallback fails (market_data stays None). The degradation ticket should either (a) fix this or (b) skip validation when market_data is None.",
+      "impact": "Tests for AC-03 and AC-04 will fail (or crash) if this isn't addressed, because market_data=None will reach the validator. The fix is a simple guard: 'if market_data is not None: md_result = md_validator.validate(market_data)'.",
+      "suggested_fix": "Add to ticket description or pipeline change section: 'Note: When market_data is None, skip MarketDataValidator.validate() to avoid AttributeError (add guard: if market_data is not None: ...).'"
+    },
+    {
+      "issue": "Interaction between degradation warnings and fusion warnings",
+      "severity": "LOW",
+      "description": "When market_data=None AND fallback fails, the pipeline generates both: (1) fallback_failed warning from degradation, and (2) missing_market_data warning from DataFusionEngine. This double-warning is arguably correct behavior (one says 'tried fallback,' the other says 'no market data'), but the ticket doesn't acknowledge it. When fallback succeeds, market_data is non-None, so fusion engine doesn't add missing_market_data — only degraded_market appears. Clean behavior.",
+      "impact": "None — the behavior is correct and self-consistent. But test authors should be aware that AC-04 and fallback_failed combined scenarios will have 2+ warnings in FusedRecord.warnings.",
+      "suggested_fix": "Optionally add a note: 'When fallback_failed is emitted, DataFusionEngine also emits its own missing_market_data warning — both warnings flow through to the report as expected.'"
+    }
+  ],
+  "test_structure_confirmation": {
+    "files_to_create": [
+      "src/generate/degradation.py — find_historical_fallback(), build_degradation_warnings(). Suggested signature:\n  def find_historical_fallback(ticker: str, date: date, target: Literal['market', 'news']) -> FusedRecord | None\n  def build_degradation_warnings(target: str, success: bool, ticker: str, date: date, fallback_date: date | None) -> list[ValidationWarning]",
+      "tests/test_degradation.py — 12-15 tests covering 8 ACs plus edge cases",
+      "tests/fixtures/degradation_data.py — ~5 fixtures: historical FusedRecords for T-1 through T-5 (varying content), collector failure mocks"
+    ],
+    "files_to_modify": [
+      "src/pipeline.py — Add degradation catch/fallback/warn logic, skip validation when market_data is None",
+      "tests/conftest.py — Register tests.fixtures.degradation_data in pytest_plugins"
+    ],
+    "files_not_modified_confirmed": [
+      "src/collect/ — exceptions already well-defined",
+      "src/preprocess/ — no changes needed",
+      "src/model/ — no changes",
+      "src/generate/reporter.py — warning rendering unchanged",
+      "src/generate/orchestrate.py — load_fused_record() reused, run_report_generation() unchanged",
+      "src/generate/config.py, models.py — unchanged"
+    ],
+    "suggested_test_matrix": {
+      "unit_tests_degradation_py": [
+        "test_find_historical_fallback_found — historical file exists within 5 days, returns FusedRecord",
+        "test_find_historical_fallback_not_found — no historical file within 5 days, returns None",
+        "test_find_historical_fallback_corrupt_file — file exists but invalid JSON",
+        "test_build_degradation_warnings_success — builds correct category/field/message for degraded_market/degraded_news",
+        "test_build_degradation_warnings_failure — builds correct category/field/message for fallback_failed"
+      ],
+      "pipeline_integration_tests": [
+        "test_ac01_market_fails_historical_exists — AC-01 verification",
+        "test_ac02_news_fails_historical_exists — AC-02 verification",
+        "test_ac03_market_fails_no_historical — AC-03 verification",
+        "test_ac04_both_fail_no_historical — AC-04 verification",
+        "test_ac05_market_fails_news_succeeds — AC-05 verification",
+        "test_ac06_news_fails_market_succeeds — AC-06 verification",
+        "test_ac07_multiple_tickers_mixed — AC-07 verification",
+        "test_ac08_warnings_in_report — AC-08 verification"
+      ],
+      "edge_case_tests": [
+        "test_partial_historical_data — historical file exists but market_data=None or news_articles=[]",
+        "test_fallback_within_5_days_uses_closest — multiple historical files, picks closest",
+        "test_trading_day_adjustment_weekend — Friday target, historical from Thursday (weekend skip)",
+        "test_consecutive_day_degradation — same ticker fails two days in a row"
+      ]
+    },
+    "fixtures_needed": [
+      "historical_fused_record_1_day_ago() — FusedRecord with valid data, 1 trading day before target",
+      "historical_fused_record_3_days_ago() — FusedRecord with valid data, 3 trading days before target",
+      "historical_fused_record_no_market() — FusedRecord with market_data=None (edge case)",
+      "historical_fused_record_no_news() — FusedRecord with empty news_articles (edge case)",
+      "mock_collector_market_fail() — MarketDataCollector that raises MarketDataUnavailableError",
+      "mock_collector_news_fail() — NewsCollector that raises NewsDataUnavailableError",
+      "ticker_list_mixed() — List of (ticker, market_fail, news_fail) tuples for AC-07"
+    ],
+    "test_count_estimate": "14-17 tests (expanded from 12-15 due to edge case additions)"
+  },
+  "dependencies_verified": {
+    "Ticket 2": "Market data collection — MarketDataUnavailableError, MarketDataCollector, trading day adjustment ✅",
+    "Ticket 3": "News data collection — NewsDataUnavailableError, NewsCollector ✅",
+    "Ticket 4": "Data quality & fusion — ValidationWarning, FusedRecord, DataFusionEngine ✅",
+    "Ticket 8": "Multi-format report — ReportInput.warnings, ReportGenerator, load_fused_record ✅",
+    "Ticket 6 (implicit)": "Sentiment analysis — FinBertSentiment.analyze handles fused with None market_data ✅ (returns _neutral_result if no articles, handles missing market_data)",
+    "Ticket 7 (implicit)": "Signal generation — TradingSignalGenerator handles market_data=None ✅ (generates hold with N/A market_return)"
+  },
+  "blocking_issues": [],
+  "moderate_suggestions": [
+    "Clarify how degradation warnings get appended to FusedRecord.warnings (see remaining_moderate_issues[0])",
+    "Guard MarketDataValidator.validate() when market_data is None (see remaining_moderate_issues[3])",
+    "Define 'valid FusedRecord' for historical fallback purposes (see remaining_moderate_issues[2])",
+    "Minor: tighten AC-01 wording from 'recent trading day' to cross-reference the 5-day lookback definition",
+    "Minor: clarify AC-08 intent — 'category, field, and message present as attributes of each ValidationWarning, rendered per existing formatting'"
+  ],
+  "overall_assessment": "The ticket has been substantially rewritten and now addresses all 3 previous blocking issues and all 5 previous moderate issues. The 8 acceptance criteria are well-structured, independently testable with mock infrastructure, and cover happy path, error cases, and edge cases comprehensively. The dependency analysis is complete, and the existing warning/report pipeline integrates without modifications. No remaining blocking issues. The 5 moderate findings are polish items that won't prevent implementation — the developer has enough specification to proceed. Verdict: READY FOR IMPLEMENTATION.",
+  "session_context_saved": {
+    "handoff_folder": ".opencode/handoffs/2026-05-30-ticket-9-tdd-review/",
+    "output_review_file": "output/reviews/tdd-review-2026-05-30-re-review.json"
+  }
+}

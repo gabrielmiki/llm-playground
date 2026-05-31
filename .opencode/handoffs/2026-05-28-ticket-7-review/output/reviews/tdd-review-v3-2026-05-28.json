@@ -1,0 +1,632 @@
+{
+  "review_metadata": {
+    "ticket": "Ticket 7 v3",
+    "title": "Trading Signal Generation",
+    "reviewer": "TDD Reviewer Agent",
+    "date": "2026-05-28",
+    "spec_file": "docs/context/financial-analysis-ticket-7.md",
+    "round": 3
+  },
+
+  "v1_issues_resolution": {
+    "verdict": "ALL 7 RESOLVED ✅",
+    "issues": [
+      {
+        "id": "B1",
+        "description": "Data model mismatch: 'price trends' requires multi-day time series, MarketData is single-day OHLCV",
+        "status": "RESOLVED ✅",
+        "evidence": "Replaced 'price trends' with single-day features (daily return, daily direction). signal_logic uses (close - open) / open for single-day return, not multi-day trends."
+      },
+      {
+        "id": "B2",
+        "description": "No signal generation formula or thresholds",
+        "status": "RESOLVED ✅",
+        "evidence": "Full signal_logic section with formulas: market_signal = clamp(daily_return * 10, -1, 1), combined_score = weighted sum, signal decision via threshold comparisons."
+      },
+      {
+        "id": "B3",
+        "description": "No confidence score derivation formula",
+        "status": "RESOLVED ✅",
+        "evidence": "combined_confidence = sentiment_weight * sentiment.confidence + market_weight * market_confidence with market_confidence = clamp(abs(daily_return) * 10, 0, 1) and disagreement halving rule."
+      },
+      {
+        "id": "B4",
+        "description": "Missing dependency on Ticket 2 (MarketData dataclass)",
+        "status": "RESOLVED ✅",
+        "evidence": "dependencies: [Ticket 2, Ticket 6] added to ticket metadata."
+      },
+      {
+        "id": "B5",
+        "description": "Dict output instead of typed dataclass",
+        "status": "RESOLVED ✅",
+        "evidence": "TradingSignal dataclass defined with typed fields (ticker, signal, confidence, rationale, sentiment_score, market_return)."
+      },
+      {
+        "id": "B6",
+        "description": "Only 3 ACs with zero edge case or error coverage",
+        "status": "RESOLVED ✅",
+        "evidence": "10 ACs now cover: happy path (01-02), neutral (03), market_data=None (04, 09), low-confidence override (05), conflicting signals (06), division-by-zero guard (07), TypeError (08), rationale format (10)."
+      },
+      {
+        "id": "B7",
+        "description": "Rationale format unspecified ('human-readable rationale')",
+        "status": "RESOLVED ✅",
+        "evidence": "Template rationale string provided with all required fields: sentiment_label, sentiment_score, confidence, market_return, combined_score, signal."
+      }
+    ]
+  },
+
+  "v2_issues_resolution": {
+    "verdict": "2 RESOLVED, 1 PARTIALLY RESOLVED, 1 NEW CRITICAL ISSUE FOUND",
+    "issues": [
+      {
+        "id": "v2-B1 (AC-05 contradiction)",
+        "description": "AC-05 expects 'hold' for low confidence (0.2), but formula produces 'buy'. Missing low-confidence override rule.",
+        "status": "RESOLVED ✅",
+        "evidence": "v3 adds line 98-99: 'if combined_confidence < confidence_threshold: signal = \"hold\"'. Numerical check: combined_confidence=0.1 < 0.3 → 'hold' ✅"
+      },
+      {
+        "id": "v2-B2 (market_data=None path undefined)",
+        "description": "signal_logic only defined path with market_data, but AC-04/09 require None handling.",
+        "status": "RESOLVED ✅",
+        "evidence": "v3 adds lines 71-73: 'if market_data is None: combined_score = sentiment.sentiment_score; combined_confidence = sentiment.confidence'. Disagreement check naturally guarded by being inside the else branch. AC-04 and AC-09 now numerically verify."
+      },
+      {
+        "id": "v2-B3 (AC-01/02 missing confidence values)",
+        "description": "AC-01/02 specify sentiment_score but not sentiment.confidence, making output confidence assertions unverifiable.",
+        "status": "RESOLVED ✅",
+        "evidence": "AC-01 now includes 'sentiment.confidence=0.8'; AC-02 includes 'sentiment.confidence=0.8'. Numerical verification: output confidence = 0.65 (AC-01) and 0.55 (AC-02), both > 0.5 ✅"
+      },
+      {
+        "id": "v2-M1 (AC-07 zero volume → zero open)",
+        "description": "Volume is not used in any computation; actual div-by-zero risk is open=0.0.",
+        "status": "RESOLVED ✅",
+        "evidence": "AC-07 replaced with 'market_data with open=0.0', signal_logic adds guard: 'if market_data.open == 0: daily_return = 0.0' ✅"
+      },
+      {
+        "id": "v2-M2 (daily_range dead code)",
+        "description": "daily_range variable defined but never used.",
+        "status": "RESOLVED ✅",
+        "evidence": "daily_range removed entirely from v3 signal_logic. Only daily_return remains."
+      },
+      {
+        "id": "v2-M3 (AC-10 vs template alignment)",
+        "description": "AC-10 checked subset of template fields; template included sentiment_label and combined_score not in AC-10.",
+        "status": "PARTIALLY RESOLVED ⚠️",
+        "evidence": "AC-10 updated to list all fields. BUT: see NEW CRITICAL ISSUE below — 'sentiment_label' does not exist on SentimentResult dataclass."
+      },
+      {
+        "id": "v2-M4 (disagreement halving guard for None)",
+        "description": "Disagreement check sentiment * market_signal < 0 would crash if market_signal undefined.",
+        "status": "RESOLVED ✅",
+        "evidence": "if/else structure naturally guards this — disagreement check is inside the else (market_data not None) branch."
+      }
+    ]
+  },
+
+  "new_blocking_issues": [
+    {
+      "id": "B8",
+      "severity": "CRITICAL",
+      "title": "sentiment_label referenced in rationale template but does not exist on SentimentResult",
+      "detail": "The rationale template (line 110) uses `sentiment_label` in the f-string: `f\"Sentiment {sentiment_label} ...\"`. However, the `SentimentResult` dataclass (sentiment.py:37-40) has only three fields: `sentiment_score`, `confidence`, and `breakdown`. There is NO `label` field on `SentimentResult`. The per-article `ArticleSentiment` has a `label` field, but the aggregated result does not. This will cause an `AttributeError` at runtime.\n\ngrep across entire src/ confirms: `sentiment_label` does not exist anywhere in the codebase.",
+      "fix_options": [
+        "Option A: Add a `label` field to the rationale derivation (not to SentimentResult itself). Define a helper: label = 'positive' if score > 0 else 'negative' if score < 0 else 'neutral'. Use this in the template.",
+        "Option B: Add a `label` field to SentimentResult and populate it during aggregation in FinBertSentiment.analyze().",
+        "Option C: Remove `sentiment_label` from the rationale template entirely and simplify: start with 'Sentiment score: {sentiment.sentiment_score:.2f}' instead."
+      ]
+    },
+    {
+      "id": "B9",
+      "severity": "BLOCKING",
+      "title": "AC-06 requires 'rationale mentions disagreement' but rationale template has no disagreement component",
+      "detail": "AC-06 states: 'Then confidence is halved (due to disagreement), combined_score < threshold, signal is \"hold\", and rationale mentions the disagreement.' However, the rationale template (lines 109-115) contains: sentiment_label, sentiment_score, confidence, market_return, combined_score, and signal — it has NO field or phrase indicating disagreement between sentiment and market signals. The template never mentions 'disagreement', 'conflict', 'divergence', or any synonym.\n\nA test for AC-06 would fail because the rationale string won't contain any indication of disagreement.",
+      "fix_options": [
+        "Option A: Add a disagreement indicator to the template: e.g., append ` Signals disagree, confidence halved.` when the halving branch is taken.",
+        "Option B: Add an optional `disagreement: bool` or `disagreement_note: str` field to TradingSignal, populated when the halving condition triggers.",
+        "Option C: Modify the AC to remove the disagreement requirement and instead check that combined_confidence is halved (which the test can verify from the confidence field, not the rationale)."
+      ]
+    }
+  ],
+
+  "new_moderate_issues": [
+    {
+      "id": "M7",
+      "severity": "MODERATE",
+      "title": "daily_return variable has conditional scope vulnerability",
+      "detail": "`daily_return` is defined ONLY inside the `else` branch (when market_data is not None, lines 76-79). It is referenced on line 108 in the f-string: `f\"{daily_return:+.2%}\" if market_data else \"N/A\"`. At runtime, Python's ternary short-circuits — when market_data is None, it evaluates to \"N/A\" without touching `daily_return`. However:\n  - Linters (ruff, pyflakes, mypy) may flag this as F821 'undefined name' or similar.\n  - If someone refactors the ternary to `if market_data is not None else \"N/A\"`, it will crash.\n  - The variable feels 'leaked' from a different scope.\n\nFix: Initialize `daily_return: float = 0.0` BEFORE the if/else block as a default, then the else branch overwrites it only when market_data exists.",
+      "severity_override": "MODERATE — Won't crash in practice but is a maintenance hazard and will likely trigger CI lint errors."
+    },
+    {
+      "id": "M8",
+      "severity": "LOW",
+      "title": "sentiment_label derivation not specified",
+      "detail": "Even if the `sentiment_label` existence issue (B8) is resolved, the spec doesn't define the conversion from numerical score to label. Common mappings:\n  - score > 0 → 'positive'\n  - score < 0 → 'negative'\n  - score == 0 → 'neutral'\n\nBut this isn't documented. The signal_logic section should include this step. Without it, the implementer has to guess, risking inconsistency.",
+      "fix": "Add to signal_logic: 'sentiment_label = \"positive\" if score > 0 else \"negative\" if score < 0 else \"neutral\"'"
+    },
+    {
+      "id": "M9",
+      "severity": "LOW",
+      "title": "Empty SentimentResult.breakdown is not covered by any AC",
+      "detail": "SentimentResult(score=0.0, confidence=0.0, breakdown=[]) is a valid state produced by sentiment.py's _neutral_result() when no articles exist or all are blank. The signal generator should handle this gracefully. A test for this case would be: combined_confidence=0.0 < 0.3 → 'hold', which is correct, but it should be explicit.",
+      "fix": "Add a note or AC that SentimentResult with empty breakdown is handled. Or add as a test variation of AC-03."
+    }
+  ],
+
+  "ac_validation": [
+    {
+      "criterion": "AC-01",
+      "text": "Given sentiment_score=+0.7, sentiment.confidence=0.8, market return=+5%, When generate() is called, Then signal is 'buy', confidence > 0.5, and rationale contains both sentiment and market contributions",
+      "testable": true,
+      "issues": [],
+      "numerical_verification": {
+        "daily_return": "0.05",
+        "market_signal": "clamp(0.5, -1, 1) = 0.5",
+        "combined_score": "0.5 * 0.7 + 0.5 * 0.5 = 0.6",
+        "combined_confidence": "0.5 * 0.8 + 0.5 * 0.5 = 0.65 (no halving: 0.7 * 0.5 = 0.35 > 0)",
+        "signal_decision": "combined_confidence(0.65) >= 0.3 → not overridden; combined_score(0.6) > 0.3 → 'buy'",
+        "confidence": "0.65 > 0.5 ✅"
+      },
+      "notes": "Now fully determined with explicit confidence. Values align correctly. ✅"
+    },
+    {
+      "criterion": "AC-02",
+      "text": "Given sentiment_score=-0.6, sentiment.confidence=0.8, market return=-3%, When generate() is called, Then signal is 'sell', confidence > 0.5",
+      "testable": true,
+      "issues": [],
+      "numerical_verification": {
+        "daily_return": "-0.03",
+        "market_signal": "clamp(-0.3, -1, 1) = -0.3",
+        "combined_score": "0.5 * (-0.6) + 0.5 * (-0.3) = -0.45",
+        "combined_confidence": "0.5 * 0.8 + 0.5 * 0.3 = 0.55 (no halving: -0.6 * -0.3 = 0.18 > 0)",
+        "signal_decision": "combined_confidence(0.55) >= 0.3 → not overridden; combined_score(-0.45) < -0.3 → 'sell'",
+        "confidence": "0.55 > 0.5 ✅"
+      },
+      "notes": "Now fully determined with explicit confidence. Values align correctly. ✅"
+    },
+    {
+      "criterion": "AC-03",
+      "text": "Given sentiment_score=+0.05, sentiment.confidence=0.4, market return=0%, When generate() is called, Then signal is 'hold'",
+      "testable": true,
+      "issues": [],
+      "numerical_verification": {
+        "daily_return": "0.0",
+        "market_signal": "clamp(0.0, -1, 1) = 0.0",
+        "combined_score": "0.5 * 0.05 + 0.5 * 0.0 = 0.025",
+        "combined_confidence": "0.5 * 0.4 + 0.5 * 0.0 = 0.2 (no halving: 0.05 * 0.0 = 0, not < 0)",
+        "signal_decision": "combined_confidence(0.2) < 0.3 → low-confidence override → 'hold'",
+        "notes": "Uses TWO separate paths to 'hold': low-confidence override kicks in BEFORE score check. This is correct but the test should verify the confidence path, not the score path."
+      },
+      "notes": "Verified. Combined_score=0.025 is also between -0.3 and 0.3, so score check would also give 'hold' — but control flow reaches low-confidence check first. ✅"
+    },
+    {
+      "criterion": "AC-04",
+      "text": "Given market_data is None, sentiment_score=+0.7, sentiment.confidence=0.8, When generate() is called, Then signal is derived from sentiment alone and confidence equals sentiment.confidence",
+      "testable": true,
+      "issues": [],
+      "numerical_verification": {
+        "path": "market_data is None branch",
+        "combined_score": "sentiment.sentiment_score = 0.7",
+        "combined_confidence": "sentiment.confidence = 0.8",
+        "signal_decision": "combined_confidence(0.8) >= 0.3 → not overridden; combined_score(0.7) > 0.3 → 'buy'",
+        "confidence": "0.8 == sentiment.confidence ✅"
+      },
+      "notes": "Verified. The None branch uses raw score/confidence directly (no weight multiplication), which differs from the weighted approach when market data exists. This asymmetry is documented. ✅"
+    },
+    {
+      "criterion": "AC-05",
+      "text": "Given sentiment_score=+0.8, sentiment.confidence=0.2, market return=0%, When generate() is called, Then signal is 'hold' (combined_confidence < confidence_threshold overrides directional score)",
+      "testable": true,
+      "issues": [],
+      "numerical_verification": {
+        "daily_return": "0.0",
+        "market_signal": "0.0",
+        "combined_score": "0.5 * 0.8 + 0.5 * 0.0 = 0.4",
+        "market_confidence": "0.0",
+        "combined_confidence": "0.5 * 0.2 + 0.5 * 0.0 = 0.1",
+        "signal_decision": "combined_confidence(0.1) < 0.3 → low-confidence override → 'hold'",
+        "notes": "Without the low-confidence override, combined_score(0.4) > 0.3 would give 'buy'. The override correctly catches this."
+      },
+      "notes": "This was the KEY v2-B1 blocking issue. Now verified: 0.1 < 0.3 → 'hold'. ✅"
+    },
+    {
+      "criterion": "AC-06",
+      "text": "Given sentiment_score=+0.9, sentiment.confidence=0.8, market return=-5%, When generate() is called, Then confidence is halved (due to disagreement), combined_score < threshold, signal is 'hold', and rationale mentions the disagreement",
+      "testable": false,
+      "issues": [
+        "BLOCKING (B9): The rationale template does not include any disagreement/conflict information. AC-06 requires 'rationale mentions the disagreement' but the template only has: sentiment_label, sentiment_score, confidence, market_return, combined_score, signal. No mention of disagreement, halving, or conflict. A test for this clause would fail.",
+        "The combined_confidence halving is numerically verified (0.65 → 0.325), but the rationale assertion cannot be tested until the template is updated."
+      ],
+      "numerical_verification": {
+        "daily_return": "-0.05",
+        "market_signal": "clamp(-0.5, -1, 1) = -0.5",
+        "combined_score": "0.5 * 0.9 + 0.5 * (-0.5) = 0.20",
+        "market_confidence": "0.5",
+        "combined_confidence_before_halving": "0.5 * 0.8 + 0.5 * 0.5 = 0.65",
+        "disagreement_check": "0.9 * (-0.5) = -0.45 < 0 → halving triggered",
+        "combined_confidence_after_halving": "0.65 * 0.5 = 0.325",
+        "signal_decision": "combined_confidence(0.325) >= 0.3 → not overridden; combined_score(0.20) not > 0.3, not < -0.3 → 'hold'"
+      },
+      "notes": "Numerical logic is correct. confidence 0.65 → 0.325 (halved ✅), combined_score 0.20 < 0.3 ✅, signal 'hold' ✅. The rationale disagreement mention is the only untestable part (B9)."
+    },
+    {
+      "criterion": "AC-07",
+      "text": "Given market_data with open=0.0, When generate() is called, Then no division-by-zero error occurs and daily_return safely defaults to 0.0",
+      "testable": true,
+      "issues": [],
+      "numerical_verification": {
+        "open_check": "market_data.open == 0 → True",
+        "daily_return": "0.0 (bypasses division)",
+        "market_signal": "clamp(0.0, -1, 1) = 0.0",
+        "no_error": "ZeroDivisionError avoided ✅"
+      },
+      "notes": "Replaces v2 AC-07 (zero volume, which was irrelevant). Now tests the actual division-by-zero risk. ✅"
+    },
+    {
+      "criterion": "AC-08",
+      "text": "Given None as SentimentResult, When generate() is called, Then TypeError is raised with descriptive message",
+      "testable": true,
+      "issues": [],
+      "notes": "Clear and unambiguous. Follows established pattern from sentiment.py (type guard at method entry). No numerical verification needed. ✅"
+    },
+    {
+      "criterion": "AC-09",
+      "text": "Given market_data is None and sentiment.confidence=0.25 (below threshold), When generate() is called, Then signal is 'hold' (low-confidence guard applies even with sentiment-only)",
+      "testable": true,
+      "issues": [],
+      "numerical_verification": {
+        "path": "market_data is None branch",
+        "combined_score": "sentiment.sentiment_score (any value — not specified, irrelevant)",
+        "combined_confidence": "sentiment.confidence = 0.25",
+        "signal_decision": "combined_confidence(0.25) < 0.3 → low-confidence override → 'hold'",
+        "notes": "Works for ANY sentiment_score value. The confidence threshold check happens before the score check."
+      },
+      "notes": "Verified. This is a clean test of the low-confidence guard interacting with the market_data=None path. ✅"
+    },
+    {
+      "criterion": "AC-10",
+      "text": "Given a generated signal, When rationale is inspected, Then it contains sentiment_label, sentiment_score, confidence, market_return (or 'N/A'), combined_score, and the signal label",
+      "testable": false,
+      "issues": [
+        "CRITICAL (B8): 'sentiment_label' does not exist on SentimentResult. The rationale template references `{sentiment_label}` but no such field exists. This will crash at runtime.",
+        "See B8 for detailed analysis and fix options."
+      ],
+      "notes": "Once B8 is resolved, this AC is testable via string containment checks on the rationale field."
+    }
+  ],
+
+  "numerical_verification_table": {
+    "description": "Manual trace of each AC through the signal_logic formula",
+    "formulas": {
+      "default_params": "confidence_threshold=0.3, sentiment_weight=0.5, market_weight=0.5",
+      "market_signal": "clamp(daily_return * 10, -1, 1)",
+      "market_confidence": "clamp(abs(daily_return) * 10, 0, 1)",
+      "combined_score": "sentiment_weight * sentiment_score + market_weight * market_signal (or raw score if market_data=None)",
+      "combined_confidence": "sentiment_weight * sentiment.confidence + market_weight * market_confidence (or raw confidence if market_data=None)",
+      "disagreement": "if sentiment.sentiment_score * market_signal < 0: combined_confidence *= 0.5 (only when market_data exists)",
+      "low_confidence_override": "if combined_confidence < confidence_threshold: signal = 'hold' (checked FIRST)",
+      "signal_decision": "elif combined_score > confidence_threshold → 'buy'; elif combined_score < -confidence_threshold → 'sell'; else → 'hold'"
+    },
+    "ac_computations": [
+      {
+        "ac": "01",
+        "market_data": "exists",
+        "open_check": "non-zero",
+        "daily_return": "+5% = 0.05",
+        "market_signal": "0.5",
+        "sentiment_score": "+0.7",
+        "sentiment_conf": "0.8",
+        "combined_score": "0.6",
+        "market_conf": "0.5",
+        "combined_conf": "0.65",
+        "disagreement": "no (0.7*0.5=0.35>0)",
+        "low_conf_override": "no (0.65>=0.3)",
+        "signal": "buy (0.6>0.3)",
+        "output_conf": "0.65",
+        "result": "✅ PASS"
+      },
+      {
+        "ac": "02",
+        "market_data": "exists",
+        "open_check": "non-zero",
+        "daily_return": "-3% = -0.03",
+        "market_signal": "-0.3",
+        "sentiment_score": "-0.6",
+        "sentiment_conf": "0.8",
+        "combined_score": "-0.45",
+        "market_conf": "0.3",
+        "combined_conf": "0.55",
+        "disagreement": "no (-0.6*-0.3=0.18>0)",
+        "low_conf_override": "no (0.55>=0.3)",
+        "signal": "sell (-0.45<-0.3)",
+        "output_conf": "0.55",
+        "result": "✅ PASS"
+      },
+      {
+        "ac": "03",
+        "market_data": "exists",
+        "open_check": "non-zero",
+        "daily_return": "0% = 0.0",
+        "market_signal": "0.0",
+        "sentiment_score": "+0.05",
+        "sentiment_conf": "0.4",
+        "combined_score": "0.025",
+        "market_conf": "0.0",
+        "combined_conf": "0.2",
+        "disagreement": "no (0.05*0=0)",
+        "low_conf_override": "YES (0.2<0.3)",
+        "signal": "hold (override)",
+        "output_conf": "0.2",
+        "result": "✅ PASS"
+      },
+      {
+        "ac": "04",
+        "market_data": "NONE",
+        "open_check": "N/A",
+        "daily_return": "N/A",
+        "market_signal": "N/A",
+        "sentiment_score": "+0.7",
+        "sentiment_conf": "0.8",
+        "combined_score": "0.7 (raw)",
+        "market_conf": "N/A",
+        "combined_conf": "0.8 (raw)",
+        "disagreement": "N/A (skipped)",
+        "low_conf_override": "no (0.8>=0.3)",
+        "signal": "buy (0.7>0.3)",
+        "output_conf": "0.8",
+        "result": "✅ PASS"
+      },
+      {
+        "ac": "05",
+        "market_data": "exists",
+        "open_check": "non-zero",
+        "daily_return": "0% = 0.0",
+        "market_signal": "0.0",
+        "sentiment_score": "+0.8",
+        "sentiment_conf": "0.2",
+        "combined_score": "0.4",
+        "market_conf": "0.0",
+        "combined_conf": "0.1",
+        "disagreement": "no (0.8*0=0)",
+        "low_conf_override": "YES (0.1<0.3)",
+        "signal": "hold (override)",
+        "output_conf": "0.1",
+        "result": "✅ PASS"
+      },
+      {
+        "ac": "06",
+        "market_data": "exists",
+        "open_check": "non-zero",
+        "daily_return": "-5% = -0.05",
+        "market_signal": "-0.5",
+        "sentiment_score": "+0.9",
+        "sentiment_conf": "0.8",
+        "combined_score": "0.20",
+        "market_conf": "0.5",
+        "combined_conf_before": "0.65",
+        "combined_conf_after": "0.325",
+        "disagreement": "YES (0.9*-0.5=-0.45<0) → halved",
+        "low_conf_override": "no (0.325>=0.3)",
+        "signal": "hold (0.20 not >0.3)",
+        "output_conf": "0.325",
+        "result": "✅ NUMERICAL PASS, ❌ UNTESTABLE (B9)"
+      },
+      {
+        "ac": "07",
+        "market_data": "exists",
+        "open_check": "open=0.0 → guard",
+        "daily_return": "0.0 (forced)",
+        "market_signal": "0.0",
+        "sentiment_score": "unspecified",
+        "sentiment_conf": "unspecified",
+        "combined_score": "depends on sentiment",
+        "market_conf": "0.0",
+        "combined_conf": "depends on sentiment",
+        "disagreement": "no (depends on sentiment*0=0)",
+        "low_conf_override": "depends",
+        "signal": "depends",
+        "output_conf": "depends",
+        "result": "✅ PASS (no ZeroDivisionError)"
+      },
+      {
+        "ac": "08",
+        "market_data": "any",
+        "open_check": "any",
+        "daily_return": "any",
+        "result": "✅ TypeError raised"
+      },
+      {
+        "ac": "09",
+        "market_data": "NONE",
+        "open_check": "N/A",
+        "daily_return": "N/A",
+        "market_signal": "N/A",
+        "sentiment_score": "unspecified (any)",
+        "sentiment_conf": "0.25",
+        "combined_score": "= sentiment_score (any)",
+        "market_conf": "N/A",
+        "combined_conf": "0.25 (raw)",
+        "disagreement": "N/A (skipped)",
+        "low_conf_override": "YES (0.25<0.3)",
+        "signal": "hold (override)",
+        "output_conf": "0.25",
+        "result": "✅ PASS (any score → hold)"
+      },
+      {
+        "ac": "10",
+        "market_data": "any",
+        "result": "❌ UNTESTABLE (B8)"
+      }
+    ]
+  },
+
+  "infrastructure_readiness": {
+    "overall": "95% READY — 2 fixture gaps, 2 spec gaps",
+    "requirements": [
+      {
+        "requirement": "SentimentResult fixture factory (for signal tests)",
+        "status": "MISSING",
+        "location": "Need tests/fixtures/signal_data.py (new file)",
+        "notes": "Existing sentiment_data.py fixtures create FusedRecord objects (for sentiment module testing). Signal generator takes SentimentResult directly. Need: sample_sentiment_positive(), sample_sentiment_negative(), sample_sentiment_low_confidence(), sample_sentiment_high_confidence(). Each returns a SentimentResult with controlled score/confidence/breakdown."
+      },
+      {
+        "requirement": "MarketData object fixtures (not raw API responses)",
+        "status": "MISSING",
+        "location": "Should be in tests/fixtures/market_data.py or new signal_data.py",
+        "notes": "Existing market_data.py fixtures return raw API response dicts (Yahoo, Alpha Vantage, Finnhub). Signal generator needs MarketData instances. Need: sample_market_data_up(return_pct), sample_market_data_down(return_pct), sample_market_data_flat(), sample_market_data_zero_open(). Low complexity — just dataclass construction with fields: open, high, low, close, volume, adjusted_close, timestamp."
+      },
+      {
+        "requirement": "TradingSignalGenerator fixture",
+        "status": "EASILY CREATED",
+        "location": "test_signals.py inline or signal_data.py",
+        "notes": "TradingSignalGenerator() with defaults. One-liner. Could be parametrized for custom thresholds/weights."
+      },
+      {
+        "requirement": "TradingSignal dataclass",
+        "status": "WILL BE CREATED (expected)",
+        "location": "src/model/pretrained/signals.py (doesn't exist yet)",
+        "notes": "Created during implementation. Testing requires it to exist first — normal TDD flow."
+      },
+      {
+        "requirement": "torch / GPU mocking",
+        "status": "NOT NEEDED",
+        "notes": "Signal generation is pure math — no torch dependency, no GPU concerns, no MockTensor needed. Significantly simpler than Ticket 6 test infrastructure."
+      },
+      {
+        "requirement": "pytest conftest registration",
+        "status": "MISSING",
+        "notes": "If tests/fixtures/signal_data.py is created, must add 'tests.fixtures.signal_data' to pytest_plugins list in tests/conftest.py."
+      },
+      {
+        "requirement": "test_signals.py file",
+        "status": "MISSING",
+        "location": "tests/test_signals.py (doesn't exist yet)",
+        "notes": "New test module. Will be created to implement all 10 AC tests + edge case tests."
+      }
+    ]
+  },
+
+  "edge_case_gaps_remaining": [
+    {
+      "gap": "Negative open value in MarketData",
+      "severity": "LOW",
+      "detail": "Guard only checks market_data.open == 0. If open is negative (data error), the formula (close - open) / open works mathematically but produces a misleading daily_return. Example: open=-5.0, close=100 → daily_return = (100 - (-5)) / (-5) = -21.0, clamped to -1.0. This would signal 'sell' on what's actually a massive price increase (from -5 to 100). One could argue garbage-in-garbage-out, but worth noting as an extreme edge case."
+    },
+    {
+      "gap": "Boundary behavior at combined_score == ±confidence_threshold",
+      "severity": "LOW",
+      "detail": "When combined_score == 0.3 or == -0.3, the strict > and < comparisons mean the signal falls to 'hold'. This is a valid design choice but should be documented in the spec so test writers know what to expect. Example: sentiment_score=0.5, daily_return=+1% → combined_score = 0.5*0.5 + 0.5*0.1 = 0.30. Not > 0.3, so 'hold'."
+    },
+    {
+      "gap": "SentimentResult with empty breakdown list",
+      "severity": "LOW",
+      "detail": "SentimentResult(score=0.0, confidence=0.0, breakdown=[]) from _neutral_result() is not tested. combined_confidence=0.0 < 0.3 → 'hold' (low-confidence override). This is correct behavior but should be explicitly covered."
+    },
+    {
+      "gap": "Extreme combined_score outside [-1, 1]",
+      "severity": "LOW",
+      "detail": "Sentiment score is naturally bounded to [-1, 1]. Market signal is clamped to [-1, 1]. Combined score with equal weights is bounded to [-1, 1]. But with unequal weights? Test: sentiment_weight=0.6, market_weight=0.5 → weights don't sum to 1.0, combined_score = 0.6*1.0 + 0.5*1.0 = 1.1. The spec uses equal weights (0.5, 0.5) by default, and with those, combined_score ∈ [-1, 1]. But if someone changes weights, the range changes. The TradingSignal.confidence field must remain in [0, 1], but there's no clamp on combined_score."
+    }
+  ],
+
+  "weights_analysis": {
+    "default_weights": {
+      "sentiment_weight": 0.5,
+      "market_weight": 0.5,
+      "sum_to_one": true
+    },
+    "what_if_weights_dont_sum_to_1": {
+      "sentiment_weight_0.6_market_weight_0.5": {
+        "sum": 1.1,
+        "effect": "Score range would be [-1.1, 1.1]. Signal thresholds are fixed at ±0.3, so buy/sell would trigger more easily. Confidence could exceed 1.0.",
+        "concern": "No validation or normalization of weights in the spec. The constructor accepts any two floats. Should there be a guard like: assert abs(sentiment_weight + market_weight - 1.0) < 1e-6?"
+      },
+      "sentiment_weight_0.3_market_weight_0.3": {
+        "sum": 0.6,
+        "effect": "Score range would be [-0.6, 0.6]. With threshold at 0.3, signals would rarely be directional (only when combined_score > 0.3 or < -0.3 from a max range of 0.6). Confidence would also be compressed."
+      }
+    },
+    "recommendation": "Consider normalizing weights internally: w_s = sentiment_weight / (sentiment_weight + market_weight), w_m = market_weight / (sentiment_weight + market_weight). Or document that weights must sum to 1.0 for correct behavior. This is LOW priority for MVP but worth noting."
+  },
+
+  "coverage_analysis": {
+    "happy_path": "COVERED ✅",
+    "details": "AC-01 (buy, aligned signals), AC-02 (sell, aligned signals) — both verified numerically.",
+    "error_cases": "COVERED ✅ (with caveat)",
+    "details": "AC-08 (TypeError for None SentimentResult) is clear. AC-07 (open=0 guard) prevents crash. Missing: error on invalid type for market_data (e.g., str instead of MarketData|None).",
+    "edge_cases": "PARTIALLY COVERED ⚠️",
+    "details": "Covered: neutral signals (03), market_data=None (04,09), low-confidence override (05), conflicting signals (06), open=0 guard (07). Missing: boundary thresholds (±0.3 exact), empty SentimentResult breakdown, extreme score values, negative open."
+  },
+
+  "verdict": "NEEDS_REVISION",
+  "verdict_rationale": "v3 resolves all 7 v1 blocking issues and 2 of 3 v2 blocking issues. However, 2 NEW blocking issues were discovered: (B8) `sentiment_label` referenced in rationale but doesn't exist on SentimentResult dataclass — will cause AttributeError at runtime; (B9) AC-06 requires 'rationale mentions disagreement' but template has no disagreement component — test cannot pass. Additionally, 1 moderate scope vulnerability (M7: daily_return conditional scope) needs attention. Once B8 and B9 are fixed, the ticket will be ready. The numerical logic is otherwise correct for all 10 ACs.",
+
+  "blocking_issues_remaining": [
+    "B8 [CRITICAL]: `sentiment_label` in rationale template (line 110) references non-existent field. SentimentResult has NO label field. Fix: derive label from score, add to SentimentResult, or remove from template.",
+    "B9 [BLOCKING]: AC-06 requires 'rationale mentions disagreement' but rationale template (lines 109-115) has no disagreement component. Fix: add disagreement note to template (conditional), or modify AC-06 to check confidence halving instead."
+  ],
+
+  "resolved_issues_this_round": [
+    "✅ B1-B7 (v1): All 7 original blocking issues resolved in v2/v3 cycle.",
+    "✅ v2-B1 (AC-05 contradiction): Low-confidence override added to signal_logic, verified numerically.",
+    "✅ v2-B2 (market_data=None path): Conditional branch added, verified with AC-04 and AC-09.",
+    "✅ v2-B3 (missing confidence values): AC-01/02 now include sentiment.confidence=0.8.",
+    "✅ v2-M1 (AC-07 zero volume): Replaced with open=0.0 guard.",
+    "✅ v2-M2 (daily_range dead code): Removed from v3.",
+    "✅ v2-M4 (disagreement halving guard): if/else structure naturally protects against undefined market_signal."
+  ],
+
+  "implementation_plan": {
+    "pre_implementation_fixes": [
+      {
+        "step": "Fix B8: Resolve sentiment_label",
+        "action": "Choose one: (A) Add label derivation to signal_logic (score > 0 → 'positive', < 0 → 'negative', == 0 → 'neutral') and reference as local variable in template. (B) Add label to SentimentResult dataclass. (C) Remove sentiment_label from template. Recommended: Option A (minimal blast radius).",
+        "effort": "Minutes. Single line of label derivation logic."
+      },
+      {
+        "step": "Fix B9: Add disagreement to rationale template",
+        "action": "Add a conditional suffix to the template when disagreement triggers: e.g., ' Signals disagree, confidence halved to {combined_confidence:.2f}.' Or add a `disagreement_halved: bool = False` field to TradingSignal. Recommended: conditional template suffix.",
+        "effort": "Minutes. Add 1-2 lines of conditional string concatenation."
+      },
+      {
+        "step": "Fix M7: daily_return scope safety",
+        "action": "Initialize `daily_return: float = 0.0` before the if/else block, then `else` branch overwrites it. Eliminates the possibly-unbound variable issue.",
+        "effort": "Seconds. Move initialization up one line."
+      }
+    ],
+    "fixture_creation": [
+      {
+        "file": "tests/fixtures/signal_data.py",
+        "contents": [
+          "sample_sentiment_positive() → SentimentResult(sentiment_score=0.7, confidence=0.8, breakdown=[])",
+          "sample_sentiment_negative() → SentimentResult(sentiment_score=-0.6, confidence=0.8, breakdown=[])",
+          "sample_sentiment_neutral() → SentimentResult(sentiment_score=0.05, confidence=0.4, breakdown=[])",
+          "sample_sentiment_low_confidence() → SentimentResult(sentiment_score=0.8, confidence=0.2, breakdown=[])",
+          "sample_sentiment_high_confidence() → SentimentResult(sentiment_score=0.9, confidence=0.8, breakdown=[])",
+          "sample_market_data_up(return_pct=5.0) → MarketData(open=100, high=107, low=99, close=105, volume=1_000_000, adjusted_close=105, timestamp='2026-05-28')",
+          "sample_market_data_down(return_pct=-3.0) → MarketData(open=100, high=101, low=95, close=97, volume=1_000_000, ...)",
+          "sample_market_data_flat() → MarketData(open=100, high=101, low=99, close=100, volume=1_000_000, ...)",
+          "sample_market_data_zero_open() → MarketData(open=0.0, high=105, low=0, close=100, volume=1_000_000, ...)",
+          "signal_generator() → TradingSignalGenerator()"
+        ]
+      },
+      {
+        "step": "Register in conftest.py",
+        "action": "Add 'tests.fixtures.signal_data' to pytest_plugins list in tests/conftest.py"
+      }
+    ],
+    "implementation": [
+      {
+        "step": "Create src/model/pretrained/signals.py",
+        "detail": "TradingSignal dataclass + TradingSignalGenerator class with generate() method implementing signal_logic (after B8/B9/M7 fixes).",
+        "export": "Add TradingSignal, TradingSignalGenerator to src/model/pretrained/__init__.py and src/model/__init__.py"
+      }
+    ],
+    "testing": [
+      {
+        "step": "Create tests/test_signals.py",
+        "detail": "One test per AC (01-10), plus edge case tests: boundary at ±0.3, empty breakdown, extreme values, negative open. No torch mocking needed."
+      }
+    ]
+  }
+}

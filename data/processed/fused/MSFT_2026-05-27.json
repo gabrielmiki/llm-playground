@@ -1,0 +1,170 @@
+{
+  "ticker": "MSFT",
+  "date": "2026-05-27",
+  "market_data": {
+    "open": 416.43,
+    "high": 419.77,
+    "low": 413.02,
+    "close": 416.03,
+    "volume": 30398049,
+    "adjusted_close": null,
+    "timestamp": "2026-05-26T00:00:00+00:00"
+  },
+  "news_articles": [
+    {
+      "title": "Stock Market Today: Dow Rises As Oil Prices Extend Their Losses; Micron Continues To Surge (Live Coverage)",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T13:44:32+00:00",
+      "url": "https://finnhub.io/api/news?id=723c0e02523f5638a88479d13f8289c2584019c040aba09f92153d223ce27f51",
+      "summary": "Stock Market Today: The Dow Jones index rose Wednesday as oil prices continued to tumble. Micron stock surged in morning trading."
+    },
+    {
+      "title": "14 Companies Now Worth Over $1 Trillion",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T13:20:51+00:00",
+      "url": "https://finnhub.io/api/news?id=747eba176133216294a50aaffc8edffad8ea7fdaa94986d30490e9fc9ed55041",
+      "summary": "It is becoming easier to get into the $1 trillion market-cap club. SK Hynix and Micron Technology now belong because of the demand for memory chips. SK Hynix's 12-month stock price jump reached 1000%. The two joined Samsung, which was recently added to the list. The $1 trillion plus list has 14 members. (The club ... 14 Companies Now Worth Over $1 Trillion"
+    },
+    {
+      "title": "Alphabet Explores Orbital Data Centers To Power Long Term AI Growth",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T13:08:15+00:00",
+      "url": "https://finnhub.io/api/news?id=9b6f0c34acf3d94ddcb8660d0eaee5b56e7a9f0af829cda25d456d702c2c1b2e",
+      "summary": "Google, part of Alphabet (NasdaqGS:GOOGL), is reportedly in advanced talks with SpaceX to deploy space-based data centers, aiming to support AI and cloud workloads. Google has joined the Data Center Innovation Initiative alongside Amazon, Meta, and Microsoft to test and co-fund next generation energy and materials technologies for data centers. For investors watching Alphabet, these moves sit at the intersection of cloud infrastructure, AI computing, and energy use. Space-based data..."
+    },
+    {
+      "title": "Juneteenth Event Connects CUNY, HBCUs and Big Tech on Black Economic Power and Ownership",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T13:00:00+00:00",
+      "url": "https://finnhub.io/api/news?id=a946fec0bf34b9ac971995a41102e76da4a3a9d38aad51742d18dee0be0242c2",
+      "summary": "The Excellence in Leadership Tour: Juneteenth will focus on \"Black Innovation. Collective Power. Generational Wealth.\" NEW YORK CITY, NY / ACCESS Newswire / May 27, 2026 / The Excellence in Leadership Tour: Juneteenth is an immersive convening that ..."
+    },
+    {
+      "title": "Bandwidth to Participate in TD Cowen Inaugural Disruptive Technology Summit",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T12:13:00+00:00",
+      "url": "https://finnhub.io/api/news?id=a048607fd92c72c6b797eab86dc2d28cb1b48fcc18c00e69ab12a33f63e5922a",
+      "summary": "Bandwidth Inc. (NASDAQ: BAND), a leading global cloud communications company, today announced that the company will participate in the TD Cowen Inaugural Disruptive Technology Summit in New York City on Wednesday, June 17, 2026. Investors interested in scheduling either one-on-one or group meetings with management should contact a TD Cowen representative or Bandwidth's investor relations team at ir@bandwidth.com."
+    },
+    {
+      "title": "Agora, the Denodo Cloud Service, now available on the Microsoft Marketplace to Power Agentic AI Use Cases",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T11:00:00+00:00",
+      "url": "https://finnhub.io/api/news?id=31df94f5b38959eb7495a787999d0b0d3fc6304605f70c69b50ab7d0fcdba2e7",
+      "summary": "Agora enables Microsoft Azure customers worldwide to leverage their full data estate across hybrid, multi-cloud, and data-sovereignty environments to accelerate agentic AI initiativesPALO ALTO, Calif., May 27, 2026 (GLOBE NEWSWIRE) -- Denodo, a leader in data management and a Microsoft AI Cloud Partner, announced that Agora, the Denodo Cloud Service \u2014 a fully managed platform \u2014 is now available on the Microsoft Marketplace. Agora provides native integrations with Microsoft services including Mic"
+    },
+    {
+      "title": "GTS Securities Buys $47.8 Million Worth of This Brand-New Quality-Growth ETF",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T10:59:23+00:00",
+      "url": "https://finnhub.io/api/news?id=690fe121386c68abbe83d43d826b9edaa2270bafe91d1f70efc440d7c3c820f9",
+      "summary": "The actively managed Sapient Quality Select ETF (SQS) targets quality-growth companies aligned with long-term economic trends across multiple sectors."
+    },
+    {
+      "title": "Social Buzz: Wallstreetbets Stocks Mostly Advancing Pre-Bell Wednesday; Intuitive Machines, Rocket Lab to Open Higher",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T10:41:44+00:00",
+      "url": "https://finnhub.io/api/news?id=39848ef88be916e9012f2a307a3ecf64a85d475da84e4a93e964e72da1721163",
+      "summary": "The most-talked-about stocks in the Reddit subforum Wallstreetbets were mostly advancing premarket h"
+    },
+    {
+      "title": "KeyBanc Reiterates Overweight Rating on Microsoft (MSFT) on Azure and Copilot Growth",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T10:27:55+00:00",
+      "url": "https://finnhub.io/api/news?id=ca43eb8129c7b45d1ea56a2f9115ed35352d7277e43faf773691e344ade9bfad",
+      "summary": "Microsoft Corporation (NASDAQ:MSFT) ranks among the best stocks for a couch potato portfolio. Microsoft Corporation (NASDAQ:MSFT) was reiterated as Overweight by KeyBanc on May 5, with a $600 price target. The firm continues to focus on Azure capability and growth, Copilot usage through Microsoft 365 Commercial Cloud expansion, and capital expenditures at the company. KeyBanc's [\u2026]"
+    },
+    {
+      "title": "Data centre operator IREN signs $1.6bn Dell deal for Blackwell systems at Texas AI campus",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T10:27:22+00:00",
+      "url": "https://finnhub.io/api/news?id=9529b68a0606d4239d9c3e45707c4a30701bc14b1a9aba2e720f6d2129b5b91e",
+      "summary": "IREN plans to deploy Blackwell systems at its Childress campus, with commissioning of the new infrastructure expected in early 2027."
+    },
+    {
+      "title": "Microsoft's AI Momentum Builds: Analyst Sees Copilot Seats Topping 25 Million, Azure Growth Above 40%",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T10:03:49+00:00",
+      "url": "https://finnhub.io/api/news?id=1b9cea1380129b8239617f2acb5993670c6a939c2be80aca5e2a257819d35a6b",
+      "summary": "BNP Paribas analyst Stefan Slowinski said Microsoft Corp is gaining momentum across its AI strategy as Copilot adoption improves, Azure growth accelerates, and concerns around OpenAI ease. Slowinski maintained an Outperform-equivalent \"(+)\" rating with a $555 price forecast, implying 33%..."
+    },
+    {
+      "title": "Elemental Impact Launches the Data Center Innovation Initiative with Amazon, Google, Meta, and Microsoft",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T09:30:00+00:00",
+      "url": "https://finnhub.io/api/news?id=1db2795d07ad3f50aabd0e2fb84a80e5204f079819db006f1e725e287ee10eb1",
+      "summary": "Elemental Impact, a nonprofit investor focused on scaling innovative technologies with deep environmental and local impact, today announced the launch of the Data Center Innovation Initiative (DCII), a deployment-focused investment initiative designed to accelerate next-generation energy and materials technologies. The DCII is designed to test and validate critical technologies in data center environments or demonstration sites, creating potential pathways for future adoption across broader ener"
+    },
+    {
+      "title": "Cerebras Surged 68% on Its First Day of Trading. Here's What That Tells Us About SpaceX's Upcoming Monster IPO",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T09:24:00+00:00",
+      "url": "https://finnhub.io/api/news?id=eae796685277fa52bcb2435e0f624983b8486ab85b4e7641a04416c342dc08d1",
+      "summary": "SpaceX's IPO may be the biggest ever, approaching nearly $2 trillion."
+    },
+    {
+      "title": "The Odds Are Stacked in Favor of This AI Stock. Here's the Math.",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T08:10:00+00:00",
+      "url": "https://finnhub.io/api/news?id=9218498297b7dfdefe5f0556c78be7a99dc3a1a4a305235e2dc49c82950846a9",
+      "summary": "There's increasing competition in nearly all parts of the AI space -- except for one."
+    },
+    {
+      "title": "ByteDance Weighs Capex of as Much as $70 Billion in AI Push",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T07:51:09+00:00",
+      "url": "https://finnhub.io/api/news?id=9d1d2dba05822b40888372cf4d02a77fafa8c4aecb9a66242110f7a1e54ed32c",
+      "summary": "(Bloomberg) -- ByteDance Ltd., the developer of TikTok and a leading force in artificial intelligence, is considering increasing its capital spending to more than double last year's in a bid to lead the Chinese AI market and challenge the top US players abroad.Most Read from BloombergIran's Khamenei Says No Going Back for Middle East Rocked by WarSingapore Hands Byju's Founder His First Ever Jail TermPutin Signs Law on Use of Army to Aid Russians Detained AbroadRussia Tells US to Evacuate Its Di"
+    },
+    {
+      "title": "Co-Packaged Optics Market Size to Hit USD 1,923.64 million by 2035 | SNS Insider",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T07:30:00+00:00",
+      "url": "https://finnhub.io/api/news?id=047cdd35d87ecebd2322454daa39c1e95e4c4e94ca386935ebaf7ece82bf25c7",
+      "summary": "The U.S. Co-Packaged Optics (CPO) Market size was valued at USD 39.61 million in 2025 and is predicted to attain a value of USD 834.82 million by 2035, growing with a CAGR of 30.25%. This growth is mainly attributed to huge investments in hyperscale artificial intelligence infrastructure in various data centers of leading cloud computing providers like Amazon Web Services, Microsoft Azure, Google Cloud, Meta, and Oracle in the United States. The Europe co-packaged optics market size, on the othe"
+    },
+    {
+      "title": "This billionaire is capping his kids' inheritance at 8 figures\u2014like Bill Gates, he thinks generational wealth is bad for society",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T07:03:00+00:00",
+      "url": "https://finnhub.io/api/news?id=08282311ba455f0b016f7924885cab3778a87d0c6ade57acf5eef63c2d250745",
+      "summary": "Voyager founder Dylan Taylor says his kids will inherit millions, not billions\u2014he'd rather fund philanthropy than future generations he'll never meet."
+    },
+    {
+      "title": "Sam Altman's Brother Calls QQQ A 'Tough Hurdle To Beat' \u2014 But AI Is Fueling A New ETF Winner In 2026",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T07:00:56+00:00",
+      "url": "https://finnhub.io/api/news?id=c4834a0d39b31010688d67e4ff9318e1de17deae941628d4b3ed75ffda6331c2",
+      "summary": "The iShares MSCI Emerging Markets ETF (EEM) has surged 25% so far in 2026, overtaking the State Street SPDR S&P 500 ETF Trust (SPY), State Street SPDR Dow Jones Indust Avg ETF Trust (DIA), and the Invesco QQQ Trust (QQQ)."
+    },
+    {
+      "title": "Zacks Investment Ideas feature highlights: Salesforce",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T06:52:00+00:00",
+      "url": "https://finnhub.io/api/news?id=333cb9dfbf920b85731fa65328e037cdda8a3585dbee1a199ff0d7fc6d78ed25",
+      "summary": "Salesforce heads into earnings with AI growth accelerating, margins expanding and shares trading below industry valuation levels."
+    },
+    {
+      "title": "Analysis-Europe's push to break Big Tech's grip tempered by internal debate",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T05:02:04+00:00",
+      "url": "https://finnhub.io/api/news?id=d6d119f22ffcec5aa5a2d9d75f10c7ed01a84791b2ddf310001a7d82350d4ff2",
+      "summary": "European leaders are divided on how far to go in curbing Big Tech as they weigh momentous decisions over giving EU firms preferential access to mobile satellite spectrum and limiting large multinationals' access to EU cloud tenders. On Tuesday, Reuters reported Brussels was likely to leave an opening for Elon Musk's Starlink and Amazon's low-earth-orbit satellite business Leo to acquire lucrative European mobile satellite spectrum next year as a result of a compromise that will reserve the bulk of frequencies for European firms. A separate decision on EU cloud tenders set for June 3 is expected to temper the influence of U.S. firms such as Amazon, Alphabet's Google and Microsoft, which dominate the global cloud market with a combined 63% share."
+    },
+    {
+      "title": "Alphabet: The Outperformance Opportunity Has Moved To A New Mag 7 Company",
+      "source": "SeekingAlpha",
+      "published_at": "2026-05-27T02:09:04+00:00",
+      "url": "https://finnhub.io/api/news?id=67d660f4a97dc111c8641b9a301d5e7022d2eaba904a6dda48153a0d2e49daa8",
+      "summary": "Alphabet has rapidly achieved market cap dominance over Microsoft, far sooner than anticipated. Read why GOOG stock is a Hold."
+    },
+    {
+      "title": "Apple Stock Hits New Record Highs as AI Doubts Begin to Fade",
+      "source": "Yahoo",
+      "published_at": "2026-05-27T00:45:00+00:00",
+      "url": "https://finnhub.io/api/news?id=19da112443e05b37493152c1ef3b3a2819ee792bc5c014f26f84ca2dd83f7347",
+      "summary": "As the most searched for stock on Zacks.com, Apple's (AAPL) remarkable rally has accelerated in recent weeks."
+    }
+  ],
+  "warnings": []
+}

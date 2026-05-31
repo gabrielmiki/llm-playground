@@ -1,0 +1,170 @@
+{
+  "ticker": "MSFT",
+  "date": "2026-05-28",
+  "market_data": {
+    "open": 411.01,
+    "high": 415.94,
+    "low": 409.58,
+    "close": 412.67,
+    "volume": 28901479,
+    "adjusted_close": null,
+    "timestamp": "2026-05-27T00:00:00+00:00"
+  },
+  "news_articles": [
+    {
+      "title": "A Big Wealth Manager Just Bought $22.4 Million Worth of This Small-Cap Value ETF",
+      "source": "Yahoo",
+      "published_at": "2026-05-28T11:07:15+00:00",
+      "url": "https://finnhub.io/api/news?id=aafa565b82ad3348d0cf730caa198edafa66da9c10e9ce63cd1a83de40c722c9",
+      "summary": "EA Bridgeway Omni Small-Cap Value ETF targets long-term growth through systematic investment in undervalued U.S. small-cap equities."
+    },
+    {
+      "title": "Jim Cramer has bold new take on Elon Musk's SpaceX IPO",
+      "source": "Yahoo",
+      "published_at": "2026-05-28T11:03:00+00:00",
+      "url": "https://finnhub.io/api/news?id=fe3c7804b7cd84e48ac36ec8b46f9454291ddca651b7e49e20d9e4c7dc8060d7",
+      "summary": "There is always one IPO that defines a generation of investors. For people who started buying stocks in the 1990s, it was Microsoft (MSFT) and Amazon (AMZN). For millennials, it was Facebook and Tesla (TSLA). Each one arrived with the same problem, a valuation that looked impossible right up until ..."
+    },
+    {
+      "title": "Dell lands $9.7bn Pentagon contract just weeks after Trump said 'go out and buy'",
+      "source": "Yahoo",
+      "published_at": "2026-05-28T10:59:16+00:00",
+      "url": "https://finnhub.io/api/news?id=0e71f7a23c2f266ce91cc1c2f6d121be7ccfb4cfa23e70f0b347dd354ba7e63a",
+      "summary": "Dell Technologies has secured a $9.7 billion (\u20ac8.3bn) defence contract to supply Microsoft software across the entire US military, just weeks after US President Donald Trump publicly endorsed the company at the White House.View on euronews"
+    },
+    {
+      "title": "Social Buzz: Wallstreetbets Stocks Mixed Premarket Thursday; Snowflake to Advance, AST SpaceMobile to Decline",
+      "source": "Yahoo",
+      "published_at": "2026-05-28T10:42:30+00:00",
+      "url": "https://finnhub.io/api/news?id=61b24de14d784fda9715161f58ccebb306f4ef48d62efceed60ea428585e2d1c",
+      "summary": "The most-talked-about stocks in the Reddit subforum Wallstreetbets were mixed hours before Thursday'"
+    },
+    {
+      "title": "The Philippines Enterprise ICT Intelligence Report 2025 Featuring Microsoft, Globe Telecom, IBM, Converge ICT Solutions, and Tata Consultancy Services (TCS)",
+      "source": "Yahoo",
+      "published_at": "2026-05-28T10:33:00+00:00",
+      "url": "https://finnhub.io/api/news?id=29bfcbf52221640f92fd161c69ca63e1dd0d1221d2aa75831d2fe53b634262be",
+      "summary": "Key market opportunities in the Philippines' ICT sector include a surge in digital transformation driven by government initiatives, and emerging tech like cloud computing and AI. The BPO sector benefits from a competitive skilled workforce and supportive infrastructure, while BFSI remains a major revenue contributor.Dublin, May 28, 2026 (GLOBE NEWSWIRE) -- The \"The Philippines - Enterprise ICT Country Intelligence Report\" report has been added to ResearchAndMarkets.com's offering.The Philippines"
+    },
+    {
+      "title": "From diapers to drugs: How India's global corporate hubs are putting AI to work",
+      "source": "Yahoo",
+      "published_at": "2026-05-28T10:31:47+00:00",
+      "url": "https://finnhub.io/api/news?id=146ef447e2af4f85d3c955c447a564b0285435dd3886587faecf38187c712c4e",
+      "summary": "Whether they are recruiting the ideal \"momfluencer\" to sell diapers or trawling through reams of data to fast-track drug launches, global centers of multinational firms in India are increasingly putting AI to work in creative ways. Heads of several Global Capability Centres (GCCs) told Reuters they are deploying AI across a host of functions - from marketing and content creation to finance and human resources - to automate time-consuming, repetitive tasks that once required hours of manual effort. And the ambition doesn't stop there."
+    },
+    {
+      "title": "The Zacks Analyst Blog Highlights Alphabet, Microsoft and Baidu",
+      "source": "Yahoo",
+      "published_at": "2026-05-28T10:09:00+00:00",
+      "url": "https://finnhub.io/api/news?id=519057226490176e503d438271b4674a157787438358e4e00ac8e8ec0c9ac917",
+      "summary": "Alphabet is expanding AI-powered Search ads with Gemini as Microsoft and Baidu intensify competition in AI search."
+    },
+    {
+      "title": "Microsoft cut its engineers off from AI because the bill got too big \u2014 why AI might not take your job after all",
+      "source": "Yahoo",
+      "published_at": "2026-05-28T09:35:00+00:00",
+      "url": "https://finnhub.io/api/news?id=4b7701cf0885386f57179f563544634fdd5117a0f73917ab70a516d6ac9f2505",
+      "summary": "The math ain't mathing at many of the giant Silicon Valley firms."
+    },
+    {
+      "title": "Micron's Cheap Stock Valuation Seen as a Contrarian Warning Sign",
+      "source": "Yahoo",
+      "published_at": "2026-05-28T09:21:49+00:00",
+      "url": "https://finnhub.io/api/news?id=4dbaaf994e4a08958ea2fc8af0a146ef19bce58e5d09973bd52a4d032a84fa1c",
+      "summary": "(Bloomberg) -- Micron Technology Inc. is the third-best performer in the S&P 500 Index this year and at the same time one of the least expensive stocks in the market. While that dichotomy looks bullish on the surface, it may be more of a warning sign than a green light for investors.Most Read from BloombergSingapore Hands Byju's Founder His First Ever Jail TermIran's Khamenei Says No Going Back for Middle East Rocked by WarTwo More Oil Supertankers Exit Hormuz to Help Push Up FlowsEx-President B"
+    },
+    {
+      "title": "Nvidia Server Maker Wiwynn Sees AI Bottlenecks Beyond Memory",
+      "source": "Yahoo",
+      "published_at": "2026-05-28T08:58:41+00:00",
+      "url": "https://finnhub.io/api/news?id=a1f153262fd88d31cc3a67ac7ab952aa8a1d10420b8ad3473b1c945c9c12eeab",
+      "summary": "(Bloomberg) -- Wiwynn Corp., one of the biggest makers of Nvidia Corp. servers, warned of shortages developing in vital data center components beyond just memory chips, potentially slowing or inflating the cost of a global AI infrastructure buildout.Most Read from BloombergSingapore Hands Byju's Founder His First Ever Jail TermIran's Khamenei Says No Going Back for Middle East Rocked by WarTwo More Oil Supertankers Exit Hormuz to Help Push Up FlowsEx-President Biden Sues to Stop DOJ Sharing Inte"
+    },
+    {
+      "title": "Marvell Stock Drops After Earnings Beat. It Sees Growth in Powering the AI Boom.",
+      "source": "Yahoo",
+      "published_at": "2026-05-28T08:55:00+00:00",
+      "url": "https://finnhub.io/api/news?id=8767785d2a94b8f99bc5bcdc005a3a8b9c7c95dcf9e9cacfebea4175cbb18bcf",
+      "summary": "The data-center boom is still going strong for Marvell Technology The chip company reported better-than-expected first-quarter revenue and sees higher revenue than expected in the current quarter. Marvell stock dropped 2.6% in Thursday's premarket following the results. The company reported revenue of $2.42 billion, compared with Wall Street estimates of $2.41 billion, according to FactSet."
+    },
+    {
+      "title": "Meet the Spectacular Vanguard ETF With 45.8% of Its Portfolio Parked in Nvidia, Alphabet, Apple, and Microsoft",
+      "source": "Yahoo",
+      "published_at": "2026-05-28T08:54:00+00:00",
+      "url": "https://finnhub.io/api/news?id=e36aa2a798c2c5780fedc5ab4af8a62a226d1addeed8ee593046bcb701768877",
+      "summary": "The Vanguard Mega Cap Growth ETF has obliterated the S&P 500 since its inception in 2007."
+    },
+    {
+      "title": "Corporate America enters its AI reckoning",
+      "source": "Yahoo",
+      "published_at": "2026-05-28T08:51:04+00:00",
+      "url": "https://finnhub.io/api/news?id=199c4bb9caf73e35ba3057719e6b9372d292160e2084e8bfe75d9139dc133c84",
+      "summary": "Corporate leaders are starting to question whether soaring AI spending is delivering meaningful returns."
+    },
+    {
+      "title": "Microsoft: The GARP Moment I've Been Waiting For",
+      "source": "SeekingAlpha",
+      "published_at": "2026-05-28T08:30:00+00:00",
+      "url": "https://finnhub.io/api/news?id=7b8ee720f1d94c3b0ceb8480c9909985acccb9870bf4bd35d61d8b0f61cf9fc8",
+      "summary": "Microsoft (MSFT) beat FQ3 estimates as EPS rose 23% YoY. Here's what investors need to know about the company."
+    },
+    {
+      "title": "Claude pricing raises new budgeting questions for CFOs",
+      "source": "Yahoo",
+      "published_at": "2026-05-28T07:46:10+00:00",
+      "url": "https://finnhub.io/api/news?id=68383ecc90d2f3861dea35eec9220d6ef0eee7442937004b0c3b27ffdf4ef01a",
+      "summary": "As Anthropic's model becomes more prevalent across finance, CFOs may have to pay closer attention to token-based billing and its impact on the growing cost of enterprise AI usage."
+    },
+    {
+      "title": "'It's Gung-Ho, Folks' - Dimon Lets Loose While the Chip Rally Catches Its Breath and AI Earnings Deliver the Real Verdict",
+      "source": "ChartMill",
+      "published_at": "2026-05-28T07:15:29+00:00",
+      "url": "https://finnhub.io/api/news?id=580e29617b85d4fbae7531a6b5d7b6f42075105c5eb9bcf5ac7ed4c2999113ee",
+      "summary": "Wednesday on Wall Street was one of those days where the session itself was a placeholder, calm on the surface, with almost everyone positioning ahead of a heavy after-hours earnings slate."
+    },
+    {
+      "title": "TeamViewer Appoints Peter Ruchatz as Chief Marketing Officer",
+      "source": "Yahoo",
+      "published_at": "2026-05-28T07:00:00+00:00",
+      "url": "https://finnhub.io/api/news?id=c7683397aa4185be1e2eaae2f10dd354c32e9223b3ffc7ca765388a08ee8ac19",
+      "summary": "TeamViewer today announced the appointment of Peter Ruchatz as Chief Marketing Officer (CMO), effective September 2026. Ruchatz is an accomplished B2B software marketing leader with a proven track record of delivering strong growth in Enterprise and SMB segments. He will join TeamViewer's Senior Leadership Team and lead the global marketing organization across brand, product marketing, demand generation, channel marketing, and pricing."
+    },
+    {
+      "title": "The AI Black Box: SpaceX, Hyperscalers, And The Liquidity Bubble Beneath The Rally",
+      "source": "SeekingAlpha",
+      "published_at": "2026-05-28T05:53:22+00:00",
+      "url": "https://finnhub.io/api/news?id=002181374e2d6d4477255c59f4af36b73fc00fec27d3fe7b2237da53cc94ec38",
+      "summary": "AI earnings increasingly depend on opaque private companies whose underlying economics remain largely hidden. See why the AI ecosystem increasingly appears reflexive"
+    },
+    {
+      "title": "Microsoft's Defense Deal And Clean Energy Push Reframe Long-Term Valuation",
+      "source": "Yahoo",
+      "published_at": "2026-05-28T03:15:02+00:00",
+      "url": "https://finnhub.io/api/news?id=a0b05fff56f6fdb7491adb16ffa967da460ae9dbab00c31fb2c1b8fcbec86dae",
+      "summary": "Microsoft, ticker NasdaqGS:MSFT, is at the center of a new $9.7b, five year enterprise software consolidation contract with the U.S. Department of Defense. The company has also joined Amazon, Google, and Meta in launching the Data Center Innovation Initiative focused on clean energy and sustainable materials for data centers. These moves touch on U.S. government technology adoption, long term software standard setting, and the environmental profile of AI and cloud infrastructure. Microsoft..."
+    },
+    {
+      "title": "Jensen Huang Joins Elite Tsinghua University Advisory Board That Includes Tim Cook And Elon Musk: Report",
+      "source": "Yahoo",
+      "published_at": "2026-05-28T01:38:40+00:00",
+      "url": "https://finnhub.io/api/news?id=b5d61698756f4baa3d6dffbb5f3d7062cfa46b63e6f732f861141895ae88915b",
+      "summary": "Nvidia Corp. (NASDAQ:NVDA) CEO Jensen Huang has reportedly agreed to join the advisory board of one of China's most prestigious universities. Nvidia CEO Joins Elite Tsinghua Advisory Board Huang accepted an invitation to join the advisory board of Tsinghua University School of Economics and Management, the Financial Times reported on Wednesday, citing people familiar with the matter. The board includes some of the world's most prominent business leaders. It has Apple Inc. (NASDAQ:AAPL) CEO Tim C"
+    },
+    {
+      "title": "The Quiet AI Winner That Doesn't Show Up on Any Hot Stock List",
+      "source": "Yahoo",
+      "published_at": "2026-05-28T01:01:00+00:00",
+      "url": "https://finnhub.io/api/news?id=380d704392778bcbc1c14ad8e862e32e8d0840dd50c5bd14e0dcbefb3e78db7f",
+      "summary": "This former telecom wreck now has $13 billion in AI contracts. Here's why it's still under the radar."
+    },
+    {
+      "title": "EWT: AI Revolution Meets The Geopolitical Shadow And Stretched Valuation",
+      "source": "SeekingAlpha",
+      "published_at": "2026-05-28T00:55:25+00:00",
+      "url": "https://finnhub.io/api/news?id=5d54b50615aaabad4903a5f45fc18c0ed300612c068267ec6e91770ed0578eba",
+      "summary": "The iShares MSCI Taiwan ETF offers concentrated exposure to Taiwan's booming technology sector, with TSMC as its dominant holding. See why EWT is a Hold."
+    }
+  ],
+  "warnings": []
+}

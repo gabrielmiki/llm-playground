@@ -1,0 +1,195 @@
+{
+  "verdict": "NEEDS_REVISION",
+  "ac_validation": [
+    {
+      "criterion": "AC-001",
+      "text": "Given market data unavailable, When processing ticker, Then historical data is used as fallback",
+      "testable": false,
+      "issues": [
+        "\"market data unavailable\" is ambiguous: does it mean all 3 providers fail (MarketDataUnavailableError)? A single provider failure? Rate limited? Parse error?",
+        "\"historical data\" is completely undefined: what data source? Previous day's cached FusedRecord? Last known good market data from a database? Filesystem cache?",
+        "No selection criteria specified: same ticker? closest prior trading day? within N days lookback?",
+        "No fallback behavior when historical data itself is unavailable (first-ever run for a ticker, or no cached data exists)",
+        "No specification of where this logic lives: MarketDataCollector? Pipeline orchestrator? New degradation module?"
+      ],
+      "suggested_fix": "Restructure into multiple precise ACs:\n  AC-1a: Given MarketDataUnavailableError raised by MarketDataCollector for ticker AAPL on date 2026-05-28, When pipeline processes ticker, Then it attempts to load cached FusedRecord from data/processed/fused/AAPL_{prev_trading_day}.json\n  AC-1b: Given historical FusedRecord loaded successfully as fallback, When market_data field contains valid MarketData, Then that MarketData is used in place of None\n  AC-1c: Given no historical FusedRecord exists for previous trading day, When fallback attempted, Then market_data remains None and a ValidationWarning with category=\"fallback_failed\" is produced\n  AC-1d: Given historical data fallback was used, When FusedRecord is created, Then a ValidationWarning with category=\"degraded_data\" is appended listing the ticker, date, and fallback source"
+    },
+    {
+      "criterion": "AC-002",
+      "text": "Given all data sources fail for ticker, When processing, Then \"insufficient_data\" status is set",
+      "testable": false,
+      "issues": [
+        "\"all data sources\" is ambiguous: does this mean all market data providers (3) fail? Both market AND news fail? All pipeline stages? All sources across all tickers?",
+        "\"insufficient_data\" status is completely undefined: no 'status' field exists on FusedRecord, MarketData, TradingSignal, or ReportResult. What component should hold this status?",
+        "No specification of where 'insufficient_data' is stored, what type it is (string? enum? boolean?), or what downstream components read it",
+        "No specification of how 'insufficient_data' interacts with report generation (e.g., should the report still be generated with a warning? skipped entirely?)"
+      ],
+      "suggested_fix": "Restructure into precise ACs:\n  AC-2a: Given both MarketDataUnavailableError AND NewsDataUnavailableError raised for ticker AAPL on date 2026-05-28, AND no historical fallback available, When pipeline processes ticker, Then FusedRecord.warnings includes a ValidationWarning with category=\"insufficient_data\" and message describing which data sources failed\n  AC-2b: Given only market data unavailable but news succeeds, When pipeline processes ticker, Then status is NOT \"insufficient_data\" (partial data is acceptable)\n  AC-2c: Define new field on FusedRecord (e.g., status: str = \"complete\") that is set to \"insufficient_data\" when both market_data is None AND no news_articles remain after filtering"
+    },
+    {
+      "criterion": "AC-003",
+      "text": "Given any degradation, When report is generated, Then warnings section clearly lists all issues",
+      "testable": true,
+      "issues": [
+        "This AC is already covered by Ticket 8 (AC-04) — the report generator already renders ValidationWarning in all three formats via ReportInput.warnings",
+        "However, the AC is vague on what constitutes 'clearly lists' — is a ValidationWarning with category and message sufficient? Or needs specific formatting?",
+        "No specification of what degradation-specific warnings should contain (message format, category values)"
+      ],
+      "suggested_fix": "AC-3 is partially testable as-is but should be tightened:\n  AC-3a: Given FusedRecord contains ValidationWarning(s) with category=\"degraded_data\" or \"insufficient_data\", When report is generated via ReportGenerator, Then result.warnings section in all formats contains each warning's message\n  AC-3b: Given multiple degradation warnings for the same ticker, When report is generated, Then all degradation warnings appear in the warnings list (no deduplication loss)"
+    }
+  ],
+  "infrastructure_readiness": [
+    {
+      "requirement": "ValidationWarning dataclass (category, field, message, value)",
+      "status": "EXISTS",
+      "location": "src/preprocess/validator.py:13-18",
+      "notes": "Already used by FusedRecord.warnings, ReportInput.warnings, and rendered by ReportGenerator"
+    },
+    {
+      "requirement": "FusedRecord with warnings list",
+      "status": "EXISTS",
+      "location": "src/preprocess/fusion.py:14-20",
+      "notes": "FusedRecord.warnings passes through to ReportInput.warnings in orchestrate.py"
+    },
+    {
+      "requirement": "MarketDataUnavailableError / NewsDataUnavailableError catching in pipeline",
+      "status": "EXISTS",
+      "location": "src/pipeline.py:71-73, 79-81",
+      "notes": "Pipeline already catches these exceptions and sets market_data=None / news_articles=[] respectively. BUT there is NO historical fallback — it just sets None."
+    },
+    {
+      "requirement": "Cached FusedRecord loading for historical fallback",
+      "status": "EXISTS (partial)",
+      "location": "src/generate/orchestrate.py:41-45",
+      "notes": "load_fused_record() exists for report generation but is NOT used as a fallback mechanism. No function exists to find previous trading day's cached record."
+    },
+    {
+      "requirement": "\"insufficient_data\" status field on FusedRecord or similar",
+      "status": "MISSING",
+      "location": "N/A",
+      "notes": "No status field exists anywhere. Would need to be added to FusedRecord, or a new mechanism created. Must decide on the data model."
+    },
+    {
+      "requirement": "Historical data selection logic (find previous cached FusedRecord)",
+      "status": "MISSING",
+      "location": "N/A",
+      "notes": "No function exists to: (a) determine the previous trading day for a given date, (b) check if a cached FusedRecord exists for that date, (c) load and return it. This must be built."
+    },
+    {
+      "requirement": "Degradation-specific warning messages format",
+      "status": "MISSING",
+      "location": "N/A",
+      "notes": "No specification of what degradation warnings should say. E.g., \"Market data unavailable for AAPL on 2026-05-28, using historical data from 2026-05-27\""
+    },
+    {
+      "requirement": "Test infrastructure for degradation (fixtures, mock patterns)",
+      "status": "MISSING",
+      "location": "N/A",
+      "notes": "Need new fixtures for: failed collector responses, partially available historical FusedRecords, test data for load_fused_record fallback path. Existing market_data.py and news_data.py fixtures can be reused for failure cases."
+    }
+  ],
+  "coverage_analysis": {
+    "happy_path": "COVERED (PARTIALLY)",
+    "error_cases": "MISSING",
+    "edge_cases": "MISSING"
+  },
+  "blocking_issues": [
+    "BLOCKING: AC-001 \"historical data\" term is undefined — no source, selection criteria, or loading mechanism specified. Cannot write a deterministic test without knowing what 'historical data' means, where it comes from, and what happens when it's also unavailable.",
+    "BLOCKING: AC-002 \"insufficient_data status\" term is undefined — no 'status' field exists in any data model (FusedRecord, MarketData, etc.). Cannot write a test that asserts a value on a nonexistent field. Must define: (a) what field holds the status, (b) valid values, (c) which code path sets it, (d) who reads it.",
+    "BLOCKING: No edge case coverage at all — the 3 ACs only cover idealized scenarios. Missing: partial degradation (one source fails, other succeeds), historical data also missing (first run), multiple tickers with mixed failure modes, consecutive-day degradation, news-only failure vs market-only failure vs both-fail."
+  ],
+  "moderate_issues": [
+    "MODERATE: Layer placement ambiguous — ticket says \"layer: generate\" but historical data fallback needs to happen in pipeline.py (collection stage) or a new orchestration module. The generate layer currently assumes data is already collected and fused. Clarify where fallback logic lives.",
+    "MODERATE: Dependency analysis incomplete — declared dependencies [Ticket 2, 3, 4] are necessary but not sufficient. Also needs: Ticket 8 (load_fused_record, ReportInput.warnings pipeline), and may need knowledge of Ticket 6/7 (how sentiment/signal stages handle None market_data). Additionally, pipeline.py (Ticket 8+ scope) needs modification.",
+    "MODERATE: No specification of what \"degradation warnings\" look like — AC-003 says \"warnings section clearly lists all issues\" but doesn't specify message format, category naming conventions, or what information each warning must contain. The existing ValidationWarning format (category/field/message/value) is adequate but needs conventions defined.",
+    "MODERATE: Current pipeline.py already catches MarketDataUnavailableError and NewsDataUnavailableError and sets data to None/[] — but this is invisible to downstream. There's no warning generated when this happens in pipeline.py. The fusion engine (Ticket 4) adds its own warning for missing_market_data, but news failure leaves no trace in the warnings pipeline.",
+    "MODERATE: No test count or structure guidance — unlike prior tickets which specified exact test counts and files, this ticket provides no implementation guidance for file structure or test organization.",
+    "MODERATE: 6 pre-existing test failures exist (documented in pipeline.md) — these may affect test run validation if they overlap with new test areas."
+  ],
+  "ac_expansion_recommendations": [
+    "AC-1a: Given MarketDataCollector raises MarketDataUnavailableError for ticker AAPL on 2026-05-28, When pipeline processes ticker, Then it loads data/processed/fused/AAPL_2026-05-27.json (or previous trading day) as fallback market_data",
+    "AC-1b: Given historical fallback successfully loads for ticker AAPL, When FusedRecord is created, Then fused.warnings contains a ValidationWarning with category=\"degraded_data\", field=\"market_data\", message containing the original target date and the fallback date",
+    "AC-1c: Given historical fallback fails (no cached record exists for previous trading day), When pipeline processes ticker, Then market_data remains None and fused.warnings contains a ValidationWarning with category=\"fallback_failed\"",
+    "AC-1d: Given news articles are empty AND historical market data is None, When FusedRecord is created, Then fused.warnings contains a ValidationWarning with category=\"insufficient_data\"",
+    "AC-2a: Given market_data is None AND news_articles is empty after processing, When FusedRecord is created, Then a ValidationWarning with category=\"insufficient_data\" is added to fused.warnings listing which sources failed",
+    "AC-2b: Given market_data is None but news_articles exist, When FusedRecord is created, Then NO insufficient_data warning is generated (only the existing missing_market_data warning from DataFusionEngine)",
+    "AC-2c: Given news_articles is empty but market_data exists, When FusedRecord is created, Then NO insufficient_data warning is generated",
+    "AC-3a: Given FusedRecord has degradation warnings with category \"degraded_data\" or \"insufficient_data\", When ReportGenerator.generate() renders the report, Then the warnings section in text/JSON/HTML contains each warning's message field",
+    "AC-3b: Given multiple tickers with degradation warnings, When ReportInput is constructed, Then all_warnings includes every degradation warning from every FusedRecord"
+  ],
+  "suggested_test_structure": {
+    "new_files": [
+      "src/generate/degradation.py — Fallback coordinator module (or add to pipeline.py)",
+      "tests/test_degradation.py — Tests for degradation detection, fallback, and warning generation (15-20 tests)",
+      "tests/fixtures/degradation_data.py — Fixtures for: failed collector mocks, cached FusedRecords, edge cases"
+    ],
+    "modified_files": [
+      "src/pipeline.py — Add historical data fallback logic in Stages 1-3 (collect → fuse)",
+      "tests/conftest.py — Register new degradation_data fixture plugin",
+      "src/generate/orchestrate.py — May need updates if fallback coordination lives here"
+    ],
+    "recommended_tests": [
+      ["Delegation Detection", "test_market_data_fallback_to_historical", "AC-1a: Historical fallback loaded when MarketDataUnavailableError raised"],
+      ["Delegation Detection", "test_historical_fallback_success_adds_warning", "AC-1b: Degradation warning added when fallback used"],
+      ["Delegation Detection", "test_historical_fallback_fails_no_cache", "AC-1c: market_data remains None when no cache exists"],
+      ["Delegation Detection", "test_news_failure_no_fallback_needed", "Empty news articles is valid (no news is not an error)"],
+      ["Delegation Detection", "test_both_sources_fail_insufficient_data", "AC-2a: insufficient_data warning when both sources fail"],
+      ["Delegation Detection", "test_market_only_failure_not_insufficient", "AC-2b: Only market fails, news OK → no insufficient_data"],
+      ["Delegation Detection", "test_news_only_failure_not_insufficient", "AC-2c: Only news fails, market OK → no insufficient_data"],
+      ["Delegation Detection", "test_degradation_warnings_in_report", "AC-3a: Degradation warnings appear in all report formats"],
+      ["Delegation Detection", "test_multiple_degradation_warnings_in_report", "AC-3b: All degradation warnings preserved in report"],
+      ["Edge Cases", "test_first_run_no_historical_data", "No prior cached FusedRecord exists"],
+      ["Edge Cases", "test_multiple_tickers_mixed_failures", "Some tickers fail, others succeed"],
+      ["Edge Cases", "test_consecutive_day_degradation", "Same ticker fails two days in a row"],
+      ["Edge Cases", "test_historical_data_stale_more_than_5_days", "Historical data is too old (configurable threshold)"],
+      ["Edge Cases", "test_partial_provider_failure_no_degradation", "Yahoo fails but Alpha Vantage succeeds → no degradation needed"]
+    ],
+    "fixtures_needed": [
+      "sample_fused_record_historical() — A FusedRecord from a previous trading day",
+      "sample_fused_record_degraded() — A FusedRecord with degradation warnings",
+      "sample_fused_record_insufficient_data() — A FusedRecord with both sources failed",
+      "mock_historical_cache_found() / mock_historical_cache_missing() — Control cache hit/miss",
+      "mock_market_data_collector_fail() / mock_news_collector_fail() — Collector failure mocks"
+    ],
+    "test_count_estimate": "15-20 tests (matching complexity of Tickets 2-3 at 15-24 tests each)"
+  },
+  "infrastructure_gaps": [
+    {
+      "gap": "No historical data cache mechanism",
+      "severity": "HIGH",
+      "description": "The system needs a mechanism to look up previous trading day's cached FusedRecord. Currently, load_fused_record() loads by exact ticker+date match. For fallback, need a function like find_previous_cached_record(ticker, date) that searches data/processed/fused/ for the most recent cached file before the target date, respecting trading day calendar.",
+      "suggested_resolution": "Add function in src/generate/degradation.py (or src/pipeline.py) that lists cached files, filters by ticker prefix, finds the most recent date before target_date, and loads it."
+    },
+    {
+      "gap": "No status field on FusedRecord",
+      "severity": "HIGH",
+      "description": "The 'insufficient_data' AC requires a status field, but none exists. Must decide: add status: str = 'complete' attribute to FusedRecord, or use the existing warnings list (ValidationWarning with category='insufficient_data') instead of a separate status field.",
+      "suggested_resolution": "RECOMMENDATION: Use warnings-based approach (add ValidationWarning with category='insufficient_data' to fused.warnings) rather than a new status field. This keeps the data model simple and leverages the existing warnings pipeline that already flows to ReportGenerator. The FusedRecord dataclass would need NO changes — just add logic to produce the appropriate ValidationWarning."
+    },
+    {
+      "gap": "No degradation warning conventions defined",
+      "severity": "MEDIUM",
+      "description": "The message format for degradation warnings is unspecified. Need conventions for: category values ('degraded_data', 'fallback_failed', 'insufficient_data'), message templates, and which fields to populate.",
+      "suggested_resolution": "Define warning conventions in the ticket spec:\n  - degraded_data: category='degraded_data', field='market_data'|'news', message='Market data for {ticker} on {date} unavailable, using historical data from {fallback_date}', value={fallback_date}\n  - fallback_failed: category='fallback_failed', field='market_data', message='No historical data available for {ticker} prior to {date}', value=None\n  - insufficient_data: category='insufficient_data', field='pipeline', message='Insufficient data for {ticker} on {date}: {sources_failed}', value=None"
+    },
+    {
+      "gap": "Pipeline.py missing warning generation for collection failures",
+      "severity": "MEDIUM",
+      "description": "When pipeline.py catches MarketDataUnavailableError, it sets market_data=None but generates NO warning. The DataFusionEngine.fuse() adds a missing_market_data warning, but there's no 'degraded_data' warning for the historical fallback being used. The NewsDataUnavailableError catch sets news_articles=[] with no warning at all.",
+      "suggested_resolution": "After catching MarketDataUnavailableError, attempt historical fallback. If successful, add degraded_data warning. If unsuccessful, add fallback_failed warning. After catching NewsDataUnavailableError, add a warning noting news was unavailable (but continue processing)."
+    }
+  ],
+  "dependency_analysis": {
+    "declared": ["Ticket 2 (Market Data Collection)", "Ticket 3 (News Data Collection)", "Ticket 4 (Data Quality & Fusion)"],
+    "actually_needed": [
+      "Ticket 2 — exception types for catching failures ✅",
+      "Ticket 3 — exception types for catching failures ✅",
+      "Ticket 4 — FusedRecord, ValidationWarning, fusion engine ✅",
+      "Ticket 8 — load_fused_record, ReportInput.warnings, ReportGenerator (warnings rendering) ✅ (already implemented)",
+      "Ticket 6 — SentimentResult handling of None market_data (already handled: FinBertSentiment.analyze returns _neutral_result() if no articles) ⚠️ (not declared but should be verified)",
+      "Ticket 7 — TradingSignalGenerator handling of market_data=None (already handled: generates hold with N/A market_return) ⚠️ (not declared but should be verified)"
+    ],
+    "missing_dependencies": ["Ticket 8 is an implicit dependency (already implemented, but needs verification of load_fused_record compatibility)"]
+  },
+  "overall_assessment": "The ticket has the right idea but the ACs are far too vague for deterministic testing. This is reminiscent of the early tickets (2, 3, 4) which started with 3 vague ACs and required multiple TDD review rounds to become testable. The warning/report infrastructure is solid and doesn't need changes, but the core fallback mechanics and insufficient_data concept need precise specification before implementation."
+}

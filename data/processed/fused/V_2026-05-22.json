@@ -1,0 +1,107 @@
+{
+  "ticker": "V",
+  "date": "2026-05-22",
+  "market_data": {
+    "open": 330.52,
+    "high": 333.43,
+    "low": 328.82,
+    "close": 328.88,
+    "volume": 7464251,
+    "adjusted_close": null,
+    "timestamp": "2026-05-22T00:00:00+00:00"
+  },
+  "news_articles": [
+    {
+      "title": "Visa (V) Valuation Check As Recent Share Performance Sends Mixed Signals",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T21:16:20+00:00",
+      "url": "https://finnhub.io/api/news?id=10cb3e29cd089ff450b22fd155f0cb0dafc996e5ad3e86b670aee21e2cc377ce",
+      "summary": "Why Visa (V) is on investors' radar right now Visa (V) is drawing attention after a period of mixed recent performance, including gains over the past month alongside a decline in year to date and 1 year total returns. See our latest analysis for Visa. Visa's recent momentum has picked up, with a 30 day share price return of 6.83% and a 90 day share price return of 3.17%. However, year to date share price performance and 1 year total shareholder return are both in decline, while the 3 year and..."
+    },
+    {
+      "title": "Tracking Akre Capital Management Portfolio - Q1 2026 Update",
+      "source": "SeekingAlpha",
+      "published_at": "2026-05-22T20:01:59+00:00",
+      "url": "https://finnhub.io/api/news?id=f520a921ccd599729a059ad93815176d8e54d7fdc23b04873cff3fe9d608d882",
+      "summary": "Akre Capital Management Q1 2026 13F: portfolio down to $6.13B, big trims in MA/V/MCO/KKR, new CRM/NOW adds, stake boosts\u2014read now."
+    },
+    {
+      "title": "Crypto and Blockchain Stocks Positioned for Long-Term Growth",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T16:40:00+00:00",
+      "url": "https://finnhub.io/api/news?id=5c408f6142b75f1dead21d3f53758973d25598559ec3db28e71fcb48a5bcc410",
+      "summary": "Here, we discuss three stocks, V, CME and COIN, which are well-poised to benefit from the growing proliferation of bitcoin and other cryptocurrencies, as well as blockchain technology."
+    },
+    {
+      "title": "Costco made a quiet credit card change that cost members money",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T16:03:00+00:00",
+      "url": "https://finnhub.io/api/news?id=bd40b1943b85fa0ab88a921bbb385c822e78ac336dd064ec96e7d7b2d214c4bd",
+      "summary": "Costco has treated credit cards differently from most retailers. First, the chain only accepts one single credit card brand at any given time. For 16 years, that was American Express, but in 2016, a change was made. \"Costco Wholesale Corp. has started to issue new Visa cards to its customers, who ..."
+    },
+    {
+      "title": "Should You Forget PayPal and Buy Visa Instead?",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T15:20:00+00:00",
+      "url": "https://finnhub.io/api/news?id=38eaae5aa3897eab817fdb2c44f936e5d3b988fc709f479a107138ed39d4fb70",
+      "summary": "The card processing leader is crushing the digital payments leader."
+    },
+    {
+      "title": "SpaceX And Anthropic Plan To Go Public \u2014 Here's What Happened After The 10 Biggest IPOs In History",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T13:34:51+00:00",
+      "url": "https://finnhub.io/api/news?id=df6364805c539aa36f96054478c940ed64c9e56f2f90cc364b57dca2b03d7ac1",
+      "summary": "Bank of America's Michael Hartnett maps how markets moved after history's 10 biggest IPOs \u2014 from rocket fuel to toppy signals."
+    },
+    {
+      "title": "Should Visa & Mastercard Investors Worry About UK & Europe's Moves?",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T12:59:00+00:00",
+      "url": "https://finnhub.io/api/news?id=db723d7e2a5cc5bc2db41f92462ebef2977ef40e02313f89798c21a26efc532f",
+      "summary": "V and MA face growing U.K. and European scrutiny as regulators push for more fee transparency and regional payment alternatives."
+    },
+    {
+      "title": "BofA's Hartnett Warns Mega-IPOs Risk Bubble Like Roaring '20s",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T12:41:37+00:00",
+      "url": "https://finnhub.io/api/news?id=53f326a2dae461f8d34f8c8ba25f6b97eefb2e9fa66370b484f2fe8fb5a93930",
+      "summary": "(Bloomberg) -- Mega IPOs like those eyed by SpaceX and OpenAI threaten to push the weighting of tech in equity benchmarks beyond market-bubble levels of concentration, according to Bank of America Corp. strategist Michael Hartnett.Most Read from BloombergBungie Plans Layoffs After Ending 'Destiny 2' DevelopmentSpot the Difference: Putin Gets Trump Treatment From Xi in ChinaIran Says the US's Latest Proposal Has 'Narrowed the Gaps'Iran in Talks With Oman Over Permanent Hormuz Toll SystemModi's To"
+    },
+    {
+      "title": "SpaceX Is Lining Up a Huge IPO. The Numbers Show That Big Deals Don't Guarantee Big Returns.",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T12:25:23+00:00",
+      "url": "https://finnhub.io/api/news?id=01feaf81e7efe928ca682bfc5467792149b5ba462946c69d4286b954129613d5",
+      "summary": "SpaceX's planned IPO would more than triple the U.S. record. Here's how past mega-listings have performed."
+    },
+    {
+      "title": "Visa Tests Stablecoin Settlement And AI Commerce To Shape Future Fees",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T08:24:05+00:00",
+      "url": "https://finnhub.io/api/news?id=1fe11a37ac013e89d6a787f60a24c7cad386d18469202dca8d391d11b2d46d62",
+      "summary": "Visa (NYSE:V) has launched a stablecoin settlement program in Canada, including a trial with Wealthsimple. The program aims to integrate blockchain based payments into existing card settlement flows. Visa is also expanding its Agentic Ready program for AI powered commerce and payments. For Visa, this move sits directly in the core of its business model as a global payments network, connecting consumers, merchants, and financial institutions. By working with Wealthsimple on stablecoin..."
+    },
+    {
+      "title": "UK PSR proposes new reporting rules for Mastercard and Visa",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T06:40:56+00:00",
+      "url": "https://finnhub.io/api/news?id=9ea83c18ead6968ace22797a1253fd73aca53808833f6216b1479f77c40ef067",
+      "summary": "The PSR previously concluded in a market review that Mastercard and Visa do not face effective competition."
+    },
+    {
+      "title": "Analysis-ECB, banks rift hampers Europe's efforts to loosen reliance on US payments giants",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T05:09:39+00:00",
+      "url": "https://finnhub.io/api/news?id=f939f04ce322d084fdba7b4cbdde428011300691a1a50d921bdefc9782a48574",
+      "summary": "Europe's push to curb its dependence on U.S. payments giants Visa and Mastercard has driven a wedge between the European Central Bank and financial firms keen to shield revenues, hobbling efforts to build a home-grown system, several people involved said. A surge in cashless payments since the COVID-19 pandemic has increased the euro zone's reliance on U.S. firms, which handle nearly two thirds of card payments in the bloc. European policymakers have made payments sovereignty a strategic priority, as a fragmenting global order raises the risk of access to payments systems being weaponised and new forms of money challenge the euro's role."
+    },
+    {
+      "title": "Did New Berkshire Hathaway CEO Greg Abel Repeat Past Warren Buffett Mistakes?",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T04:35:00+00:00",
+      "url": "https://finnhub.io/api/news?id=1b15bbdc31b7bd41585312b900e9e3921ecabfab6ece13130250aea39351bcad",
+      "summary": "Airlines and retailers have not always been good investments for the company."
+    }
+  ],
+  "warnings": []
+}

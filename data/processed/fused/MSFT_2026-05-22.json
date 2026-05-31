@@ -1,0 +1,443 @@
+{
+  "ticker": "MSFT",
+  "date": "2026-05-22",
+  "market_data": {
+    "open": 419.535,
+    "high": 424.4,
+    "low": 416.33,
+    "close": 418.57,
+    "volume": 22390344,
+    "adjusted_close": null,
+    "timestamp": "2026-05-22T00:00:00+00:00"
+  },
+  "news_articles": [
+    {
+      "title": "Microsoft vs. Apple Stock: The Numbers Reveal a Clear Winner Heading Into H2 2026",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T23:00:02+00:00",
+      "url": "https://finnhub.io/api/news?id=74ccddca1b7489db4b5539e50b0647953cfeffc1282a5f9c75537c45b6430f4e",
+      "summary": "Microsoft vs. Apple stock: Compare fundamentals, valuation, dividends, analyst ratings, and AI exposure to see which looks like the better buy."
+    },
+    {
+      "title": "The Gates Foundation Sold All of Its Remaining Microsoft Stock. Should Investors Be Worried?",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T21:11:00+00:00",
+      "url": "https://finnhub.io/api/news?id=6e7c9bcaad507543c6c71729875e0670e388b9177db978abd5d3f8a8927d8a96",
+      "summary": "The famed foundation sold its remaining $3 billion position in the software company."
+    },
+    {
+      "title": "AI trade: Investors may want to look outside infrastructure, Nvidia",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T20:28:22+00:00",
+      "url": "https://finnhub.io/api/news?id=1983266ed674689ea14d1ca854afd8db1fcb0402eb61d55cd3438ec7218af050",
+      "summary": "All three of the major averages (^DJI, ^IXIC, ^GSPC) ended Friday's session in positive territory \u2014 the Dow Jones Industrial Average leading the way and rising 294 points \u2014 managing to close out the trading week with gains. This comes after Nvidia (NVDA) reported first quarter earnings results that beat estimates, but ultimately failed to wow Wall Street investors. Morningstar Wealth CIO for the Americas, Philip Straehl, comes on Market Domination Overtime to assess investor sentiment around the AI trade in response to Nvidia's latest earnings print."
+    },
+    {
+      "title": "GlobalFoundries (GFS) Launches Dedicated Quantum Technology Solutions Unit",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T20:09:44+00:00",
+      "url": "https://finnhub.io/api/news?id=bc3823cb26f4fc10aefc050a9ea040bce58e943e83ab374fb1b89f5bc3bcc574",
+      "summary": "GlobalFoundries Inc. (NASDAQ:GFS) is one of the best multibagger stocks to buy in 2026. On May 21, GlobalFoundries launched Quantum Technology Solutions to scale domestic manufacturing for utility-scale quantum computing. The new business will manufacture complete hardware solutions (including quantum processor units/QPUs, cryogenic read-out ICs, and advanced packaging), marking GF's entry into next-generation high-performance computing. [\u2026]"
+    },
+    {
+      "title": "Alphabet and NVIDIA: The Biggest Mag 7 Winners This Earnings Season",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T20:01:00+00:00",
+      "url": "https://finnhub.io/api/news?id=477ef4d082400a98354c31f99eda81e09b6a0f384ae440a5f3e0af192dd4143e",
+      "summary": "NVIDIA and Alphabet delivered some of the biggest highlights from the Mag 7 group in the Q1 earnings cycle, with Google Cloud sales showing bullish acceleration while NVIDIA's Data Center results again broke records."
+    },
+    {
+      "title": "Nvidia Has a Plan to Get the Stock Moving Again",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T19:47:00+00:00",
+      "url": "https://finnhub.io/api/news?id=bb5460bda312f54447ac14a76814d58211cec2385e71fc43c294b3947b85e47b",
+      "summary": "Nvidia is offering a peek behind the curtain of its data-center business. The new disclosure is meant to assuage investor worries about future growth."
+    },
+    {
+      "title": "Update: Rising US Borrowing Costs Won't Slow Massive AI Data-Center Buildout as Potential Profit Outweighs Spending",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T19:33:17+00:00",
+      "url": "https://finnhub.io/api/news?id=a966f8073e61c7e9efc6aa797b4d81da99051a3e6fda288dfe5fe40a3a3b1011",
+      "summary": "(Updates with comments from Morgan Stanley starting in 13th paragraph.) Rising interest rates wo"
+    },
+    {
+      "title": "The 1 Chart Every AI Investor Needs to See Before Buying Anything Right Now",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T19:05:00+00:00",
+      "url": "https://finnhub.io/api/news?id=caa6fa79d8e0c805255b01beb0fe7a41517b173e6b0077b8c3e66567636942ee",
+      "summary": "At first glance, this information may look more like a reason not to invest in these companies."
+    },
+    {
+      "title": "Microsoft Stock Is a Buy as OpenAI Prepares for an IPO. Here's Why.",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T19:02:34+00:00",
+      "url": "https://finnhub.io/api/news?id=25c69d37aeb2f81644aae1d6095372a8ae2d220d09e012204d0958d83613a371",
+      "summary": "OpenAI is reportedly looking to file for an IPO. MSFT stock looks like a buy ahead of the AI startup's listing."
+    },
+    {
+      "title": "Dominic Chu: The Trump Bull Market's AI Rally Is Powering the S&P 500 Toward an 8th Straight Winning Week",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T18:45:23+00:00",
+      "url": "https://finnhub.io/api/news?id=fa89f68aa583fc9dab5953f45169ddb26a386688f824e1ee957154ba5789c79a",
+      "summary": "CNBC's Dominic Chu opened Friday's market coverage by noting that \"the stocks are looking like they may open higher today, rounding out what could be the eighth straight winning week for the S&P 500.\" That kind of streak does not happen by accident, and inside the Trump bull market it has become the defining rhythm: ... Dominic Chu: The Trump Bull Market's AI Rally Is Powering the S&P 500 Toward an 8th Straight Winning Week"
+    },
+    {
+      "title": "CDL's $2.29 annual dividend beats Treasury yields despite rising interest rates",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T18:30:54+00:00",
+      "url": "https://finnhub.io/api/news?id=d860b7fa2ca0c1c604a4f7ff105c16de0de5f7780fc99cc8b7a6cf6deac18afe",
+      "summary": "Income investors holding the VictoryShares US Large Cap High Div Volatility Wtd ETF (NYSEARCA:CDL) own a fund built around one premise: large American companies with stable share prices tend to pay reliable dividends. CDL distributes cash monthly and paid $2.29 per share in 2025 against a current share price of roughly $76. With Treasury yields ... CDL's $2.29 annual dividend beats Treasury yields despite rising interest rates"
+    },
+    {
+      "title": "SCHG's Top Ten Holdings Now Drive 59 Percent of the Fund, Creating Hidden Single Stock Risk",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T18:30:53+00:00",
+      "url": "https://finnhub.io/api/news?id=c07231400d66a49eb8e6ec53facc788010fd742025aac53d334ab2109f595ff6",
+      "summary": "A young saver opens a Schwab account, picks the Schwab U.S. Large-Cap Growth ETF (NYSEARCA:SCHG) over a plain S&P 500 fund because they want a growth tilt at almost no cost, and assumes 197 holdings buys them diversification. The math says otherwise. SCHG's top 10 names drive 59% of the portfolio, which means more than ... SCHG's Top Ten Holdings Now Drive 59 Percent of the Fund, Creating Hidden Single Stock Risk"
+    },
+    {
+      "title": "Google appeals US court ruling on search monopoly",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T18:18:55+00:00",
+      "url": "https://finnhub.io/api/news?id=eed1f6111cd2108e153d11b1ac2eeead00f37372fc5a2e9a1b2ac5cc0f4a1619",
+      "summary": "Alphabet's Google on Friday appealed a Washington federal judge's ruling that it holds illegal monopolies in online search and related advertising. \u2022 Google argued that U.S. Judge Amit Mehta made legal errors in his 2024 ruling, which found the company illegally blocked competitors by paying billions of dollars annually to firms including Apple to be the default search engine on new devices. \u2022 The arrangements did not prevent the device makers and browser developers from promoting rival search services like Microsoft's Bing, Google argued."
+    },
+    {
+      "title": "Datadog, SK Hynix added to AI 30 List as Wedbush sees 'third inning\" of AI revolution",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T17:14:00+00:00",
+      "url": "https://finnhub.io/api/news?id=38f26756a0e0ab792499ff90032d9292d85d408c9f4e36eba847f5fed40cf3d7",
+      "summary": "Wedbush Securities has added Datadog Inc (NASDAQ:DDOG) and SK Hynix (KRX: 000660) to its closely watched IVES AI 30 list, citing the memory super-cycle and AI observability as two of the most compelling themes in the current phase of the artificial intelligence buildout. In a note to clients,..."
+    },
+    {
+      "title": "Microsoft reports are exposing AI's real cost problem: Using the tech is more expensive than paying human employees",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T16:56:36+00:00",
+      "url": "https://finnhub.io/api/news?id=c77598ad683220f321cb236e4d0cd7c13e4ae9e4fb5fa3fb1cf3b4114142afaf",
+      "summary": "Companies are racing to incentivize employees to use AI. But as some companies are finding, the more employees that use the technology, the heavier the bill."
+    },
+    {
+      "title": "Qualcomm's stock pop shows investors are 'waking up' to boom in AI devices",
+      "source": "CNBC",
+      "published_at": "2026-05-22T16:52:39+00:00",
+      "url": "https://finnhub.io/api/news?id=287248caaddc0361798c0a8219fc47bec39c38baa3e0dbf48d2fcdf6bcfc69fb",
+      "summary": "Qualcomm is on a big run, powered by investor bullishness that the company will be at the center of a boom in AI devices."
+    },
+    {
+      "title": "Rising US Borrowing Costs Won't Slow Massive AI Data-Center Buildout as Potential Profit Outweighs Spending",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T16:40:25+00:00",
+      "url": "https://finnhub.io/api/news?id=1160810d6d0660fa177be61a8955ad358b814ff3e29604f25126f11aa7e462be",
+      "summary": "Rising interest rates won't stop companies such as Alphabet's (GOOG, GOOGL) Google, Amazon (AMZN) an"
+    },
+    {
+      "title": "Activision shareholders reach $250 million settlement over Microsoft buyout",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T16:23:27+00:00",
+      "url": "https://finnhub.io/api/news?id=2845e2a168b392351f9dcd8309e2e10c273264cc19d820a44b3b5118699df732",
+      "summary": "Shareholders of Activision Blizzard reached a $250 million settlement over allegations that the company's former executives and Microsoft shortchanged them when Microsoft acquired the game maker for $75.4 billion in 2023, according to a late Thursday court filing in a Delaware state court. Shareholders in the maker of the \"Call of Duty\" video game, led by Swedish pension fund Sjunde AP-Fonden, accused former Activision Blizzard executives including Chief Executive Bobby Kotick of breaching their fiduciary duties to investors by agreeing to a $95 per share takeover price. The shareholders said Kotick rushed into the merger so he could keep his job and $400 million of change-of-control benefits."
+    },
+    {
+      "title": "One Problem for the SpaceX IPO",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T16:20:00+00:00",
+      "url": "https://finnhub.io/api/news?id=a3de0b1cf19da9e3d084882e38419197f96538ba3f82cb240535fe087a0b58ae",
+      "summary": "Trillion dollar companies are typically profitable. SpaceX lost about $5 billion in 2025, according to its IPO registration statement."
+    },
+    {
+      "title": "Vanguard's VIG Quietly Returned 247% While Investors Chased Higher Yields",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T16:14:32+00:00",
+      "url": "https://finnhub.io/api/news?id=ab65a0e79a5fa212076af582bff43b835f0bbe275de933105f6fb609ce2172d8",
+      "summary": "Retirees evaluating dividend funds tend to anchor on current yield, which is exactly why Vanguard Dividend Appreciation ETF (NYSEARCA:VIG) often gets overlooked. The fund pays a distribution yield of roughly 1.6%, which looks unimpressive next to higher-yielding alternatives. Morningstar analysts have repeatedly flagged VIG as a quiet winner for retirees precisely because of that misread. ... Vanguard's VIG Quietly Returned 247% While Investors Chased Higher Yields"
+    },
+    {
+      "title": "Tech ETFs to Buy as Microsoft, Anthropic Eye Custom AI Chip Deal",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T16:11:00+00:00",
+      "url": "https://finnhub.io/api/news?id=826878833145ac8ec87c8b9955b38fb67b88a511c4b2b080d4288a00b051e3f3",
+      "summary": "Microsoft's Maia AI chip talks with Anthropic spotlight tech ETFs as a diversified way to tap the AI-driven custom silicon boom."
+    },
+    {
+      "title": "SpaceX, OpenAI, Anthropic: Investors are 'better off' waiting for IPOs",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T15:43:06+00:00",
+      "url": "https://finnhub.io/api/news?id=e8c461749c4e4e5a307cf81b651ba829f78145a184bdd25f4bf35b4997f1dc2d",
+      "summary": "Private markets are in focus, with initial public offerings (IPOs) from Anthropic (ANTH.PVT), OpenAI (OPAI.PVT), and SpaceX (SPAX.PVT) on the horizon. Powers Advisory Group managing partner Matt Powers joins Yahoo Finance to explain why he says investors should wait to buy into these names."
+    },
+    {
+      "title": "DocuSign AI-Backed Platform Increasingly Addressing Enterprise Needs, RBC Says",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T15:04:22+00:00",
+      "url": "https://finnhub.io/api/news?id=3d5bd66d5a9a10874d423ccec36a3035cfebd1dc00d0688615929a95da6a903a",
+      "summary": "DocuSign's (DOCU) AI-backed platform IAM, initially targeted at mid-market clients, is increasingly"
+    },
+    {
+      "title": "Grok Could Undermine SpaceX IPO",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T14:59:19+00:00",
+      "url": "https://finnhub.io/api/news?id=909129ed683368662c6ab1a2c6183a1290eb30f0d5e86dd59a40a3d65446cfb6",
+      "summary": "Morningstar warned, \"'Financials Look Reckless': Lifting xAI's Hood in the SpaceX IPO\". Its AI division, xAI, lost $2.47 billion on $818 million in the first quarter of this year. \"If you compare xAI to a traditional SaaS company, the financials look reckless,\" Harrison Rolfes, a senior research analyst at PitchBook, wrote. That may be a ... Grok Could Undermine SpaceX IPO"
+    },
+    {
+      "title": "What's Happening With IBM Stock?",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T14:34:56+00:00",
+      "url": "https://finnhub.io/api/news?id=867bc10d5952fe465e9ae3a96e4d921887e06f1dc0d5aa206a908f190f030daa",
+      "summary": "IBM (NYSE: IBM) surged 12.4% to close at $252.97 on May 21, 2026, after the Commerce Department announced $2.0 billion in quantum computing grants to nine companies. The headline? IBM secures $1 billion in government funding for a new quantum chip foundry called Anderon, with IBM matching the investment dollar-for-dollar. The stock's reaction was swift and decisive."
+    },
+    {
+      "title": "Why SoundHound's Pipeline Growth Matters for the SOUN Stock",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T14:25:00+00:00",
+      "url": "https://finnhub.io/api/news?id=af305e8f60508bf402700ee4a36fa912b68fa35e79f857a5fcf9ca885f06c340",
+      "summary": "SOUN's \"massive pipeline\" is swelling as Q1 revenue jumps 52%, with OASYS and the planned LivePerson deal targeting faster enterprise AI growth."
+    },
+    {
+      "title": "IREN's $3.4 Billion NVIDIA Deal Points To Something Big Around The Corner",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T14:11:13+00:00",
+      "url": "https://finnhub.io/api/news?id=bc852622af092c6b009fe4c2f90c053c33a8ad5c9e1e4a8df837c49e611e006b",
+      "summary": "Our IREN (NASDAQ:IREN) call is constructive. Shares closed at $47.74 on May 19, 2026, well off the post-earnings high near $60.80 but still up 459% over the past year. Our 24/7 Wall St. price target for IREN is $64.62, implying 35.36% upside over the next 12 months. Our model carries a constructive rating on IREN ... IREN's $3.4 Billion NVIDIA Deal Points To Something Big Around The Corner"
+    },
+    {
+      "title": "Iran Optimism Drives Semi Mania, Potential Short Squeeze Ahead",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T13:52:50+00:00",
+      "url": "https://finnhub.io/api/news?id=f3cb85d50258305e8177ddff52445942a4958158ab53d95497690a68708d3c80",
+      "summary": "Iran Optimism"
+    },
+    {
+      "title": "Market Chatter: Microsoft Defends Data Visualization Product by Blocking Databricks Feature",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T13:50:14+00:00",
+      "url": "https://finnhub.io/api/news?id=d15edbb6f1ec4a12436f8bf2d1509fcacd570c4933289cc3a04645e178930c34",
+      "summary": "Microsoft (MSFT) blocked a new feature created by Databricks, a longtime partner, that makes it easi"
+    },
+    {
+      "title": "CoreWeave vs. Nebius: Which Artificial Intelligence (AI) Infrastructure Stock Is a Better Buy in 2026?",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T13:45:01+00:00",
+      "url": "https://finnhub.io/api/news?id=3c7d68e569cfc311a33c682af3acfddc7242da75a88781fea4d0fb058ddbdd4e",
+      "summary": "Both CoreWeave and Nebius power AI giants with critical infrastructure, but one looks like the superior investment."
+    },
+    {
+      "title": "What Is Going On With Marvell Stock On Friday?",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T13:33:25+00:00",
+      "url": "https://finnhub.io/api/news?id=edc894237f8a286d966bfa0d7d352dd5087aaf10c069a2edf0d9aa1c630c33f8",
+      "summary": "Marvell Technology (MRVL) stock jumps 2.7% to $195.95 as Wall Street hikes price targets up to $215. See how Amazon Trainium and Microsoft Maia chips fuel Marvell's massive custom AI silicon boom ahead of May 27 earnings in 2026."
+    },
+    {
+      "title": "Microsoft Eyes Anthropic Deal to Expand AI Chip Reach",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T13:29:47+00:00",
+      "url": "https://finnhub.io/api/news?id=243a56dff80d29b89e928e67e1092538f1b40b8ee12a2f7a8ae6f6206d3a69b2",
+      "summary": "Anthropic is seeking more compute capacity as demand for Claude grows."
+    },
+    {
+      "title": "Is Microsoft or Meta Platforms the Greatest Value on the Market?",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T13:29:00+00:00",
+      "url": "https://finnhub.io/api/news?id=c047c9016f7c637dcc353d890fd198001b5b0b821052e82ced51a5b5b9b5f5cd",
+      "summary": "Both stocks are trading well below their usual valuation ranges by a key metric."
+    },
+    {
+      "title": "Nvidia, Microsoft Back Massive New Physical AI Push With Kawasaki",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T13:24:16+00:00",
+      "url": "https://finnhub.io/api/news?id=623d2ed1f88c5b88e63071a018e7f026d24a7c082ffc3c38d42070d92a859981",
+      "summary": "Nvidia Teams Up With Kawasaki and Microsoft to Accelerate Physical AI"
+    },
+    {
+      "title": "The Zacks Analyst Blog Highlights Meta Platforms, Alphabet, Amazon and Microsoft",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T13:22:00+00:00",
+      "url": "https://finnhub.io/api/news?id=72434a71848b2bf7f6d5549fb82f180b740a31e2a6ab5b120588924cb3cf640d",
+      "summary": "META slid more than 10% in a month as heavy AI spending and valuation concerns offset strong engagement and ad tool adoption."
+    },
+    {
+      "title": "Nvidia Powers 52% Of Sovereign AI Projects \u2014 So Who's Really Sovereign?",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T13:16:05+00:00",
+      "url": "https://finnhub.io/api/news?id=d623212386067e8a31585dde31876c22ff4eaa4d97c704c0f2848992f194de40",
+      "summary": "Nvidia supplies GPUs for 52% of tracked sovereign AI projects worldwide, highlighting the company's growing role in government-backed AI infrastructure initiatives."
+    },
+    {
+      "title": "Where Will Apple Stock Be In 3 Years?",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T12:47:11+00:00",
+      "url": "https://finnhub.io/api/news?id=61bdc5d67964934dc2e91456f5c3b06c575bb68e59ceee61bda074686ece95f6",
+      "summary": "Apple (AAPL) stock trades at $304.99 per share, a market cap of $4.5T, and 36.5 times trailing earnings. Is that a fair price, or is there more going on here."
+    },
+    {
+      "title": "Anthropic Hits $900 Billion Valuation \u2014 With One Surprising Back\u2011Door Access Point Before Its IPO",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T12:41:51+00:00",
+      "url": "https://finnhub.io/api/news?id=1fcb0ba31ef1df840e49251770d781c31c384df51a7feec18401bca378f842f7",
+      "summary": "Multiple public companies have stakes in Anthropic. One smaller stock could be the big winner from Anthropic's rising valuation and potential IPO."
+    },
+    {
+      "title": "Cloud AI Update - CAI Boosts Multicloud Integration With AWS And Microsoft Partnerships",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T12:38:53+00:00",
+      "url": "https://finnhub.io/api/news?id=094fee2a89b784ee3c5c67805e1da66c00008ff5cbf8237663cd98b0f8833499",
+      "summary": "CAI, a global services firm, has announced strategic partnerships with Amazon Web Services (AWS) and Microsoft to enhance multicloud integration, aiming to support public sector and enterprise clients in modernizing their IT infrastructure. By collaborating with Anthropic, Databricks, and LMNTRIX, CAI seeks to deliver a comprehensive cloud solution that integrates security and AI capabilities across AWS and Azure environments. This multicloud strategy is designed to help organizations avoid..."
+    },
+    {
+      "title": "Beyond the \"Magnificent Seven\": These 3 Breakout AI Stocks Are Disrupting the Industry",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T12:20:00+00:00",
+      "url": "https://finnhub.io/api/news?id=d7d644ccffd23c9f60c3fab171970e264c0d8795362a1748553eb15ba3863e00",
+      "summary": "Micron Technology, Taiwan Semiconductor Manufacturing, and Broadcom are all major players in the AI realm."
+    },
+    {
+      "title": "Microsoft And Former Activision Blizzard Execs Settle Class Action With Activision Shareholders Over 2023 Acquisition For $250M",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T12:12:23+00:00",
+      "url": "https://finnhub.io/api/news?id=87ac73d49c8be673b68461c1eb47de5f401649f7a301e688b68f98006cc89aaf",
+      "summary": "- Reuters Citing Court Filing"
+    },
+    {
+      "title": "Microsoft Deepens AI Stack With EY Alliance And Maia Chip Talks",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T12:11:19+00:00",
+      "url": "https://finnhub.io/api/news?id=b05aafa67b02b8e5c6f2ba31acd4c2aafdba3517b2b9b662f4fa14020a78c094",
+      "summary": "Microsoft and EY announced a $1b partnership to accelerate enterprise AI adoption and move projects from pilots into scaled production. The alliance includes deep engineering collaboration and aims to build sector specific AI solutions for large global clients. Separately, Microsoft is in talks with Anthropic to supply its custom Maia AI chips, expanding the reach of its in house AI hardware. Microsoft (NasdaqGS:MSFT) is trading at $419.09, with the stock up 2.4% over the past week and up..."
+    },
+    {
+      "title": "SpaceX To Drop 70% Post IPO?",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T11:58:57+00:00",
+      "url": "https://finnhub.io/api/news?id=c9e63c2c53ec77a7c1317bf64ab73d427bac264ca2879719bf87522016235989",
+      "summary": "What's better: paying $2 trillion for SpaceX, with under $20 billion in revenue, or $5 trillion for Google (GOOG), generating $400 billion in revenue and $100 billion in profits."
+    },
+    {
+      "title": "Inside Microsoft's high-stakes push to win back its AI lead",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T11:58:48+00:00",
+      "url": "https://finnhub.io/api/news?id=a37fd52740b5dce8a011c06a8f692bc310538b96f8f15e32aef12e3a49078f73",
+      "summary": "A new Fortune feature takes readers inside Microsoft's plan for a comeback."
+    },
+    {
+      "title": "EY and Microsoft to invest over $1bn in enterprise AI transformation",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T11:32:33+00:00",
+      "url": "https://finnhub.io/api/news?id=2b867589ef9be7b320705f362d0705f094652dd9dbf720ee3d6f7512cd1fdcb8",
+      "summary": "The initiative strengthens the existing EY-Microsoft partnership across tax, assurance, consulting and EY-Parthenon."
+    },
+    {
+      "title": "Dow Jones Hits Record Highs, DELL Jumps 15%: Stock Market Today",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T11:27:33+00:00",
+      "url": "https://finnhub.io/api/news?id=d6c84006cba1cff192f517576b8adb8d0010a91de81ffe0b3401f1610fa9e95b",
+      "summary": "Dell, Qualcomm and HP power an AI-fueled rally to send the Dow to record highs. Nasdaq 100 and S&P 500 eyes eighth straight week of gains."
+    },
+    {
+      "title": "Oracle Analysts See Up to 45% Upside as AI Cloud Growth Accelerates",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T11:22:48+00:00",
+      "url": "https://finnhub.io/api/news?id=7d9b6bffa021ada9edb0d9463af422326557eaf490113c4291058513c8963d34",
+      "summary": "Wall Street firms raised price targets after strong cloud growth and expanding AI demand."
+    },
+    {
+      "title": "Billionaire Bill Ackman Just Dumped Alphabet Stock to Buy These Two AI Stocks. Should Investors Follow Suit?",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T09:50:00+00:00",
+      "url": "https://finnhub.io/api/news?id=73b8379547abf6fcc4d386443aaeaf441bb2a83de2fb85b8cf87ab3e9efc7a2e",
+      "summary": "Ackman was recently buying shares of Microsoft and Amazon."
+    },
+    {
+      "title": "How To Own SpaceX Through Alphabet Shares: The Pre-IPO Strategy",
+      "source": "SeekingAlpha",
+      "published_at": "2026-05-22T08:59:20+00:00",
+      "url": "https://finnhub.io/api/news?id=3278c12970772bd9b2fdfe4e39c4b9ffbefe17650fe70d2f5e6e25239f5fc7f0",
+      "summary": "Alphabet ownership offers a liquid, institutional-grade pre-IPO path into the SpaceX stake without speculative premiums. Learn why GOOGL stock is a buy."
+    },
+    {
+      "title": "Nvidia Is Becoming An Incredible Dividend Growth Compounder And Is Undervalued",
+      "source": "SeekingAlpha",
+      "published_at": "2026-05-22T08:45:00+00:00",
+      "url": "https://finnhub.io/api/news?id=a232cd299b34da5cc32e0de16d4959d16b7c73497472868eb588f541f76e8eb3",
+      "summary": "Nvidia Corporation s blowout quarter boosts dividends 2,400% and adds $80B buybacks. Click for this updated look at NVDA stock following earnings."
+    },
+    {
+      "title": "Arista Networks: Buy The Margin Anxiety Selloff",
+      "source": "SeekingAlpha",
+      "published_at": "2026-05-22T08:21:21+00:00",
+      "url": "https://finnhub.io/api/news?id=ad5bc480d411e3a6ac7f171211b8194ebd3fbd5bb5f26d34cf0fbc0ad7eb39eb",
+      "summary": "Arista Networks' AI networking business remains demand-driven, with supply constraints currently limiting revenue realization. Click for this ANET stock update."
+    },
+    {
+      "title": "Stellantis' turnaround plan, prediction market regulation, Oura's IPO filing and more in Morning Squawk",
+      "source": "CNBC",
+      "published_at": "2026-05-22T08:02:56+00:00",
+      "url": "https://finnhub.io/api/news?id=44109874f93b2bb7468ab9da889d1adb199faddf5d922c462d05ef328bb385cd",
+      "summary": "Here are five key things investors need to know to start the trading day."
+    },
+    {
+      "title": "Microsoft's GitHub was positioned to win the AI coding race. Outages got in the way",
+      "source": "CNBC",
+      "published_at": "2026-05-22T08:00:01+00:00",
+      "url": "https://finnhub.io/api/news?id=1a83fc4b0c129e368353c4b842e448f9c402ba6826f27035a9ccc15d61cb3603",
+      "summary": "GitHub's user base has swelled under Microsoft's ownership, but the software repository has fallen behind newer rivals in the world of vibe coding."
+    },
+    {
+      "title": "Wall Street's Favorite New AI Stock vs. the One They're Ignoring: The Numbers Aren't Even Close",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T06:43:00+00:00",
+      "url": "https://finnhub.io/api/news?id=e3059d53f3dcd3b4962f6486968c88a494ac2fef59feb3978a8d8e1192539fcc",
+      "summary": "Cerebras investors are getting ahead of themselves."
+    },
+    {
+      "title": "Microsoft's AI Transition Still Looks Early",
+      "source": "SeekingAlpha",
+      "published_at": "2026-05-22T06:28:27+00:00",
+      "url": "https://finnhub.io/api/news?id=b70a3f3a29360b182108093252e58f753773597378cc6623ba56bd27d584274b",
+      "summary": "Microsoft's Copilot adoption acceleration should drive higher ARPU and stabilize margins in 2H 2026 and beyond. Learn why MSFT stock is a buy."
+    },
+    {
+      "title": "Peace Hopes, Quantum Fireworks, and a Very Bad Day for Walmart",
+      "source": "ChartMill",
+      "published_at": "2026-05-22T06:12:12+00:00",
+      "url": "https://finnhub.io/api/news?id=6337e48b6c3a2fd7b42811eedd2ad45d671d35d647681d9d363cfe35270b3cbc",
+      "summary": "Wall Street was heading for a rough Thursday morning, until Donald Trump walked into the Oval Office and mentioned the word \"peace.\""
+    },
+    {
+      "title": "ServiceNow: The Big Mispriced Tollbooth For Agentic AI",
+      "source": "SeekingAlpha",
+      "published_at": "2026-05-22T05:44:35+00:00",
+      "url": "https://finnhub.io/api/news?id=31192f90301ebf85724b4dcc7e170140e136c0c6a26e8e40d8ee5abc9838c5fe",
+      "summary": "ServiceNow is rated Strong Buy after a ~50% 1Y price drop, driven by misunderstood M&A margin dilution and deferred Middle East revenue."
+    },
+    {
+      "title": "Meta, Broadcom And Others Launch $125 Million UCLA AI Chip Hub",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T05:37:08+00:00",
+      "url": "https://finnhub.io/api/news?id=2d288d1d12c23665a873eb9d51710edb920f2aceb5bd6254c76e2172649ef7ba",
+      "summary": "Broadcom, Meta, AMAT & more partner with UCLA for a new $125M AI semiconductor hub to boost research & workforce growth."
+    },
+    {
+      "title": "Nvidia Is Going To Have To Do An Apple On Dividends, Says Jim Cramer: Sounds 'Boring' But It Works",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T04:17:41+00:00",
+      "url": "https://finnhub.io/api/news?id=40660d43caaa32a1914034c7677823ed279e47797f12e520a82efa217fa5bbdb",
+      "summary": "Nvidia's dividend hike still offers a modest yield, reinforcing that mega-cap AI stocks are built for growth rather than income."
+    },
+    {
+      "title": "AGD: Good Fund, But Tech Exposure And Valuation Could Be Risks",
+      "source": "SeekingAlpha",
+      "published_at": "2026-05-22T04:07:04+00:00",
+      "url": "https://finnhub.io/api/news?id=750cd53037bbccd3d0308ad74fef99c8df0c53597b2513a4ff4f8313e11ec9a6",
+      "summary": "The abrdn Global Dynamic Dividend Fund offers an 11.52% yield by investing primarily in global equities, focusing on dividend income. Read more on AGD CEF here."
+    },
+    {
+      "title": "Microsoft and Black Tech Street Launch Greenwood Cyber + AI Lab in Tulsa",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T00:50:00+00:00",
+      "url": "https://finnhub.io/api/news?id=bc6e2db1318ce4ce9e2c2595319bebdb8d9602a66efd5bc58ddb2a576e74710d",
+      "summary": "Microsoft and Black Tech Street today announce the opening of the Greenwood Cyber + AI Lab, a collaborative technology hub focused on advancing artificial intelligence, cybersecurity, and autonomous systems innovation."
+    }
+  ],
+  "warnings": []
+}

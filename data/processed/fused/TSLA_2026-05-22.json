@@ -1,0 +1,415 @@
+{
+  "ticker": "TSLA",
+  "date": "2026-05-22",
+  "market_data": {
+    "open": 422.665,
+    "high": 431.51,
+    "low": 420.51,
+    "close": 426.01,
+    "volume": 46104710,
+    "adjusted_close": null,
+    "timestamp": "2026-05-22T00:00:00+00:00"
+  },
+  "news_articles": [
+    {
+      "title": "SpaceX Starship Test Features Pez Dispenser-Style Satellite Deployment Ahead of IPO",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T23:25:00+00:00",
+      "url": "https://finnhub.io/api/news?id=f831839ab4ea175d526580f6e4a00343af552a5af6d217afb47d48e592440520",
+      "summary": "The importance of Starship can't be overstated for SpaceX, which is planning to raise record amounts of money in a June IPO."
+    },
+    {
+      "title": "Dow Jones Futures: Stock Market Rebounds To Highs; Tesla, These Five AI Plays Are At Buy Points",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T21:24:41+00:00",
+      "url": "https://finnhub.io/api/news?id=18f75ab7ef49dc790477c4d913ec8a1a95606ae6886943695fc48fe7160fce35",
+      "summary": "The stock market rebounded for solid weekly gains, with leaders showing bullish action. Tesla is near a buy point along with ASML and several other AI stocks. Here's what to do."
+    },
+    {
+      "title": "Elon Musk Says 'This Will Be Awesome' As NASA Unveils Moon Base Plans",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T20:31:22+00:00",
+      "url": "https://finnhub.io/api/news?id=9fc5c08daaaef34e7e2a173c4e77921e0ac0d59dfba2e0ef6658a0cd7b3bc598",
+      "summary": "SpaceX and Tesla Inc. CEO Elon Musk, on Wednesday, backed NASA's goal of establishing a base on the lunar surface as the agency prepares to return humans to the Moon with the Artemis mission. Elon Musk Reacts To NASA Moonbase..."
+    },
+    {
+      "title": "Tesla Is Chasing the Future of Driving. Its Stock Is Stuck in a 350x Earnings Trap",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T20:30:38+00:00",
+      "url": "https://finnhub.io/api/news?id=e4769bde6c34c87cd006da413f1b772434b5ada716cc40ed6e302f0c6fa66514",
+      "summary": "Tesla's new China hiring push for Full Self-Driving strengthens its autonomy narrative, even as valuation and execution risks remain elevated."
+    },
+    {
+      "title": "Ford Stock Soars as Wall Street Wakes Up to Its AI Play",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T20:17:00+00:00",
+      "url": "https://finnhub.io/api/news?id=9439f675a62b9346b69a2febe6881e6c4b245063831ae9a2fb2b3d2280907143",
+      "summary": "Wall Street appeared to be waking up on Friday to Ford Motor's transformation into an AI stock. Ford stock was on pace for its highest close since August 2022, according to Dow Jones Market Data. Through Friday, Ford stock was up 18% over the past month."
+    },
+    {
+      "title": "The SpaceX Paradox: How Can a Money-Losing Company Be Worth $2 Trillion?",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T20:14:00+00:00",
+      "url": "https://finnhub.io/api/news?id=291bd3da85ecd4c1124bdfb5cd792a9066732e22e8cba67a0eaa10dfe825ac84",
+      "summary": "Trillion dollar companies are typically profitable. SpaceX lost about $5 billion in 2025, according to its IPO registration statement."
+    },
+    {
+      "title": "Are mega-IPOs like SpaceX huge opportunities for options trades?",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T19:55:54+00:00",
+      "url": "https://finnhub.io/api/news?id=4d88faec72215f20ad106bfc8c3917129af96fdc2033c03d4dad687dd010964a",
+      "summary": "As part of the latest installment of Yahoo Finance's Options Playbook, BayCrest managing director David Boole explains the influence that mega-IPOs, the likes of SpaceX (SPAX.PVT), Anthropic (ANTH.PVT), and OpenAI (OPAI.PVT), are having on markets (^DJI, ^IXIC, ^GSPC), possible options trades, and proxy trades on other stocks like Elon Musk's Tesla (TSLA)."
+    },
+    {
+      "title": "Following Trump-Xi Talks, Elon Musk's Tesla Launches Full Self-Driving In China After Years Of Uncertainty",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T19:31:20+00:00",
+      "url": "https://finnhub.io/api/news?id=d4b5dfb088ba45ea24f83c9429ada3aa373acc65c4f3ec35e3d28f8cb98fd489",
+      "summary": "Tesla Inc. has finally rolled out its Full Self-Driving (FSD) service in China following President Donald Trump's visit to China and meeting with Chinese President Xi Jinping. Tesla Rolls Out FSD In China In a post on X on Wednesday,..."
+    },
+    {
+      "title": "SEC Delays Crypto Stock Tokens Amid Wall Street Pushback",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T18:44:44+00:00",
+      "url": "https://finnhub.io/api/news?id=eeb323a5b6d2bfc8a7997177566fe2a8fbe2f27ea3969b23af84568aa89aa664",
+      "summary": "The SEC has delayed its innovation exemption for crypto versions of US stocks amid Wall Street pushback, halting tokenized trading plans."
+    },
+    {
+      "title": "Elon Musk's new Tesla update is a joy for customers and investors",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T18:17:00+00:00",
+      "url": "https://finnhub.io/api/news?id=3e105ea69b7ea84c34f6669821520db7284b641e4ff77070b0c19718dccf0bf2",
+      "summary": "Tesla has been losing ground in one of its most strategically important markets. Domestic rivals have been faster, cheaper, and increasingly more capable on the software features that matter most to buyers there. The company has known this. So have investors. On May 21, Tesla did something about ..."
+    },
+    {
+      "title": "These S&P500 stocks are the most active in today's session",
+      "source": "ChartMill",
+      "published_at": "2026-05-22T18:05:00+00:00",
+      "url": "https://finnhub.io/api/news?id=486a37ae765a2e27a9b9b34c9d6ba4dbfc9d9ff197ee3f39d63508626634c988",
+      "summary": "Looking for the most active S&P500 stocks in today's session? Join us as we dive into the US markets on Friday and discover the stocks that are dominating the trading activity and setting the pace for the market."
+    },
+    {
+      "title": "SpaceX IPO Could Make Elon Musk World's First Trillionaire, Eclipsing Rockefeller's Wealth Share",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T18:04:25+00:00",
+      "url": "https://finnhub.io/api/news?id=407303e91d58ec7386ecee15c497d5e1d477e368615508c4b264ffa95dfc9a57",
+      "summary": "Robert Frank's CNBC segment on May 22, 2026, titled Elon Musk's trillionaire march: Here's what to know, laid out the arithmetic of how the SpaceX IPO could push Musk past a threshold no human has ever crossed. \"Elon Musk is worth right now around $800 billion,\" Frank said. \"The SpaceX IPO likely to put him ... SpaceX IPO Could Make Elon Musk World's First Trillionaire, Eclipsing Rockefeller's Wealth Share"
+    },
+    {
+      "title": "SpaceX launches Starship test flight on second try",
+      "source": "CNBC",
+      "published_at": "2026-05-22T17:52:11+00:00",
+      "url": "https://finnhub.io/api/news?id=00301599b8c208a19b08e12e60543cbf2ab57b887932c551b043f90c8cffc8f5",
+      "summary": "SpaceX launched its massive Starship rocket on Friday, a day after the company scrubbed plans before takeoff."
+    },
+    {
+      "title": "The Federal Government Ghosts Grok",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T17:16:05+00:00",
+      "url": "https://finnhub.io/api/news?id=2a7a4592ffadc6f56c8a36a323fde9004fa11a8a482813be1e52abb9acf0f306",
+      "summary": "Government AI inventory showed Grok appearing in just three of four hundred vendor examples with ChatGPT, Gemini, and others outpacing."
+    },
+    {
+      "title": "One Problem for the SpaceX IPO",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T16:20:00+00:00",
+      "url": "https://finnhub.io/api/news?id=a3de0b1cf19da9e3d084882e38419197f96538ba3f82cb240535fe087a0b58ae",
+      "summary": "Trillion dollar companies are typically profitable. SpaceX lost about $5 billion in 2025, according to its IPO registration statement."
+    },
+    {
+      "title": "Musk may already be a trillionaire while these SpaceX employees and investors will hit multibillion-dollar jackpots after blockbuster IPO",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T16:17:41+00:00",
+      "url": "https://finnhub.io/api/news?id=6a5fbf2c6741cb1f790e1ddda63f84d5599da2c4d143c82a5deb2507834753bf",
+      "summary": "If SpaceX surpasses $1.7 trillion after going public, it would confirm Musk's $1 trillion net worth."
+    },
+    {
+      "title": "Tesla (TSLA) Up 11.8% Since Last Earnings Report: Can It Continue?",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T15:30:12+00:00",
+      "url": "https://finnhub.io/api/news?id=803a32e5f7e269a004015f7c1a7f6a7e564bb8ae0f53f4b35dd6552dee45ab1a",
+      "summary": "Tesla (TSLA) reported earnings 30 days ago. What's next for the stock? We take a look at earnings estimates for some clues."
+    },
+    {
+      "title": "SpaceX Targets $75 Billion IPO at Up to $2 Trillion Valuation",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T15:03:32+00:00",
+      "url": "https://finnhub.io/api/news?id=f760bbeb7b2373cbc9734f061483e0938f9ed7e1031872f3f462c8e50ef83e24",
+      "summary": "Filing shows Musk retaining control as SpaceX expands deeper into AI, Starlink and space infrastructure ambitions."
+    },
+    {
+      "title": "12 Zeros and 1 Musk: The Trillionaire Era Officially Begins.",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T14:21:00+00:00",
+      "url": "https://finnhub.io/api/news?id=3d7502698b4cb59d83f6ba83d045ad6525ef7460fa4c0acf3c2c20f5752a16a0",
+      "summary": "Tesla and SpaceX CEO Elon Musk, already the world's richest person, is now the world's first trillionaire. On Wednesday, his rocket company, SpaceX, released its initial public offering registration statement to the public. Musk's Tesla stock, including his 2018 vested stock options, is currently worth about $290 billion."
+    },
+    {
+      "title": "SpaceX IPO Vs. Tesla 2010: Different Era, Same Hype?",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T14:17:24+00:00",
+      "url": "https://finnhub.io/api/news?id=2c9384812d86584fe0557475bd2cb93837e0ca81a1fb143b7a839f2df3e2b0ff",
+      "summary": "SpaceX is preparing for an IPO that could break all global records: analysts discussing a potential valuation of $1.5-2 trillion."
+    },
+    {
+      "title": "AI mania is fueling bubble-like concentration in the S&P 500",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T13:57:54+00:00",
+      "url": "https://finnhub.io/api/news?id=4f0335b417da0e77c772b41d9796f79ef68192f7fe3a11483f3157cfe8ee434c",
+      "summary": "Tech just keeps getting bigger!"
+    },
+    {
+      "title": "Iran Optimism Drives Semi Mania, Potential Short Squeeze Ahead",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T13:52:50+00:00",
+      "url": "https://finnhub.io/api/news?id=f3cb85d50258305e8177ddff52445942a4958158ab53d95497690a68708d3c80",
+      "summary": "Iran Optimism"
+    },
+    {
+      "title": "NIO Drops 6% on First-Ever Profit, Tesla Moves Up 2%: The Two-Speed EV Trade in Action",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T13:37:26+00:00",
+      "url": "https://finnhub.io/api/news?id=dcef50292fce7886ea7f268c218efa0d28cd511e20c7a455c87611464532dcea",
+      "summary": "Shares of Nio (NYSE:NIO) are down 7% on Friday morning, an unusual reaction to a quarter that, on paper, marked a genuine turning point for the Chinese EV maker. Nio's revenue jumped 112% year over year, deliveries nearly doubled, and the company posted its first-ever quarterly adjusted operating profit. Meanwhile, Tesla (NASDAQ:TSLA) is up 1% ... NIO Drops 6% on First-Ever Profit, Tesla Moves Up 2%: The Two-Speed EV Trade in Action"
+    },
+    {
+      "title": "Tesla Recalls Model Y SUVs Over Missing Weight Labels",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T13:29:42+00:00",
+      "url": "https://finnhub.io/api/news?id=cbb7ea971f7476441c986157bfb5ccd28f675547dba79076e1d428eb74061728",
+      "summary": "Tesla is recalling 14,575 Model Y SUVs in the U.S."
+    },
+    {
+      "title": "Mark Cuban Is 'Factually Wrong' With His Bitcoin Thesis, Scott Melker Argues",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T13:17:28+00:00",
+      "url": "https://finnhub.io/api/news?id=628456721c696ffb4db5a67fe53e345239a4ebb8407dbd04909b62084779b07e",
+      "summary": "Billionaire investor Mark Cuban sold most of his Bitcoin (CRYPTO: BTC) holdings, saying the cryptocurrency \"lost the plot\" after failing t"
+    },
+    {
+      "title": "Zacks Investment Ideas feature highlights: Tesla",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T13:13:00+00:00",
+      "url": "https://finnhub.io/api/news?id=a6fd5b94b2d3801d8ac4b1a599ee5dcc719f0f6e4b58459e0c167ab61121d670",
+      "summary": "TSLA could see a major boost from SpaceX's June IPO as its stake in the company may surge in value amid massive valuation expectations."
+    },
+    {
+      "title": "Why the SpaceX Hype Isn't Boosting Tesla Stock",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T12:53:00+00:00",
+      "url": "https://finnhub.io/api/news?id=f5ab963affbf464b39c7b4735d5eb93c6fee693e7010cbcb8a25bce280e18cff",
+      "summary": "Shares have been listless lately as investors have given SpaceX more of their attention. Tesla shares were up 0.8% at $420.96 in premarket trading, while and futures were up 0.4% and 0.7%, respectively. Investors have also turned their attention to SpaceX, which made its IPO registration public on Wednesday."
+    },
+    {
+      "title": "SpaceX IPO: What You Need To Know",
+      "source": "SeekingAlpha",
+      "published_at": "2026-05-22T12:24:37+00:00",
+      "url": "https://finnhub.io/api/news?id=c26ce435a55a6f50a47ca91e1fa2952d9427b4030149c5b30f240dc9bf680ff4",
+      "summary": "Space Exploration Technologies Corp. aka SpaceX eyes an IPO at a record $1.75T valuation. Click for this first look at SPCX and whether it is worth investing."
+    },
+    {
+      "title": "Beyond the \"Magnificent Seven\": These 3 Breakout AI Stocks Are Disrupting the Industry",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T12:20:00+00:00",
+      "url": "https://finnhub.io/api/news?id=d7d644ccffd23c9f60c3fab171970e264c0d8795362a1748553eb15ba3863e00",
+      "summary": "Micron Technology, Taiwan Semiconductor Manufacturing, and Broadcom are all major players in the AI realm."
+    },
+    {
+      "title": "Should You Wait to Buy Tesla Stock After June 12?",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T12:20:00+00:00",
+      "url": "https://finnhub.io/api/news?id=617865f55f53e3d43a3e8baac7ee8681dab6377d6f2add4e987ab7a590c2644c",
+      "summary": "The upcoming SpaceX IPO may be bad news for Tesla's stock."
+    },
+    {
+      "title": "Musk Targets Friday for Delayed Starship Launch and What It Means for the IPO",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T12:19:00+00:00",
+      "url": "https://finnhub.io/api/news?id=d6b900a1691d1b8a8eacade0c677cd571477bf3d624c97b8e0feb70153e4b44c",
+      "summary": "The Starship test flight comes as investors gear up for SpaceX's initial public offering, which could value the company at $2 trillion or more."
+    },
+    {
+      "title": "Posthaste: Is the world ready for its first trillionaire? It's coming sooner than we think",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T12:17:48+00:00",
+      "url": "https://finnhub.io/api/news?id=6fa34d3250d797251f54b55bffa2ba8612e8c860b39995097648fe7d7ae2c17d",
+      "summary": "What's that mean for the rest of us"
+    },
+    {
+      "title": "Musk's Latest Venture Gives Space Stocks Their Own Tesla Surge",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T12:01:37+00:00",
+      "url": "https://finnhub.io/api/news?id=2ef3bd7e285afb3b94e29419c127206bbbc1f9b44e248cb827ca77f6b63b3d4d",
+      "summary": "(Bloomberg) -- With the highly-anticipated debut of SpaceX on the US stock market around the corner, euphoria for Elon Musk's rocket venture is drawing comparisons to Tesla Inc.'s effect on electric-vehicle stocks. Most Read from BloombergBungie Plans Layoffs After Ending 'Destiny 2' DevelopmentSpot the Difference: Putin Gets Trump Treatment From Xi in ChinaIran Says the US's Latest Proposal Has 'Narrowed the Gaps'Iran in Talks With Oman Over Permanent Hormuz Toll SystemModi's Toffee Gift to Mel"
+    },
+    {
+      "title": "US President Trump Postpones Signing of Executive Order on AI",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T11:35:29+00:00",
+      "url": "https://finnhub.io/api/news?id=d7e947e8b17993548f70f64f9f269d5029b04a0028b95025066e7451ac48509f",
+      "summary": "US President Donald Trump has postponed signing an executive order on artificial intelligence becaus"
+    },
+    {
+      "title": "$890 Million: Inside The Curious Relationship Between Tesla And Space X",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T11:31:08+00:00",
+      "url": "https://finnhub.io/api/news?id=2fa5284e90e0a267a40d47c17c69bf96a165bc795271ad9d5cc7a9008c8d7043",
+      "summary": "Tesla Inc. has sold roughly $890 million in vehicles and batteries to other companies in Elon Musk's orbit since 2023, and a Wednesday filing showed the buyers paid full price. The SpaceX prospectus disclosed about $131 million in Cybertruck purchases..."
+    },
+    {
+      "title": "SpaceX Just Told the SEC What Could Crash Its Stock Overnight, and It Has Nothing to Do With Rockets",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T11:27:56+00:00",
+      "url": "https://finnhub.io/api/news?id=ee084db54afa9d104308886692d7ea3ca340f4dbdffb95cd2e6e6f8799d3d23d",
+      "summary": "Skim the headlines and you might assume the biggest risk to SpaceX shareholders is a Starship blowing up on the pad, or a Falcon 9 losing a payload. After reading the company's pre-IPO disclosures this week, I'm convinced the biggest threat to shareholders is Elon Musk himself. SpaceX signed its registration statement in Starbase, Texas, ... SpaceX Just Told the SEC What Could Crash Its Stock Overnight, and It Has Nothing to Do With Rockets"
+    },
+    {
+      "title": "SpaceX Will Try Another Starship Launch Today Ahead of IPO",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T11:23:00+00:00",
+      "url": "https://finnhub.io/api/news?id=7056a078b366926b45cee8fae42785e9e8f0eaaa465e5ce0d9cc9718eb36ce25",
+      "summary": "The Starship test flight comes as investors gear up for SpaceX's initial public offering, which could value the company at $2 trillion or more."
+    },
+    {
+      "title": "Elon Musk Mega-Merger? Dan Ives Puts SpaceX Tesla Tie-Up Odds At 80%",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T11:01:16+00:00",
+      "url": "https://finnhub.io/api/news?id=77fcdeb06445d69151a5fe155f9c09cccaa74cdc1bc93a06830d1adeda3606c8",
+      "summary": "Elon Musk's corporate universe could be headed for its biggest combination yet, according to Wedbush analyst Dan Ives, who is now putting an 80% probability on a Tesla Inc. and SpaceX merger. Ives made the call in a Wednesday note..."
+    },
+    {
+      "title": "Prediction: 1 Stock That Will Be Worth More Than Tesla and SpaceX Combined by Next Year",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T10:50:00+00:00",
+      "url": "https://finnhub.io/api/news?id=858b168e02aca09446029727c9a8b8cd88f9b02a4c9a5b2e8e4040a5dee2582c",
+      "summary": "This technology stock should have significantly more earnings power than the two Elon Musk-led businesses."
+    },
+    {
+      "title": "Electric Vehicles Update - Financing Revolutionizes Accessibility In Sustainable Transportation",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T10:39:41+00:00",
+      "url": "https://finnhub.io/api/news?id=d7ee641815f9a161cf000773f58dfc3b13d9c361c7d2e091f6ce98bc8d10bfa9",
+      "summary": "The electric vehicle finance market is expanding rapidly, influenced by innovative financing models such as battery leasing and subscription services. These initiatives aim to make electric vehicles (EVs) more accessible, particularly as they tend to be costlier than traditional vehicles. Government incentives and subsidies further enhance this accessibility, encouraging both consumer and commercial sectors to adopt EVs. Financial institutions are developing bespoke financing solutions..."
+    },
+    {
+      "title": "How 1 Top Global EV Maker Adjusted to the Iran Conflict and Is Thriving",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T10:35:00+00:00",
+      "url": "https://finnhub.io/api/news?id=32b7f460b6c785a8699fd0ebad9ffdcc7a958e44094a24492dc659cccc37da8e",
+      "summary": "BYD overtook Tesla in global EV sales last year. It's doing another impressive thing amid the Iran conflict by raising export guidance."
+    },
+    {
+      "title": "Elon Musk's trillionaire march: Here's what to know",
+      "source": "CNBC",
+      "published_at": "2026-05-22T10:00:08+00:00",
+      "url": "https://finnhub.io/api/news?id=03f6f5199a1778b98925a35aea3a32dc29b1e5dc10a3ebeed051f4bdce0bd935",
+      "summary": "SpaceX's upcoming IPO is setting the stage for Elon Musk to become the world's first trillionaire. CNBC's Robert Frank joins 'Squawk on the Street' with the details."
+    },
+    {
+      "title": "Betting on Musk's space ambitions: ARK Invest's Brett Winton on SpaceX's valuation",
+      "source": "CNBC",
+      "published_at": "2026-05-22T09:25:53+00:00",
+      "url": "https://finnhub.io/api/news?id=1e0a9d9b8c45c67147ef80cc4bbbd4941928a5a5b2ea0f6d9ab1b92680efad6f",
+      "summary": "Brett Winton, Ark Investment Management chief futurist, joins 'Squawk Box' to discuss the impending SpaceX IPO, the numbers behind SpaceX's valuation, and more."
+    },
+    {
+      "title": "How To Own SpaceX Through Alphabet Shares: The Pre-IPO Strategy",
+      "source": "SeekingAlpha",
+      "published_at": "2026-05-22T08:59:20+00:00",
+      "url": "https://finnhub.io/api/news?id=3278c12970772bd9b2fdfe4e39c4b9ffbefe17650fe70d2f5e6e25239f5fc7f0",
+      "summary": "Alphabet ownership offers a liquid, institutional-grade pre-IPO path into the SpaceX stake without speculative premiums. Learn why GOOGL stock is a buy."
+    },
+    {
+      "title": "TSLA Stock Rises Premarket Despite Model Y Recalls \u2014 Retail Expects Musk To Reward Tesla Holders In 'Overpriced' IPO",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T08:47:25+00:00",
+      "url": "https://finnhub.io/api/news?id=6c5adbed9ed93dde5e65f63d006cc752b4350fb331c3b38d9bdfe432ee0c85b5",
+      "summary": "Prediction market traders currently see the highest odds for a SpaceX debut valuation between $2 trillion and $2.5 trillion."
+    },
+    {
+      "title": "DXYZ, VCX Stocks Catch IPO Fever: Traders Chase SpaceX, OpenAI And Anthropic For Valuations Rivaling TSLA, META",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T07:38:16+00:00",
+      "url": "https://finnhub.io/api/news?id=3213cce7575617729ef7b7a421e340a502a500ebd0d349a94d475ce11b87b75a",
+      "summary": "SpaceX accounts for 16.2% of DXYZ's portfolio, while VCX holds Anthropic at 20.7%, OpenAI at 9.9% and SpaceX at 5%."
+    },
+    {
+      "title": "Tesla FSD Expansion And Musk Ecosystem Ties Reshape Investor Questions",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T07:15:22+00:00",
+      "url": "https://finnhub.io/api/news?id=13141a1e304997a8b420f1851f1e96fb9394cc8dd7b0fc10975b54e03e356a93",
+      "summary": "Tesla (NasdaqGS:TSLA) has launched its Full Self-Driving (FSD) software in China and nine additional markets after securing regulatory approval. The rollout marks a key expansion of Tesla's software offering into China, a highly competitive and closely watched electric vehicle and autonomous driving market. Recent disclosures highlight around $890 million in cross-company revenues and shared AI infrastructure projects between Tesla, SpaceX, and xAI. These links are drawing investor focus to..."
+    },
+    {
+      "title": "Tesla Draws Fresh SpaceX Merger Speculation After IPO Filing",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T07:04:10+00:00",
+      "url": "https://finnhub.io/api/news?id=d9bb9524bce9d5f6a7218c343903e75eaed4728dd010d76bf1b5dfe750bf308f",
+      "summary": "Wedbush sees a potential deal, but prediction-market traders remain divided."
+    },
+    {
+      "title": "Tesla Investors Beware? SpaceX IPO Could Pull Cash, Attention And Musk Away From EV Giant",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T05:39:55+00:00",
+      "url": "https://finnhub.io/api/news?id=ff519e9a6ec053eb4843864c2787c7b3f650b192064010de6935938a162147ca",
+      "summary": "Elon Musk-led commercial spaceflight giant SpaceX's IPO could become a problem for Tesla Inc. (NASDAQ:TSLA) investors and shareholders as the market readies itself for the June IPO date. Muskonomy The upcoming IPO could take investors' appetite away from Tesla and onto SpaceX, while also shifting Musk's efforts and focus from the EV giant, experts cited by Bloomberg on Thursday said. \"This cannot be a positive for Tesla,\" Joe Gilbert, a portfolio manager at Integrity Asset Management, cited in t"
+    },
+    {
+      "title": "Billboard Stocks Are Surging. Why Lamar and Outfront Can Keep Rallying.",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T05:30:00+00:00",
+      "url": "https://finnhub.io/api/news?id=bac1efb9956d02e08b41c4b9c3303580d7fb3204b4ec5a583f72f5845197aeb4",
+      "summary": "Outdoor advertising is an example of a so-called HALO business that likely won't be disrupted by AI."
+    },
+    {
+      "title": "No, Tesla Doesn't Need E.U. Approval to Sell Full Self-Driving (Supervised) in Europe",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T04:59:00+00:00",
+      "url": "https://finnhub.io/api/news?id=d35165c1c413f4cce5dea107ecd8e587f4f01524f04c6b388380155230bdd53d",
+      "summary": "It can go country by country."
+    },
+    {
+      "title": "Tesla Recalls 14,575 Model Y Vehicles Over Missing Certification Label, Raising Vehicle Overload Crash Risk",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T04:22:05+00:00",
+      "url": "https://finnhub.io/api/news?id=1099193e3d6fcb257f63260190ce59c088e737a5f80c64d795dbca4ae862d7ba",
+      "summary": "-National Highway Traffic Safety Administration"
+    },
+    {
+      "title": "Tesla Model S Sparked Elon Musk's AI, Robotics And Space Revolution: 'Little Did We Know,' Says Cathie Wood",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T04:19:55+00:00",
+      "url": "https://finnhub.io/api/news?id=2e4e489da2068c98f3e4292a20d944e524efe601323c2c985dca1716c6cae77a",
+      "summary": "ARK Invest's Cathie Wood praises Tesla's Model S for sparking a revolution in AI, space exploration, and robotics led by Elon Musk."
+    },
+    {
+      "title": "Ford Takes Aim At Tesla And BYD In Europe With New Electric Hatchback, SUV Roadmap",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T03:48:49+00:00",
+      "url": "https://finnhub.io/api/news?id=eb1ebad2af0946a723f31c6ff6bd24aca449f5aa9b1f19059627b08eeff8e210",
+      "summary": "Ford CEO Jim Farley outlines automaker's plan to expand in Europe with 7 new vehicles, including Bronco and EVs."
+    },
+    {
+      "title": "Ross Gerber Invokes Netflix, Says Mercedes Made A 'Blockbuster' Error By Letting 10% Tesla Stake Slip Away",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T02:31:07+00:00",
+      "url": "https://finnhub.io/api/news?id=77c6c24066b36a672f647a39fb745744056dbbf43664c8722fbc9c8ef97875fb",
+      "summary": "Ross Gerber, co-founder of Gerber Kawasaki Wealth & Investment Management, agreed Tuesday with a social media post arguing that Mercedes-Benz Group AG's $50 million investment for nearly 10% of Tesla Inc. in 2009 would be worth about $130 billion today..."
+    },
+    {
+      "title": "Gary Black Explains Why He's 'Not Interested' In SpaceX IPO Despite All The Hype, Investor Explains When He's Likely To Buy The Stock",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T02:04:16+00:00",
+      "url": "https://finnhub.io/api/news?id=2c590e52b508db27537864655a3a434a6dab7e2670e8d78b0a602b33f26d3afb",
+      "summary": "Tesla investor Gary Black is skeptical of investing in SpaceX's IPO due to its high valuation and potential oversubscription."
+    },
+    {
+      "title": "CNBC Daily Open: Wall Street set for a winning week",
+      "source": "CNBC",
+      "published_at": "2026-05-22T01:59:17+00:00",
+      "url": "https://finnhub.io/api/news?id=3f50401c3080bbac90e22fe87a0c6bdd9440cc73e3e4c6f208e7bc5da0caaea0",
+      "summary": "Major U.S. markets look set to end the week in the green despite a rocky start to the week's trade with bond market jitters still a concern."
+    }
+  ],
+  "warnings": []
+}

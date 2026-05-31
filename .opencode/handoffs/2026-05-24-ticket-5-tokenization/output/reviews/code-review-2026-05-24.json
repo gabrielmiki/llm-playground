@@ -1,0 +1,111 @@
+{
+  "verdict": "APPROVE",
+  "clear_analysis": {
+    "context": {
+      "status": "ALIGNED",
+      "notes": "All 11 acceptance criteria (AC-01 through AC-11) are covered by 36 tests spanning 3 backends. The implementation matches the ticket spec: factory pattern, BaseTokenizer ABC, 3 concrete backends, encode_many streaming, fused_record_to_text static method, and proper exception hierarchy. No feature creep identified. Minor note: the spec says '11 tests parametrized across backends' — the actual count is 36 (11 logical tests × ~3 backends + special token and fused_record_to_text tests), which exceeds the minimum spec."
+    },
+    "logic": {
+      "status": "CORRECT",
+      "issues": [
+        "tiktoken: encode uses allowed_special='all' (permissive but correct — AC-07 passes). Using {'<|endoftext|>'} would be more restrictive and match the ticket's implementation hint.",
+        "HFTokenizerTokenizer: BPE initialized with unk_token=None — works for test-controlled text but will raise on unknown characters in production. Consider adding fallback or unk_token handling.",
+        "SentencePiece: user_defined_symbols from special_tokens keys — the dict's integer values (IDs) are silently ignored. SentencePiece assigns IDs automatically after reserved tokens (0=UNK, 1=BOS, 2=EOS). AC-07 requires \"matching its assigned value\" but this is not enforced for sentencepiece.",
+        "HFTokenizerTokenizer: special_tokens dict values (IDs) are also ignored — only the keys are passed as a string list to BpeTrainer. Works for the test case because sequential assignment matches expected IDs."
+      ]
+    },
+    "efficiency": {
+      "status": "OPTIMAL",
+      "notes": "encode_many is a lazy generator (BaseTokenizer:28-30). No N+1 patterns, no repeated calls, no unnecessary allocations in hot paths. SentencePiece temp file cleanup uses try/finally (lines 134-139). Empty-string early returns before backend API calls."
+    },
+    "architecture": {
+      "status": "COMPLIANT",
+      "issues": [
+        "TokenizerConfig dataclass (tokenizer_configs.py:7-10) is defined, exported in __init__.py, but never consumed by TokenizerFactory.create() or any other code. Dead code — the factory accepts individual params (backend, vocab_size, **kwargs) instead of a config object.",
+        "HFTokenizerTokenizer naming is awkward (double 'Tokenizer') but matches the AC-08 spec exactly.",
+        "BaseTokenizer.encode_many (tokenizer.py:28-30) uses Iterable[str] as input type — consistent with streaming patterns elsewhere in the codebase (cf. DataFusionEngine.fuse_many, TextCleaner.clean_many)."
+      ]
+    },
+    "reliability": {
+      "status": "ROBUST",
+      "gaps": [
+        "Train-before-encode guard: present for both HFTokenizerTokenizer (line 83-84) and SentencePieceTokenizer (line 144-147). Raises TokenizerError with clear message.",
+        "Empty string encode returns [] for all 3 backends (lines 40-41, 85-86, 148-149).",
+        "Empty list decode returns '' for all 3 backends (lines 45-46, 90-91, 156-157).",
+        "Invalid vocab_size (<=0) raises TokenizerError with specific message (lines 62-63, 106-107).",
+        "Unknown backend raises TokenizerError (line 192).",
+        "SentencePiece temp file cleanup is robust with try/finally (lines 134-139).",
+        "Minor: HFTokenizerTokenizer BPE with unk_token=None will crash on unknown byte sequences — no fallback token."
+      ]
+    }
+  },
+  "ai_specific_issues": [
+    {
+      "type": "DUPLICATION",
+      "location": "src/preprocess/tokenizer.py:40-41, 85-86, 148-149",
+      "evidence": "The empty-string guard `if not text: return []` is duplicated identically across all three backend encode() methods. Similarly, `if not tokens: return \"\"` is duplicated at lines 45-46, 90-91, 156-157.",
+      "recommendation": "Move the empty-string/empty-list guard to BaseTokenizer.encode() as a pre-check before calling a _do_encode abstract method: `def encode(self, text): if not text: return []; return self._do_encode(text)`"
+    },
+    {
+      "type": "DUPLICATION",
+      "location": "src/preprocess/tokenizer.py:62-63, 106-107",
+      "evidence": "The `if vocab_size <= 0: raise TokenizerError(...)` guard is duplicated in HFTokenizerTokenizer.__init__ and SentencePieceTokenizer.__init__.",
+      "recommendation": "Move this validation to TokenizerFactory.create() before instantiating backends, or add a shared helper function."
+    },
+    {
+      "type": "DUPLICATION",
+      "location": "src/preprocess/tokenizer.py:83-84, 144-147",
+      "evidence": "The 'must be trained before encoding' guard is duplicated in HFTokenizerTokenizer.encode() and SentencePieceTokenizer.encode(). The pattern `if not self._trained: raise TokenizerError(...)` is identical.",
+      "recommendation": "Make `_trained` a property of BaseTokenizer (default True for tiktoken, False for trainable) and add the guard in BaseTokenizer.encode() before calling an abstract `_do_encode()`."
+    },
+    {
+      "type": "SHALLOW_TEST",
+      "location": "tests/test_tokenizer.py:44-49",
+      "evidence": "AC-03 specifies: tiktoken.vocab_size() returns 100277, trainable backends with vocab_size=8192 return 8192. But the test only asserts `t.vocab_size() > 0`. The specific values from the AC are never verified.",
+      "recommendation": "Add exact-value assertions: for tiktoken, assert t.vocab_size() == 100277 (with a tolerance comment for version-dependent values); for trainable backends, assert vocab_size >= configured value (actual may be lower on tiny corpus)."
+    },
+    {
+      "type": "SHALLOW_TEST",
+      "location": "tests/test_tokenizer.py:71-86, 88-103",
+      "evidence": "AC-07 requires special tokens to be 'preserved as a single token ID matching its assigned value.' The tokenizers test (line 78-86) checks `\"<|pad|>\" in decoded` and `\"<|bos|>\" in decoded` but never verifies the specific token IDs (0 and 1). The sentencepiece test (line 95-103) has the same weakness.",
+      "recommendation": "For tokenizers: expand test to assert `pad_tokens[0] == 0` and `bos_tokens[0] == 1`. For sentencepiece: at minimum verify the tokens are single IDs (the specific IDs cannot be guaranteed due to sentencepiece API limitations — add a comment explaining this)."
+    },
+    {
+      "type": "SHALLOW_TEST",
+      "location": "tests/test_tokenizer.py:63-69",
+      "evidence": "AC-07 says 'text containing <|endoftext|>' implying the token appears within surrounding text. The test only tests `<|endoftext|>` alone. A more robust test would use `\"Hello<|endoftext|>World\"` and verify the special token is a single ID embedded among content tokens.",
+      "recommendation": "Add a second assertion with embedded special token: `text = \"Hello<|endoftext|>World\"` and verify the middle token is 100257."
+    },
+    {
+      "type": "SHALLOW_TEST",
+      "location": "tests/test_tokenizer.py:116-121",
+      "evidence": "AC-09 is tested (all IDs < 512) but no test verifies ID < vocab_size for sentencepiece. The AC only mentions tokenizers but sentencepiece should also produce valid IDs.",
+      "recommendation": "Add a `test_sentencepiece_ids_within_vocab` test symmetric to test_tokenizers_ids_within_vocab."
+    },
+    {
+      "type": "MISSING_GUARD",
+      "location": "src/preprocess/tokenizer.py:67",
+      "evidence": "HFTokenizerTokenizer initializes BPE with `unk_token=None`. If input text contains bytes not seen during training (e.g., CJK characters, emojis, or specialized symbols), BPE will raise. Ticket ACs only test ASCII text.",
+      "recommendation": "Consider setting `unk_token=\"<|unk|>\"` or adding the UNK token to special_tokens with ID 0 for production use."
+    },
+    {
+      "type": "INCONSISTENT_PATTERN",
+      "location": "tests/test_tokenizer.py:19-24 vs 44-49",
+      "evidence": "test_vocab_size (line 44) uses @pytest.mark.parametrize with `TokenizerFactory.create(backend)` directly instead of the parametrized `tokenizer` fixture (line 19). The fixture already handles backend creation and training, so this test re-implements the same logic. This is inconsistent with 6 other parametrized tests that use the fixture.",
+      "recommendation": "Refactor test_vocab_size to use the tokenizer fixture instead of re-creating tokenizers."
+    },
+    {
+      "type": "INCONSISTENT_PATTERN",
+      "location": "src/preprocess/tokenizer.py:164-192",
+      "evidence": "TokenizerFactory.create() accepts `**kwargs` but only `special_tokens` is extracted. All other kwargs are silently ignored with no warning. The spec says 'optional kwargs per backend' but tiktoken doesn't accept any, and tokenizers/sentencepiece only accept special_tokens. Silently ignoring extra kwargs could mask bugs.",
+      "recommendation": "Log a warning for unexpected kwargs (e.g., `logger.warning(\"Unexpected kwarg '%s' ignored\", k)`)."
+    },
+    {
+      "type": "MISSING_GUARD",
+      "location": "tests/fixtures/tokenizer_data.py:6-43",
+      "evidence": "tokenizer_data.py defines 4 fixtures (sample_fused_text, sample_fused_text_multi, sample_special_tokens_text, sample_empty_text) that are registered in conftest.py but never used by any test in test_tokenizer.py. The tests define their own inline test data instead. The fixtures are dead code causing unnecessary plugin load.",
+      "recommendation": "Either (a) use the fixtures in tests (better: tests should be refactored to use them) or (b) remove the fixtures and the conftest registration if they add no value."
+    }
+  ],
+  "summary": "Solid implementation covering all 11 ACs with 36 passing tests across 3 backends. Main issues are: (1) TokenizerConfig is dead code (defined but never consumed), (2) several test assertions are shallower than their ACs demand (vocab_size exact values, special token IDs), and (3) there's detectable AI-style duplication across the 3 backend classes (empty guards, train guards, vocab validation) that could be DRYed up via BaseTokenizer. No blocking issues — verdict APPROVE."
+}

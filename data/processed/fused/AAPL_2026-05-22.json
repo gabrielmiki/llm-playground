@@ -1,0 +1,366 @@
+{
+  "ticker": "AAPL",
+  "date": "2026-05-22",
+  "market_data": {
+    "open": 306.12,
+    "high": 311.4,
+    "low": 305.84,
+    "close": 308.82,
+    "volume": 43670223,
+    "adjusted_close": null,
+    "timestamp": "2026-05-22T00:00:00+00:00"
+  },
+  "news_articles": [
+    {
+      "title": "Microsoft vs. Apple Stock: The Numbers Reveal a Clear Winner Heading Into H2 2026",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T23:00:02+00:00",
+      "url": "https://finnhub.io/api/news?id=74ccddca1b7489db4b5539e50b0647953cfeffc1282a5f9c75537c45b6430f4e",
+      "summary": "Microsoft vs. Apple stock: Compare fundamentals, valuation, dividends, analyst ratings, and AI exposure to see which looks like the better buy."
+    },
+    {
+      "title": "RDDT Stock Drops To Near One-Month Lows After Meta Launches Rival App",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T22:00:00+00:00",
+      "url": "https://finnhub.io/api/news?id=00285dd3fa87e66b5769f6d482c085f23aa36631b9b66e7069c666d416732d45",
+      "summary": "Meta launches 'Forum,' a discussion app that positions itself as a direct rival to Reddit."
+    },
+    {
+      "title": "Is Snap (SNAP) Quietly Recasting Its Brand Strategy With Luke Wood's Board Appointment?",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T20:16:11+00:00",
+      "url": "https://finnhub.io/api/news?id=26963eb018aa3c986fbb42a02db2ca4276cebec996293951f6f89c5bd5b42423",
+      "summary": "On May 20, 2026, Snap Inc. expanded its board of directors to thirteen members by appointing Luke Wood, former Beats by Dr. Dre President and Apple Vice President, who also leads Violet St Holdings and sits on Fender Musical Instruments' board. By bringing in a director with deep consumer electronics, music, and brand-building experience, Snap is signaling a focus on strengthening leadership around product, partnerships, and monetization opportunities. We'll now examine how Luke Wood's..."
+    },
+    {
+      "title": "EUV ETF: The Chip-Making Technology Fueling AI",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T20:03:54+00:00",
+      "url": "https://finnhub.io/api/news?id=72e1464b125385526dfae7e25e0a83ce96ed94c68ebf5e8b758927f8bd162dee",
+      "summary": "The EUV ETF gives investors targeted exposure to extreme ultraviolet lithography \u2014 the chip-making technology that makes AI chips like Nvidia's H100 possible. Here's what you need to know."
+    },
+    {
+      "title": "IMAX Potential Suitors Include Netflix, Apple, Wedbush Says",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T20:02:04+00:00",
+      "url": "https://finnhub.io/api/news?id=9483b768517254664e8dfefd7199b6f963e00636dd3fe7d9013f444d1a78fcc0",
+      "summary": "A potential sale of IMAX (IMAX) could attract a number of likely suitors including private equity fi"
+    },
+    {
+      "title": "OMAH Delivers 15% Returns While Berkshire Stock Drops 5%: The Buffett ETF Retirees Overlook",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T19:32:45+00:00",
+      "url": "https://finnhub.io/api/news?id=7579b0e0cec44f64e28da5c017f6a83a78e1e0bd992dc8703702b5f683f28c41",
+      "summary": "Retirees who admire Warren Buffett face a recurring frustration: Berkshire Hathaway (NYSE:BRK-B) pays no dividend, so owning the stock means watching the compounding happen on paper while no cash hits the brokerage account. The VistaShares Target 15 Berkshire Select Income ETF (NYSEARCA:OMAH) was built to plug that gap. OMAH holds a basket modeled after Berkshire's ... OMAH Delivers 15% Returns While Berkshire Stock Drops 5%: The Buffett ETF Retirees Overlook"
+    },
+    {
+      "title": "QYLD's 12% Yield Looks Generous, But Its 10 Year Total Return Tells a Harder Story",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T19:18:21+00:00",
+      "url": "https://finnhub.io/api/news?id=a86793a6aa9f03b2c80e63d1dcacfdb828fb0c5096aee852dfced9fe28467047",
+      "summary": "The Global X NASDAQ 100 Covered Call ETF (NASDAQ:QYLD) advertises a trailing distribution yield around 12%, which is roughly ten times what the broad market pays. That headline is what drew income-focused investors into QYLD when it launched in 2013, and it is still what keeps roughly $8.13 billion in assets parked there today. The ... QYLD's 12% Yield Looks Generous, But Its 10 Year Total Return Tells a Harder Story"
+    },
+    {
+      "title": "Dominic Chu: The Trump Bull Market's AI Rally Is Powering the S&P 500 Toward an 8th Straight Winning Week",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T18:45:23+00:00",
+      "url": "https://finnhub.io/api/news?id=fa89f68aa583fc9dab5953f45169ddb26a386688f824e1ee957154ba5789c79a",
+      "summary": "CNBC's Dominic Chu opened Friday's market coverage by noting that \"the stocks are looking like they may open higher today, rounding out what could be the eighth straight winning week for the S&P 500.\" That kind of streak does not happen by accident, and inside the Trump bull market it has become the defining rhythm: ... Dominic Chu: The Trump Bull Market's AI Rally Is Powering the S&P 500 Toward an 8th Straight Winning Week"
+    },
+    {
+      "title": "SEC Delays Crypto Stock Tokens Amid Wall Street Pushback",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T18:44:44+00:00",
+      "url": "https://finnhub.io/api/news?id=eeb323a5b6d2bfc8a7997177566fe2a8fbe2f27ea3969b23af84568aa89aa664",
+      "summary": "The SEC has delayed its innovation exemption for crypto versions of US stocks amid Wall Street pushback, halting tokenized trading plans."
+    },
+    {
+      "title": "CDL's $2.29 annual dividend beats Treasury yields despite rising interest rates",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T18:30:54+00:00",
+      "url": "https://finnhub.io/api/news?id=d860b7fa2ca0c1c604a4f7ff105c16de0de5f7780fc99cc8b7a6cf6deac18afe",
+      "summary": "Income investors holding the VictoryShares US Large Cap High Div Volatility Wtd ETF (NYSEARCA:CDL) own a fund built around one premise: large American companies with stable share prices tend to pay reliable dividends. CDL distributes cash monthly and paid $2.29 per share in 2025 against a current share price of roughly $76. With Treasury yields ... CDL's $2.29 annual dividend beats Treasury yields despite rising interest rates"
+    },
+    {
+      "title": "SCHG's Top Ten Holdings Now Drive 59 Percent of the Fund, Creating Hidden Single Stock Risk",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T18:30:53+00:00",
+      "url": "https://finnhub.io/api/news?id=c07231400d66a49eb8e6ec53facc788010fd742025aac53d334ab2109f595ff6",
+      "summary": "A young saver opens a Schwab account, picks the Schwab U.S. Large-Cap Growth ETF (NYSEARCA:SCHG) over a plain S&P 500 fund because they want a growth tilt at almost no cost, and assumes 197 holdings buys them diversification. The math says otherwise. SCHG's top 10 names drive 59% of the portfolio, which means more than ... SCHG's Top Ten Holdings Now Drive 59 Percent of the Fund, Creating Hidden Single Stock Risk"
+    },
+    {
+      "title": "Google appeals US court ruling on search monopoly",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T18:18:55+00:00",
+      "url": "https://finnhub.io/api/news?id=eed1f6111cd2108e153d11b1ac2eeead00f37372fc5a2e9a1b2ac5cc0f4a1619",
+      "summary": "Alphabet's Google on Friday appealed a Washington federal judge's ruling that it holds illegal monopolies in online search and related advertising. \u2022 Google argued that U.S. Judge Amit Mehta made legal errors in his 2024 ruling, which found the company illegally blocked competitors by paying billions of dollars annually to firms including Apple to be the default search engine on new devices. \u2022 The arrangements did not prevent the device makers and browser developers from promoting rival search services like Microsoft's Bing, Google argued."
+    },
+    {
+      "title": "These Stocks Are Today's Movers: Estee Lauder, Workday, Zoom Communications, Take-Two, Imax, and More",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T10:41:00+00:00",
+      "url": "https://finnhub.io/api/news?id=9890b80ad13354d1444507eca7734988baed1d2162d2414ad3089eb04e52dd23",
+      "summary": "FEATURE Stock futures pointed higher Friday as investors remained cautiously optimistic a deal to end the stalemate between the U.S. and Iran could be reached. These stocks were moving in premarket trading: Estee Lauder rose 10%."
+    },
+    {
+      "title": "These S&P500 stocks are the most active in today's session",
+      "source": "ChartMill",
+      "published_at": "2026-05-22T18:05:00+00:00",
+      "url": "https://finnhub.io/api/news?id=486a37ae765a2e27a9b9b34c9d6ba4dbfc9d9ff197ee3f39d63508626634c988",
+      "summary": "Looking for the most active S&P500 stocks in today's session? Join us as we dive into the US markets on Friday and discover the stocks that are dominating the trading activity and setting the pace for the market."
+    },
+    {
+      "title": "Oura's IPO Could Reveal Whether Wellness Tech Is Finally Wall Street-Ready",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T16:53:17+00:00",
+      "url": "https://finnhub.io/api/news?id=6540cab6ad816936e4696cc44c6d725c76315e29e3c7ac0056f9288635acc0ce",
+      "summary": "Oura Health is prepings its IPO, which will test whether public markets are ready for a new wave of health technology companies."
+    },
+    {
+      "title": "One Problem for the SpaceX IPO",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T16:20:00+00:00",
+      "url": "https://finnhub.io/api/news?id=a3de0b1cf19da9e3d084882e38419197f96538ba3f82cb240535fe087a0b58ae",
+      "summary": "Trillion dollar companies are typically profitable. SpaceX lost about $5 billion in 2025, according to its IPO registration statement."
+    },
+    {
+      "title": "Vanguard's VIG Quietly Returned 247% While Investors Chased Higher Yields",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T16:14:32+00:00",
+      "url": "https://finnhub.io/api/news?id=ab65a0e79a5fa212076af582bff43b835f0bbe275de933105f6fb609ce2172d8",
+      "summary": "Retirees evaluating dividend funds tend to anchor on current yield, which is exactly why Vanguard Dividend Appreciation ETF (NYSEARCA:VIG) often gets overlooked. The fund pays a distribution yield of roughly 1.6%, which looks unimpressive next to higher-yielding alternatives. Morningstar analysts have repeatedly flagged VIG as a quiet winner for retirees precisely because of that misread. ... Vanguard's VIG Quietly Returned 247% While Investors Chased Higher Yields"
+    },
+    {
+      "title": "Best Buy Poised for In-Line First-Quarter Comparable Sales, Wedbush Says",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T15:31:23+00:00",
+      "url": "https://finnhub.io/api/news?id=ccce9f453d72854ac3ff9b9833b76600bae81bbbc228679ee2d16cfa05e54e0d",
+      "summary": "Best Buy (BBY) is expected to report in-line comparable sales for the first quarter and issue a cons"
+    },
+    {
+      "title": "Fortnite's App Store Return Puts Apple's Services Model Under Spotlight",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T15:11:30+00:00",
+      "url": "https://finnhub.io/api/news?id=24e765a5f9ab2610a4d8b2fe9e18a7756ba90eb68f50dce8a9c16c342331e91d",
+      "summary": "Epic Games' Fortnite has returned to Apple's App Store, reconnecting one of the largest mobile games with iOS users. The move comes while global regulators are reassessing Apple's App Store rules and fee structure. The legal conflict between Epic and Apple over commissions and developer terms is still active. Regulatory outcomes from this dispute may influence Apple's services business and investor risk profile for NasdaqGS:AAPL. Apple, through NasdaqGS:AAPL, is closely linked to the..."
+    },
+    {
+      "title": "Imax's Potential Acquirers Include Private Equity Firms, Netflix, Apple, Sony, Wedbush Says",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T15:01:34+00:00",
+      "url": "https://finnhub.io/api/news?id=254ea535a2d5c40fed2dccbca164d02e0b36b9ce2639016789a03c4fa17ed441",
+      "summary": "Imax (IMAX) is an \"attractive\" asset, and its most likely acquirers include private equity firms, Ne"
+    },
+    {
+      "title": "Reddit stock drops almost 6% after Meta launches standalone app for online forums",
+      "source": "CNBC",
+      "published_at": "2026-05-22T14:34:57+00:00",
+      "url": "https://finnhub.io/api/news?id=ee310fc7a0c0976e36ab8967ebc17126fdb1528eb8277b4c371cb4853acaeab4",
+      "summary": "Reddit shares fell after Meta released a standalone app for Facebook Groups called Forum."
+    },
+    {
+      "title": "Apple Stock at 52-Week High: Buy, Sell or Hold?",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T14:30:46+00:00",
+      "url": "https://finnhub.io/api/news?id=eb2f48a01048d2f3ba81fa2387a1740af17bbaf626601b9506d7787ef0dcd88f",
+      "summary": "Apple (NASDAQ:AAPL) at $304.99 is a hold, with the stock perched at a fresh all-time high after a 51.52% one-year run that has pushed the price past where most published analyst targets sit today. Apple remains the world's premier consumer electronics franchise, anchoring a 2.5 billion active device installed base that feeds a high-margin Services ... Apple Stock at 52-Week High: Buy, Sell or Hold?"
+    },
+    {
+      "title": "Smart ring maker Oura files to go public",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T14:03:35+00:00",
+      "url": "https://finnhub.io/api/news?id=666630788344fcd20947bb18296e0f917fb38cf9d3140c6f379883e01751d1f2",
+      "summary": "The Finnish company said in September that it has sold 5.5 million smart rings to date."
+    },
+    {
+      "title": "AI mania is fueling bubble-like concentration in the S&P 500",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T13:57:54+00:00",
+      "url": "https://finnhub.io/api/news?id=4f0335b417da0e77c772b41d9796f79ef68192f7fe3a11483f3157cfe8ee434c",
+      "summary": "Tech just keeps getting bigger!"
+    },
+    {
+      "title": "Iran Optimism Drives Semi Mania, Potential Short Squeeze Ahead",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T13:52:50+00:00",
+      "url": "https://finnhub.io/api/news?id=f3cb85d50258305e8177ddff52445942a4958158ab53d95497690a68708d3c80",
+      "summary": "Iran Optimism"
+    },
+    {
+      "title": "Apple Takes App Store Fight to Supreme Court in Epic Games Case",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T13:29:51+00:00",
+      "url": "https://finnhub.io/api/news?id=9549d166bd5a98c386487b77e156e491a477a5f5cf4ec2666e07da40b563ba17",
+      "summary": "The appeal could shape how developers process payments outside Apple's ecosystem."
+    },
+    {
+      "title": "How AI is influencing dividends",
+      "source": "CNBC",
+      "published_at": "2026-05-22T13:13:07+00:00",
+      "url": "https://finnhub.io/api/news?id=766a46bf20556a2fa45226da6a3a833126fb713cb9a54c881b30b6f3485d5a27",
+      "summary": "CNBC's \"Halftime Report\" Investment Committee discusses how AI is affecting dividends and whether those stocks are still attractive investments."
+    },
+    {
+      "title": "Could Apple, Amazon, Or Netflix Buy IMAX? This Analyst Sees Rising M&A Appeal For The Company",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T13:09:41+00:00",
+      "url": "https://finnhub.io/api/news?id=e101a42bb27459e44592e7a0cd17b78ecd22f32b93c3abdd86ea13ff4c6c7f40",
+      "summary": "Benchmark stated that IMAX's strategic value is not fully reflected in its stock price, as premium theatrical formats continue to gain market share."
+    },
+    {
+      "title": "Where Will Apple Stock Be In 3 Years?",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T12:47:11+00:00",
+      "url": "https://finnhub.io/api/news?id=61bdc5d67964934dc2e91456f5c3b06c575bb68e59ceee61bda074686ece95f6",
+      "summary": "Apple (AAPL) stock trades at $304.99 per share, a market cap of $4.5T, and 36.5 times trailing earnings. Is that a fair price, or is there more going on here."
+    },
+    {
+      "title": "Wall Street thinks IMAX is ripe for a sale. Here's who could buy it",
+      "source": "CNBC",
+      "published_at": "2026-05-22T12:26:26+00:00",
+      "url": "https://finnhub.io/api/news?id=e1366f8f62c49efb079a8582c31c95da029ae1ab915d6b25fe25c819bc3a6d83",
+      "summary": "A source told CNBC that IMAX has held \"preliminary talks\" through intermediaries, but no official pitches have been made by the company."
+    },
+    {
+      "title": "Beyond the \"Magnificent Seven\": These 3 Breakout AI Stocks Are Disrupting the Industry",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T12:20:00+00:00",
+      "url": "https://finnhub.io/api/news?id=d7d644ccffd23c9f60c3fab171970e264c0d8795362a1748553eb15ba3863e00",
+      "summary": "Micron Technology, Taiwan Semiconductor Manufacturing, and Broadcom are all major players in the AI realm."
+    },
+    {
+      "title": "Dow rises to record intraday high on Iran peace hopes",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T12:01:00+00:00",
+      "url": "https://finnhub.io/api/news?id=5f3c7e813a83fbf7d43d2ea9f0902f6726b8ba3023b0db35f950358e1846a2ba",
+      "summary": "Investors have faith that a US-Iran peace deal could be within reach even as oil prices climb"
+    },
+    {
+      "title": "The Best AI Stock to Buy Now for Less Than $500",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T11:30:02+00:00",
+      "url": "https://finnhub.io/api/news?id=b498288a1a963b286fd2f1d205cfa6150147968ed6423ed2bcdd394e70839e97",
+      "summary": "This semiconductor company remains deeply embedded in the AI supply chain."
+    },
+    {
+      "title": "Apple Execs Say We Are In The Early Innings Of Spatial Computing \u2013 Here's How The Technology Is Already Changing The Consumer World",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T11:16:12+00:00",
+      "url": "https://finnhub.io/api/news?id=91b13e2c800a61fb811d156c8fb8cacd2d7632b4b97f78e36babb10fe7345d63",
+      "summary": ""
+    },
+    {
+      "title": "Nvidia Is Cheap, Says A Wall Street Journal Columnist\u2014But Prediction Markets Disagree With Him",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T11:09:11+00:00",
+      "url": "https://finnhub.io/api/news?id=c560c3779a70badf0192c5c8ab9065c24f9333ab894a52528e47d40ebc1babb0",
+      "summary": "A WSJ columnist says Nvidia is a bargain even at $5.4 trillion. Polymarket traders aren't so sure, pricing real risk into the AI bellwether's year-end reign."
+    },
+    {
+      "title": "Analyzing an Apple Stock Butterfly Spread: Risk, Reward, and Setup",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T11:00:02+00:00",
+      "url": "https://finnhub.io/api/news?id=91f43d4910d9fca2a84a76d581c24d9c9dbaabfae86764416af0523dc8bedb51",
+      "summary": "The long call butterfly spread is a defined-risk, limited-profit options strategy designed for traders who expect minimal price movement in the underlying asset."
+    },
+    {
+      "title": "SpaceX: Going Boldly Where No One Has Gone Before",
+      "source": "SeekingAlpha",
+      "published_at": "2026-05-22T10:44:11+00:00",
+      "url": "https://finnhub.io/api/news?id=de56423ebca92e2196304804e9010674f7d7a38a70b96b8dacdd99842f1c62aa",
+      "summary": "SpaceX IPO analysis: $1.75T target valuation looks unattractive with weak controls, insider-heavy proceeds and lofty forecasts. Click for more on the SPCX offering."
+    },
+    {
+      "title": "How To Own SpaceX Through Alphabet Shares: The Pre-IPO Strategy",
+      "source": "SeekingAlpha",
+      "published_at": "2026-05-22T08:59:20+00:00",
+      "url": "https://finnhub.io/api/news?id=3278c12970772bd9b2fdfe4e39c4b9ffbefe17650fe70d2f5e6e25239f5fc7f0",
+      "summary": "Alphabet ownership offers a liquid, institutional-grade pre-IPO path into the SpaceX stake without speculative premiums. Learn why GOOGL stock is a buy."
+    },
+    {
+      "title": "Why Are Intel (INTC) Shares Soaring Today",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T07:24:55+00:00",
+      "url": "https://finnhub.io/api/news?id=71549a7e6c68e539d6896e92e85888caddd114384c0b2601be83a3acea9de056",
+      "summary": "Shares of computer processor maker Intel (NASDAQ:INTC) jumped 5.4% in the afternoon session after the stock continued to rally following news of a preliminary chip-making deal with Apple, a significant analyst price target increase, and reports of potential acquisition talks."
+    },
+    {
+      "title": "Trump said he'd 'remember' companies that didn't apply for tariff refunds. Many of them are anyway",
+      "source": "CNBC",
+      "published_at": "2026-05-22T07:23:13+00:00",
+      "url": "https://finnhub.io/api/news?id=cd1ec8f796ba9599ec2503bf73025bc342b2ce549b327c97e7d70a84e23cfc4a",
+      "summary": "CNBC's Megan Cassella joins 'Squawk Box' with the latest news."
+    },
+    {
+      "title": "Trump said he'd 'remember' companies that didn't apply for tariff refunds. Many of them are anyway",
+      "source": "CNBC",
+      "published_at": "2026-05-22T07:00:01+00:00",
+      "url": "https://finnhub.io/api/news?id=835c2223ec1ee1d85e788a55093e03f26268f480eca164e23da1019d7636980f",
+      "summary": "Walmart confirmed to CNBC it has sought a tariff refund and plans to use any money it receives back to invest in lower prices for shoppers."
+    },
+    {
+      "title": "Asia's AI Trade Is Expanding Beyond Taiwan Semiconductor: Analyst",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T06:32:17+00:00",
+      "url": "https://finnhub.io/api/news?id=9dcaa2727a256bcb1d8567a6e215994310ced0adf8d0336cecbaed204cc7f413",
+      "summary": "As the AI trade broadens, investors rotate from Taiwan Semiconductor to emerging winners like MediaTek and Samsung."
+    },
+    {
+      "title": "Google's AI Glasses Threaten Meta's 80% Market Grip, Analyst Says",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T05:56:29+00:00",
+      "url": "https://finnhub.io/api/news?id=6188c5ad5fd851558b37ade0dd820351c91dcb1f80d2f8cb19a4af223c505ffb",
+      "summary": "Google partners with Samsung, Warby Parker, and Gentle Monster for new Android XR glasses to challenge Meta's market lead."
+    },
+    {
+      "title": "Analysis-ECB, banks rift hampers Europe's efforts to loosen reliance on US payments giants",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T05:09:39+00:00",
+      "url": "https://finnhub.io/api/news?id=f939f04ce322d084fdba7b4cbdde428011300691a1a50d921bdefc9782a48574",
+      "summary": "Europe's push to curb its dependence on U.S. payments giants Visa and Mastercard has driven a wedge between the European Central Bank and financial firms keen to shield revenues, hobbling efforts to build a home-grown system, several people involved said. A surge in cashless payments since the COVID-19 pandemic has increased the euro zone's reliance on U.S. firms, which handle nearly two thirds of card payments in the bloc. European policymakers have made payments sovereignty a strategic priority, as a fragmenting global order raises the risk of access to payments systems being weaponised and new forms of money challenge the euro's role."
+    },
+    {
+      "title": "Nvidia Is Going To Have To Do An Apple On Dividends, Says Jim Cramer: Sounds 'Boring' But It Works",
+      "source": "Benzinga",
+      "published_at": "2026-05-22T04:17:41+00:00",
+      "url": "https://finnhub.io/api/news?id=40660d43caaa32a1914034c7677823ed279e47797f12e520a82efa217fa5bbdb",
+      "summary": "Nvidia's dividend hike still offers a modest yield, reinforcing that mega-cap AI stocks are built for growth rather than income."
+    },
+    {
+      "title": "AGD: Good Fund, But Tech Exposure And Valuation Could Be Risks",
+      "source": "SeekingAlpha",
+      "published_at": "2026-05-22T04:07:04+00:00",
+      "url": "https://finnhub.io/api/news?id=750cd53037bbccd3d0308ad74fef99c8df0c53597b2513a4ff4f8313e11ec9a6",
+      "summary": "The abrdn Global Dynamic Dividend Fund offers an 11.52% yield by investing primarily in global equities, focusing on dividend income. Read more on AGD CEF here."
+    },
+    {
+      "title": "AMD asking partners to ramp up production, CEO says",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T02:13:29+00:00",
+      "url": "https://finnhub.io/api/news?id=d79d321c16e5e4c68df0a003f3e6ba71e84dc772870cef7768e2b46a46d093b7",
+      "summary": "Advanced Micro Devices CEO Lisa Su said on Friday in Taipei that the company was asking its partners to ramp up production given strong demand for AI. AMD is a major customer of TSMC, the world's largest contract chipmaker. (Reporting by Wen-Yee Lee; Writing by Ben Blanchard; Editing by Jacqueline Wong)"
+    },
+    {
+      "title": "Guzman Y Gomez Gives Up on Failing US Business; Shares Soar",
+      "source": "Yahoo",
+      "published_at": "2026-05-22T00:24:38+00:00",
+      "url": "https://finnhub.io/api/news?id=de955812c72740c7543f76eb6e5b2ca208d7270926ce80fbf402ba3b33776fc6",
+      "summary": "(Bloomberg) -- Australian burrito chain Guzman y Gomez Ltd. said it's closing its Chicago restaurants and exiting the US after failing to generate adequate sales. The company's shares soared.Most Read from BloombergSpot the Difference: Putin Gets Trump Treatment From Xi in ChinaIran Says the US's Latest Proposal Has 'Narrowed the Gaps'Modi's Toffee Gift to Meloni Ignites Rally in Wrong Indian StockIran in Talks With Oman Over Permanent Hormuz Toll SystemDow Average Climbs to Record on US-Iran De"
+    },
+    {
+      "title": "CNBC Daily Open: Wall Street set for a winning week",
+      "source": "CNBC",
+      "published_at": "2026-05-22T01:59:17+00:00",
+      "url": "https://finnhub.io/api/news?id=3f50401c3080bbac90e22fe87a0c6bdd9440cc73e3e4c6f208e7bc5da0caaea0",
+      "summary": "Major U.S. markets look set to end the week in the green despite a rocky start to the week's trade with bond market jitters still a concern."
+    },
+    {
+      "title": "Lenovo's biggest challenge - exploding memory prices: Analyst",
+      "source": "CNBC",
+      "published_at": "2026-05-22T01:22:17+00:00",
+      "url": "https://finnhub.io/api/news?id=b17c7fa322f62785e9b8afe0f218d324f72f73355ce5db0fd7453749e7272614",
+      "summary": "Despite Lenovo's record $83 billion in revenues and a 26-year stock high, Counterpoint Research's Ivan Lam warns that surging memory costs remain the key risk ahead, which may squeeze margins and force price hikes that could dampen consumer demand, just as Lenovo pushes for $100 billion in two years."
+    }
+  ],
+  "warnings": []
+}

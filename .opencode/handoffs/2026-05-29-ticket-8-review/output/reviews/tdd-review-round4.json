@@ -1,0 +1,167 @@
+{
+  "verdict": "APPROVE",
+  "blocking_issues": [],
+  "moderate_issues": [
+    "M1 — AC-09 HTML well-formedness approach: Python's html.parser.HTMLParser is a lenient streaming parser (Python 3.4+) that does NOT raise on unbalanced tags, making 'parseable without error' trivially true. The test needs a custom subclass that tracks open/close tag balance (excluding void elements like <link>, <meta>, <br>). This is testable but requires moderate effort in the test helper — the spec should be explicit about the approach (custom HTMLParser subclass with void-element list).",
+    "M2 — AC-01 'configured TICKERS list' reference: The AC says 'all 10 ticker symbols from the configured TICKERS list' but ReportGenerator.generate() receives ReportInput.ticker_signals which may not match config.TICKERS exactly (order, subset). The assertion should verify tickers appear in the input signals, not in config.TICKERS. The current wording creates a subtle ambiguity if config.TICKERS and input signals diverge.",
+    "M3 — AC-11 only tests empty date: _validate_date() also validates YYYY-MM-DD format, raising ValueError for invalid formats. There's no AC for invalid date strings (e.g. '2026/05/28', 'not-a-date'). The format validation code will be written but not tested by any AC. Consider adding an AC or noting this as a purposeful scope gap.",
+    "M4 — File output directory creation: The spec says files are saved to data/processed/reports/{report_id}.{txt,json,html} but doesn't mention creating that directory (os.makedirs). The orchestrate.run_report_generation() will fail if the directory doesn't exist. Tests for orchestration will need to handle filesystem setup or mock the file writes."
+  ],
+  "low_issues": [
+    "L1 — AC-07 only covers text/HTML for market_return=None: JSON correctly uses null per the format spec, but this JSON-specific behavior (null vs number) is not tested by any AC. Low priority since it's explicitly documented.",
+    "L2 — No AC for empty warnings case: The JSON format spec says 'omit warnings if empty' but no AC tests this path. If warnings is an empty list or None, the JSON should omit the key. Acceptable scope gap since it's in the format spec.",
+    "L3 — Smoke test (30s) is a benchmark, not enforced: This is by design and correctly positioned. No action needed."
+  ],
+  "ac_validation": [
+    {
+      "criterion": "AC-01",
+      "text": "Given 10 TradingSignal objects (buy/sell/hold mix), When ReportGenerator.generate() is called, Then returns ReportResult whose text report contains all 10 ticker symbols from the configured TICKERS list, json is a valid parseable JSON string, and html contains `<table>` and `</html>` tags",
+      "testable": true,
+      "issues": [
+        "Ambiguous reference: 'configured TICKERS list' could mean config.TICKERS or the input ticker_signals. These could differ in order or membership. Recommend: 'contains all ticker symbols from the input ticker_signals'"
+      ],
+      "suggested_fix": "Change 'configured TICKERS list' to 'input ticker_signals' to remove ambiguity about which ticker source is authoritative"
+    },
+    {
+      "criterion": "AC-02",
+      "text": "Given 10 TradingSignal objects with known tickers, When text report is inspected, Then each ticker symbol, signal label, and confidence value appears in the output",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-03",
+      "text": "Given 10 TradingSignal objects, When JSON report is parsed, Then it is valid JSON with a `signals` array containing entries that each have all 6 TradingSignal fields: `ticker`, `signal`, `confidence`, `sentiment_score`, `market_return`, and `rationale`",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-04",
+      "text": "Given 3 ValidationWarning objects with varying categories, When ReportGenerator.generate() is called with warnings included, Then all three formats contain warning content: text has a 'Warnings' section, JSON has a `warnings` key with 3 entries, HTML has warning content in a styled warning section below the table",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-05",
+      "text": "Given an empty list of TradingSignal objects, When ReportGenerator.generate() is called, Then ValueError is raised with a descriptive message",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-06",
+      "text": "Given None as ReportInput, When ReportGenerator.generate() is called, Then TypeError is raised with a descriptive message",
+      "testable": true,
+      "issues": [
+        "Requires explicit type guard: `if input is None: raise TypeError(...)` at top of generate(). The type hint says `input: ReportInput` (not `Optional[ReportInput]`), but the None guard is needed for runtime behavior — same pattern as Ticket 7's AC-08 in TradingSignalGenerator.generate()"
+      ],
+      "suggested_fix": "No fix needed — implementation must add the explicit guard (documented pattern from Ticket 7)"
+    },
+    {
+      "criterion": "AC-07",
+      "text": "Given TradingSignal objects where some have market_return=None, When the text and HTML reports are inspected, Then those entries show 'N/A' for the market return",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-08",
+      "text": "Given a ReportResult, When report_id is inspected, Then it is an 8-character hex string matching `^[0-9a-f]{8}$`",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-09",
+      "text": "Given a generated HTML report, When parsed by Python's html.parser, Then it is well-formed HTML (no unclosed tags, parseable without error)",
+      "testable": true,
+      "issues": [
+        "Python's html.parser.HTMLParser (3.4+) does NOT raise on malformed HTML — it's a lenient streaming parser. 'Parseable without error' is always true for any HTML-like text. Need a custom subclass with tag-stack tracking and void-element awareness (<link>, <meta>, <br>, etc.) to detect unclosed tags. This is testable but requires a non-trivial test utility."
+      ],
+      "suggested_fix": "Specify the testing approach: 'Use a custom HTMLParser subclass that tracks the tag stack (excluding void elements) and asserts the stack is empty after parsing.' Or add an importable test helper in tests/fixtures/report_data.py."
+    },
+    {
+      "criterion": "AC-10",
+      "text": "Given 10 TradingSignal objects, When all three formats are inspected, Then the number of data lines in the text format (excluding the preamble: Report header, blank line, column headers, and separator line) equals the length of the `signals` array in JSON and equals the number of `<tr>` rows in HTML (excluding the header row)",
+      "testable": true,
+      "issues": [
+        "Preamble line counting needs precise definition. From the format spec, 'Report header' spans 3 lines (date, ID, === separator), then blank line, then column headers, then ---- separator — total 6 lines before data. The AC's 'preamble' as 4 components is clear in context of the format spec but could be off-by-one if 'Report header' is interpreted as 1 line instead of 3."
+      ],
+      "suggested_fix": "Consider clarifying: 'the preamble (report title + ID + separator + blank line + column headers + separator = 6 lines)' to match the format spec exactly"
+    },
+    {
+      "criterion": "AC-11",
+      "text": "Given an empty string as date, When run_report_generation() is called, Then ValueError is raised with a descriptive message",
+      "testable": true,
+      "issues": [
+        "Only tests empty string. The _validate_date() function also validates YYYY-MM-DD format. Invalid formats like 'not-a-date' or '2026/05/28' would also raise ValueError but are untested by any AC."
+      ],
+      "suggested_fix": "Consider adding AC-12 for invalid date format, or accept the scope gap as intentional"
+    }
+  ],
+  "infrastructure_readiness": [
+    {
+      "requirement": "TradingSignal test fixtures",
+      "status": "MISSING",
+      "location": "tests/fixtures/report_data.py (to be created)",
+      "notes": "TradingSignal is a pure dataclass — construct directly in fixtures. No mocking needed. signal_data.py has SentimentResult + MarketData fixtures but no TradingSignal fixtures."
+    },
+    {
+      "requirement": "ValidationWarning test fixtures",
+      "status": "MISSING",
+      "location": "tests/fixtures/report_data.py (to be created)",
+      "notes": "ValidationWarning is a pure dataclass — construct directly. No existing ValidationWarning fixtures anywhere in the codebase."
+    },
+    {
+      "requirement": "ReportInput / ReportResult test fixtures",
+      "status": "MISSING",
+      "location": "tests/fixtures/report_data.py (to be created)",
+      "notes": "8 fixtures planned: buy/sell/hold/no-market signals, mixed list of 10, empty list, warnings list, full ReportInput. All direct dataclass construction."
+    },
+    {
+      "requirement": "conftest registration",
+      "status": "MISSING",
+      "location": "tests/conftest.py",
+      "notes": "Need to add 'tests.fixtures.report_data' to pytest_plugins. Standard pattern — same as sentiment_data and signal_data."
+    },
+    {
+      "requirement": "Mock torch / FinBertSentiment for orchestration tests",
+      "status": "NOT_NEEDED_FOR_UNIT_TESTS",
+      "location": null,
+      "notes": "ReportGenerator.generate() is pure Python string manipulation — no torch dependency. ACs are testable at the ReportGenerator unit level without any mocking. Orchestration tests (run_report_generation) would need FinBertSentiment mocked, but those are integration-level tests outside the AC scope."
+    },
+    {
+      "requirement": "TICKERS config",
+      "status": "MISSING",
+      "location": "src/generate/config.py (to be created)",
+      "notes": "Trivial — 10-ticker list. Tests can import and verify tickers appear in output."
+    },
+    {
+      "requirement": "load_fused_record file path pattern",
+      "status": "MISSING",
+      "location": "src/generate/orchestrate.py (to be created)",
+      "notes": "reads data/processed/fused/{ticker}_{date}.json. For integration tests, need to verify FusedRecordWriter output path pattern matches. Not needed for unit AC tests."
+    },
+    {
+      "requirement": "report output directory",
+      "status": "MISSING",
+      "location": "data/processed/reports/",
+      "notes": "Directory doesn't exist yet. run_report_generation() needs os.makedirs(). Tests for file output will need tmp_path or mocked filesystem."
+    }
+  ],
+  "coverage_analysis": {
+    "happy_path": "COVERED",
+    "error_cases": "COVERED",
+    "edge_cases": "COVERED"
+  },
+  "risk_assessment": {
+    "comparison_to_prior_tickets": "Significantly better spec quality than Ticket 6 (3 vague ACs) and Ticket 7 (3 vague ACs). This ticket arrived with 11 well-structured ACs, concrete format specs, verified API types, and round 3 issues are resolved. The AC-to-test mapping is clear. The spec benefits from patterns established in Tickets 6 and 7 (explicit error types, dataclass-based models, format templates).",
+    "mock_complexity_estimate": "LOW — ReportGenerator is pure string formatting/markup logic. No torch, no GPU, no external APIs, no httpx mocking. All dependencies (TradingSignal, ValidationWarning) are pure dataclasses constructed directly in fixtures. This is simpler than Ticket 7 (which had signal logic formulas to validate) and far simpler than Ticket 6 (which needed MockTensor infrastructure).",
+    "fixture_estimate": "LOW — 8 fixtures as specified, all direct dataclass construction. No mocking helpers or custom infrastructure needed. Contrast with Ticket 6 which needed MockTensor, sys.modules injection, and mock softmax infrastructure.",
+    "orchestration_test_difficulty": "MEDIUM — If run_report_generation() is integration-tested, it needs: (1) temporary filesystem with FusedRecord JSON files, (2) mocked FinBertSentiment (or real model), and (3) file output verification. But the ACs are testable at the pure ReportGenerator unit level, so orchestration testing is optional for AC verification.",
+    "html_validation_test_difficulty": "MODERATE — AC-09 requires custom HTMLParser subclass with tag-stacking logic and void-element list. Straightforward but more code than typical assertions."
+  },
+  "summary": "**Verdict: APPROVE** — All 11 ACs are testable with concrete inputs and outputs. The 3 round-3 moderate issues (M1 AC-04 wording, M2 AC-10 preamble, M3 file output gap) have been resolved. The API types import correctly from existing source files. Dependencies [Ticket 4, Ticket 6, Ticket 7] are correct and sufficient. The two-step orchestration design is sound with clear separation between ReportGenerator (pure formatting) and orchestrate.py (file I/O, model loading).\n\n**4 moderate issues remain**, none blocking:\n1. AC-09 HTML well-formedness needs a custom HTMLParser subclass (Python's HTMLParser doesn't validate by default)\n2. AC-01 'configured TICKERS list' references config rather than input signals\n3. AC-11 only tests empty date, not invalid formats (code will exist but untested)\n4. File output directory creation not mentioned in spec\n\n**Mock complexity is LOW** — ReportGenerator is pure string formatting. No torch, GPU, or external dependencies. All 8 planned fixtures use direct dataclass construction. This is the simplest test infrastructure among Tickets 6, 7, and 8.\n\n**Risk is low** — Prior post-mortem lessons applied: explicit error types (AC-05/06/11), concrete format specs (text/JSON/HTML), verified import paths, documented warning propagation, clear orchestration boundary."
+}

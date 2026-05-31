@@ -1,0 +1,191 @@
+{
+  "verdict": "NEEDS_REVISION",
+  "blocking_issues": [
+    "BLOCKING-1: Pipeline integration — single-ticker vs multi-ticker architecture conflict. The existing `src/pipeline.py::run_pipeline()` is designed for a single ticker (takes `--ticker AAPL`). The ticket's Stage 7 proposes collecting results from all 10 tickers, but the current architecture has no multi-ticker loop or accumulation mechanism. The ticket does not specify whether the pipeline should be rewritten with a multi-ticker loop, or if Stage 7 should be a separate orchestration that reads pre-computed signal outputs from disk. This architectural gap is not addressed and could require significant refactoring.",
+    "BLOCKING-2: Pipeline integration — FusedRecord.warnings are not propagated to downstream stages. `FusedRecord.warnings` are generated in Stage 3 (fusion) and written to disk in Stage 4, but are never passed to Stage 5 (sentiment), Stage 6 (signal), or proposed Stage 7 (report). The current pipeline only passes `fused.market_data` to `TradingSignalGenerator.generate()`. The ticket's Stage 7 plan assumes `FusedRecord.warnings` are available at report generation time, but the pipeline data flow does not support this. Either warnings must be threaded through all stages, or Stage 7 must re-read FusedRecord from disk."
+  ],
+  "moderate_issues": [
+    "MODERATE-1: JSON representation of `market_return=None` is unspecified. AC-07 says text/HTML should show 'N/A' for None market_return, but the JSON format is silent on this. The JSON format example shows `\"market_return\": 0.05` (a number). If market_return is None, the JSON output could be `null`, the key could be omitted, or it could crash with serialization error. This needs to be specified explicitly. Note: `json.dumps()` will serialize None to `null` by default, but the spec should confirm this is the intended behavior.",
+    "MODERATE-2: Text format is an example, not a spec. Column widths, decimal precision for confidence/sentiment, percentage formatting for market_return, and rationale truncation width are all unspecified. The example shows '+0.70' for sentiment and '0.65' for confidence but doesn't specify the format string (e.g., `{sentiment_score:+.2f}`, `{confidence:.2f}`). Tests that check exact text output will be fragile without a locked-down format spec.",
+    "MODERATE-3: AC-03 only verifies 3 of 6 TradingSignal fields in JSON output. The JSON format spec says entries 'mirror TradingSignal fields (ticker, signal, confidence, sentiment_score, market_return, rationale)' but AC-03 only checks for `ticker`, `signal`, and `confidence`. Tests could pass even if `sentiment_score`, `market_return`, or `rationale` are missing. AC-03 should be expanded to verify all 6 fields exist.",
+    "MODERATE-4: AC-01 'non-empty text' assertion is weak. Any string with length > 0 would trivially pass. Should specify minimum content (e.g., contains date, report_id, and at least some signal data). Compare with AC-02 which is more specific — AC-01 should be tightened.",
+    "MODERATE-5: No AC for invalid/empty `date` string. The `ReportInput.date` is typed as `str` with no format validation. An empty string or malformed date would produce 'Report: ' or 'Report: bad-date' in output. No error path or behavior is specified for this case. Either validation should be added (raising ValueError) or the spec should state that the date is passed through verbatim.",
+    "MODERATE-6: AC-10 'same number of entries' is ambiguous for text format. For JSON it's clear (len of signals array), for HTML it's clear (count of table rows). For text, it's unclear whether 'entries' means data lines, non-empty lines, or parsed rows. This should be specified (e.g., 'count of non-header, non-separator lines in the table section').",
+    "MODERATE-7: No existing TradingSignal or ValidationWarning fixtures. Tests need direct TradingSignal objects (pre-constructed, not via generator) and ValidationWarning objects. `tests/fixtures/signal_data.py` only has SentimentResult and MarketData fixtures (inputs to the generator, not the output). A new fixture module (e.g., `tests/fixtures/report_data.py`) with ~8-10 fixtures is needed and must be registered in `tests/conftest.py`.",
+    "MODERATE-8: Ticket 7 added TradingSignal dataclass in `src/model/pretrained/signals.py`. Ticket 8 proposes placing ReportInput/ReportResult in `src/generate/models.py`. This creates a layering question: should report models live next to the reporter (proposed), or in the shared model layer? This is an architectural consistency concern worth clarifying."
+  ],
+  "low_issues": [
+    "LOW-1: AC-05/AC-06 'descriptive message' is vague. Any non-empty string message passes. Ticket 7's AC-08 faced the same issue and was resolved by checking the message contains specific text. Consider specifying message content (e.g., 'must contain \"ticker_signals\" or \"empty\"').",
+    "LOW-2: Missing edge case: all signals with market_return=None. AC-07 tests 'some' signals with None, but 'all' could expose different code paths (e.g., no percentage formatting needed at all). Low probability of bug but worth a test.",
+    "LOW-3: Smoke test (30-second benchmark) has unclear enforcement. Moved out of ACs (good), but no pytest marker or skip-if-CI mechanism defined. Should be `@pytest.mark.smoke` or `@pytest.mark.benchmark` with a clear skip condition."
+  ],
+  "ac_validation": [
+    {
+      "criterion": "AC-01",
+      "text": "Given 10 TradingSignal objects (buy/sell/hold mix), When ReportGenerator.generate() is called, Then returns ReportResult with non-empty text, parseable JSON string, and HTML containing `<table>` and `</html>` tags",
+      "testable": true,
+      "issues": [
+        "'non-empty text' assertion is weak — any string of length > 0 passes. Should specify expected content (e.g., contains report header, at least some ticker symbols, date)",
+        "'parseable JSON string' is clear via `json.loads()`",
+        "'HTML containing `<table>` and `</html>`' is testable via `in` checks"
+      ],
+      "suggested_fix": "Replace 'non-empty text' with concrete assertions: 'text contains the report date, the report_id, and at least 3 unique ticker symbols from the input signals'"
+    },
+    {
+      "criterion": "AC-02",
+      "text": "Given 10 TradingSignal objects with known tickers, When text report is inspected, Then each ticker symbol, signal label, and confidence value appears in the output",
+      "testable": true,
+      "issues": [
+        "Confidence value format (digits of precision) is not specified — e.g., 0.65 vs 0.6500 vs 0.7. Tests may falsely fail due to format mismatch."
+      ],
+      "suggested_fix": "Add a format note: 'confidence values formatted to 2 decimal places (e.g., 0.65)' or specify the Python format string"
+    },
+    {
+      "criterion": "AC-03",
+      "text": "Given 10 TradingSignal objects, When JSON report is parsed, Then it is valid JSON with a `signals` array containing entries that each have `ticker`, `signal`, and `confidence` fields",
+      "testable": true,
+      "issues": [
+        "Only checks 3 of 6 TradingSignal fields. The JSON format spec says entries 'mirror TradingSignal fields (ticker, signal, confidence, sentiment_score, market_return, rationale)' but AC-03 doesn't verify sentiment_score, market_return, or rationale exist. Tests could pass with incomplete output.",
+        "No verification of data type correctness (e.g., confidence is a number, not a string)"
+      ],
+      "suggested_fix": "Expand AC-03: 'entries each have all 6 TradingSignal fields: ticker (str), signal (str), confidence (float), sentiment_score (float), market_return (float | None), rationale (str)'"
+    },
+    {
+      "criterion": "AC-04",
+      "text": "Given 3 ValidationWarning objects with varying categories, When ReportGenerator.generate() is called with warnings included, Then all three formats contain warning content: text has a 'Warnings' section, JSON has a `warnings` key with 3 entries, HTML has warning rows within the report",
+      "testable": true,
+      "issues": []
+    },
+    {
+      "criterion": "AC-05",
+      "text": "Given an empty list of TradingSignal objects, When ReportGenerator.generate() is called, Then ValueError is raised with a descriptive message",
+      "testable": true,
+      "issues": [
+        "'descriptive message' is vague — any non-empty string qualifies. Should be tightened to include specific key phrases (e.g., 'must contain at least one signal' or 'empty')."
+      ],
+      "suggested_fix": "Add: 'ValueError message includes the phrase \"ticker_signals\" or \"empty\"'"
+    },
+    {
+      "criterion": "AC-06",
+      "text": "Given None as ReportInput, When ReportGenerator.generate() is called, Then TypeError is raised with a descriptive message",
+      "testable": true,
+      "issues": [
+        "Same 'descriptive message' ambiguity as AC-05."
+      ],
+      "suggested_fix": "Add: 'TypeError message includes the phrase \"ReportInput\" or \"None\"'"
+    },
+    {
+      "criterion": "AC-07",
+      "text": "Given TradingSignal objects where some have market_return=None, When the text and HTML reports are inspected, Then those entries show 'N/A' for the market return",
+      "testable": true,
+      "issues": [
+        "Only text and HTML are mentioned — what about JSON format? If market_return is None in the JSON output, it would serialize as `null`. The spec should confirm this is acceptable or specify behavior.",
+        "'N/A' is concrete and testable via string search. Good."
+      ],
+      "suggested_fix": "Either: (a) confirm JSON renders None as `null` (add note), or (b) add 'JSON report contains `null` for market_return values when the field is None'"
+    },
+    {
+      "criterion": "AC-08",
+      "text": "Given a ReportResult, When report_id is inspected, Then it is an 8-character hex string matching `^[0-9a-f]{8}$`",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": "None needed — regex is concrete and testable"
+    },
+    {
+      "criterion": "AC-09",
+      "text": "Given a generated HTML report, When parsed by Python's html.parser, Then it is well-formed HTML (no unclosed tags, parseable without error)",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": "None needed — testable via `from html.parser import HTMLParser; parser = HTMLParser(); parser.feed(html)`"
+    },
+    {
+      "criterion": "AC-10",
+      "text": "Given 10 TradingSignal objects, When all three formats are inspected, Then the same number of entries appear in each format",
+      "testable": true,
+      "issues": [
+        "'Same number of entries' is ambiguous for text format. JSON has a `signals` array (countable). HTML has `<tr>` rows (countable). Text could be parsed by counting lines, non-header lines, or data rows — each gives different results.",
+        "What about warnings entries? Should the count include only signals, or signals+warnings? Not specified."
+      ],
+      "suggested_fix": "Clarify: 'the same number of signal entries appear in each format, defined as: JSON signals array length, HTML data rows (excluding header), and text data lines (excluding header, separator lines, and warnings section)'"
+    }
+  ],
+  "infrastructure_readiness": [
+    {
+      "requirement": "TradingSignal fixtures (direct construction, for report tests)",
+      "status": "MISSING",
+      "location": "N/A",
+      "notes": "Existing `tests/fixtures/signal_data.py` has SentimentResult and MarketData fixtures (inputs to signal generator), but no pre-constructed TradingSignal fixtures. Need ~6-8 TradingSignal fixtures with buy/sell/hold mix, with/without market_return=None, to support AC-01/02/03/07/10."
+    },
+    {
+      "requirement": "ValidationWarning fixtures",
+      "status": "MISSING",
+      "location": "N/A",
+      "notes": "No existing ValidationWarning fixtures anywhere in the test suite. Need ~3 fixtures with varying categories for AC-04. Can be constructed via direct dataclass call."
+    },
+    {
+      "requirement": "ReportInput / ReportResult fixtures",
+      "status": "MISSING",
+      "location": "N/A",
+      "notes": "ReportInput and ReportResult are new types proposed in this ticket. No fixtures exist yet. Could be constructed inline or via pytest fixtures."
+    },
+    {
+      "requirement": "New fixture module registration in conftest.py",
+      "status": "MISSING",
+      "location": "tests/conftest.py",
+      "notes": "Any new fixture file (e.g., `tests/fixtures/report_data.py`) must be added to `pytest_plugins` list in conftest.py, following existing pattern."
+    },
+    {
+      "requirement": "Test file for reporter",
+      "status": "MISSING",
+      "location": "N/A",
+      "notes": "No `tests/test_reporter.py` file exists. Needs to be created with tests for each AC."
+    },
+    {
+      "requirement": "Package files (src/generate/models.py, config.py, reporter.py)",
+      "status": "MISSING",
+      "location": "src/generate/",
+      "notes": "These files do not exist. Current `src/generate/` contains only `__init__.py` (placeholder) and `__main__.py` (placeholder). All three files need to be created."
+    },
+    {
+      "requirement": "Signal fixtures registered in conftest",
+      "status": "EXISTS",
+      "location": "tests/conftest.py",
+      "notes": "`tests.fixtures.signal_data` is already registered in pytest_plugins."
+    },
+    {
+      "requirement": "TradingSignal dataclass importable",
+      "status": "EXISTS",
+      "location": "src/model/pretrained/signals.py",
+      "notes": "TradingSignal is defined at `src.model.pretrained.signals.TradingSignal`. Importable and ready."
+    },
+    {
+      "requirement": "ValidationWarning dataclass importable",
+      "status": "EXISTS",
+      "location": "src/preprocess/validator.py",
+      "notes": "ValidationWarning is defined at `src.preprocess.validator.ValidationWarning`. Importable and ready."
+    },
+    {
+      "requirement": "html.parser available for AC-09",
+      "status": "EXISTS",
+      "location": "stdlib (html.parser)",
+      "notes": "Python standard library — no dependencies needed."
+    },
+    {
+      "requirement": "Mock torch / GPU handling",
+      "status": "NOT_APPLICABLE",
+      "location": "N/A",
+      "notes": "Report generation is pure string formatting. No torch dependency, no GPU concerns, no external API calls. Similar to Ticket 7 — direct dataclass construction is sufficient."
+    }
+  ],
+  "coverage_analysis": {
+    "happy_path": "COVERED",
+    "error_cases": "PARTIALLY_COVERED",
+    "edge_cases": "PARTIALLY_COVERED"
+  },
+  "risk_assessment": {
+    "comparison_to_prior_tickets": "This ticket is structurally more solid than initial versions of Ticket 6 and Ticket 7. The AC count (10) is adequate. The format specs are detailed enough to implement against with some ambiguity. The API spec types correctly reference existing dataclasses. The main risk is pipeline integration — both blocking issues stem from the pipeline not being architected for multi-ticker aggregation. The previous post-mortems for Ticket 7 emphasized that dependency analysis catches gaps the spec review misses. Here, the pipeline data flow analysis reveals the same kind of gap: the spec assumes warnings propagate to the report stage, but the actual pipeline code doesn't support this.",
+    "mock_complexity_estimate": "NONE — Report generation is pure string formatting and JSON serialization. No torch/GPU/external dependencies. All test inputs are direct dataclass construction (TradingSignal, ValidationWarning). No MagicMock gotchas, no MockTensor, no sys.modules injection. Similar complexity to Ticket 7's test infrastructure.",
+    "fixture_estimate": "8-10 fixtures needed: (1) sample_trading_signal_buy, (2) sample_trading_signal_sell, (3) sample_trading_signal_hold, (4) sample_trading_signal_no_market_return, (5) sample_report_input_10_signals, (6) sample_report_input_with_warnings, (7) sample_validation_warning_1/2/3, (8) sample_report_result. These should be placed in a new `tests/fixtures/report_data.py` and registered in conftest."
+  },
+  "summary": "The updated Ticket 8 is substantially improved over any hypothetical prior version — it has 10 well-structured ACs, detailed format specs, matching API spec types, and a reasonable complexity rating. However, two blocking pipeline integration issues remain: (1) the existing pipeline is single-ticker but Stage 7 requires multi-ticker aggregation, and (2) FusedRecord.warnings are not propagated through the pipeline to the report stage. These are genuine architectural gaps that would cause implementation failures (similar to the dependency analysis discoveries in Ticket 7's implementation). Additionally, there are 8 moderate issues around format ambiguity, weak AC assertions, missing fixtures, and JSON null representation that should be resolved before implementation. The mock complexity is the lowest of any ticket so far — pure string operations, no external dependencies. APPROVAL is conditional on resolving the two blocking pipeline issues and at least the moderate-level format/AC ambiguities."
+}

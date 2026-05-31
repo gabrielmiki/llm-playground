@@ -1,0 +1,296 @@
+{
+  "ticket": "Ticket 5: Tokenization Pipeline",
+  "review_timestamp": "2026-05-24",
+  "review_type": "CONTEXT-DRIVEN_RE-EVALUATION",
+  "context_sources": [
+    "docs/context/architecture.md",
+    "docs/context/pipeline.md",
+    "docs/context/process-flow.md",
+    "docs/context/financial-analysis-ticket-5.md",
+    "docs/context/financial-analysis-tickets.md",
+    "docs/context/post-mortems/2026-05-23-ticket-4-data-quality-and-fusion.md",
+    ".opencode/handoffs/2026-05-23-ticket-4-data-quality-and-fusion/handoff.md",
+    "src/preprocess/__init__.py",
+    "src/preprocess/exceptions.py",
+    "src/preprocess/fusion.py",
+    "src/preprocess/output_writer.py",
+    "src/preprocess/cleaner.py",
+    "src/preprocess/validator.py",
+    "src/collect/market_data.py",
+    "tests/conftest.py",
+    "tests/fixtures/preprocess_data.py",
+    "tests/fixtures/tracking_iterable.py",
+    "tests/test_fusion.py",
+    "pyproject.toml"
+  ],
+  "ac_validation": [
+    {
+      "criterion": "AC-001",
+      "text": "Given text \"Hello world\", When TokenizerFactory.create(\"tiktoken\").encode() is called, Then returns a list of integers with length > 0",
+      "testable": false,
+      "issues": [
+        "BLOCKING: tiktoken does NOT support a custom vocab_size — tiktoken.get_encoding(\"cl100k_base\") uses fixed pre-defined BPE encodings. The API TokenizerFactory.create(\"tiktoken\", vocab_size=8192) is fundamentally incompatible with tiktoken's design. Either drop vocab_size for tiktoken or use a different encoding selection mechanism.",
+        "CRITICAL: Missing which tiktoken encoding to use (e.g., cl100k_base, p50k_base, r50k_base). \"Hello world\" produces different token IDs depending on encoding choice.",
+        "MINOR: \"list of integers with length > 0\" is trivially true for any non-empty text. The AC should verify the expected token IDs or at minimum verify that tokens are valid for the chosen encoding (e.g., check max_token_value)."
+      ],
+      "suggested_fix": "Split into two ACs: (1) Test tiktoken with a pre-defined encoding directly (e.g., TokenizerFactory.create(\"tiktoken\", encoding=\"cl100k_base\")), verifying specific token IDs for known text. (2) Test that TokenizerFactory.create(\"tiktoken\") without vocab_size works (since tiktoken ignores vocab_size). Alternatively, restrict tiktoken's API to exclude vocab_size and use encoding_name instead."
+    },
+    {
+      "criterion": "AC-002",
+      "text": "Given token IDs, When BaseTokenizer.decode() is called, Then returns the original text (roundtrip fidelity for ASCII text)",
+      "testable": false,
+      "issues": [
+        "BLOCKING: BaseTokenizer is an abstract class (ABC). You cannot call .decode() on it directly. The AC must specify a concrete backend instance (e.g., TokenizerFactory.create(\"tiktoken\")).",
+        "CRITICAL: Roundtrip fidelity is NOT guaranteed for all backends. sentencepiece normalizes text (e.g., Unicode NFKC normalization), which means decode(encode(text)) may not return byte-identical text even for ASCII in some cases.",
+        "CRITICAL: \"for ASCII text\" — what about non-ASCII? Financial data contains currency symbols ($, €, £), ticker symbols, and international company names with diacritics. The AC should also cover non-ASCII text since this is the actual use case.",
+        "MINOR: Which backend does this test apply to? All three? The AC should be parametrized across backends."
+      ],
+      "suggested_fix": "Specify backend: \"Given text 'Hello world' tokenized via TokenizerFactory.create('tiktoken', encoding='cl100k_base'), When .decode(tokens) is called with the returned tokens, Then result equals 'Hello world'.\" Add separate ACs for non-ASCII roundtrip. Parametrize across all 3 backends with per-backend caveats."
+    },
+    {
+      "criterion": "AC-003",
+      "text": "Given TokenizerFactory.create(\"tiktoken\", vocab_size=8192), When vocab_size() is called, Then returns a positive integer",
+      "testable": false,
+      "issues": [
+        "BLOCKING: tiktoken does not accept a vocab_size parameter. Its encoding objects have a .max_token_value property (e.g., 100256 for cl100k_base). A tiktoken-based adapter would need to decide: return the configured 8192 (but tiktoken ignores it) or return the actual encoding size (but that won't be 8192). The semantics are undefined.",
+        "CRITICAL: \"returns a positive integer\" is ambiguous. Does it return the CONFIGURED vocab_size (8192) or the ACTUAL encoding vocab size? These can differ (tiktoken's cl100k_base has 100256 tokens). The AC must specify which.",
+        "MINOR: vocab_size() is less meaningful for tiktoken and sentencepiece (which use pre-defined or trained vocabularies). It's primarily relevant for tokenizers (HuggingFace) which supports training custom tokenizers."
+      ],
+      "suggested_fix": "Remove vocab_size from tiktoken's constructor entirely. For tiktoken, use encoding_name instead. Add AC: 'Given TokenizerFactory.create(\"tokenizers\", vocab_size=8192), When .vocab_size() is called, Then returns 8192.' Clarify that for fixed-encoding backends (tiktoken, sentencepiece), vocab_size() returns the actual encoding size."
+    },
+    {
+      "criterion": "AC-004",
+      "text": "Given unknown backend name \"invalid_backend\", When TokenizerFactory.create() is called, Then raises ValueError with message \"Unknown tokenizer backend: invalid_backend\"",
+      "testable": true,
+      "issues": [
+        "HIGH: Uses bare ValueError. Inconsistent with Ticket 4's exception hierarchy (PreprocessingError → LanguageFilterError, FusionError). Should raise TokenizerError(PreprocessingError) for consistency. All preprocessing exceptions inherit from PreprocessingError.",
+        "The exact error message format is testable but should be codified in the AC or api_spec."
+      ],
+      "suggested_fix": "Change to: '...Then raises TokenizerError with message matching \"Unknown tokenizer backend: invalid_backend\". Add TokenizerError to src/preprocess/exceptions.py: class TokenizerError(PreprocessingError): pass'"
+    },
+    {
+      "criterion": "AC-005",
+      "text": "Given empty string \"\", When BaseTokenizer.encode() is called, Then returns empty list []",
+      "testable": false,
+      "issues": [
+        "CRITICAL: BaseTokenizer is abstract — same issue as AC-002. Must specify a concrete backend instance.",
+        "HIGH: This behavior should be verified across ALL three backends, not just one. Different backends may handle empty strings differently (e.g., sentencepiece might return [0] instead of []).",
+        "MINOR: The AC doesn't specify which backend(s) are being tested."
+      ],
+      "suggested_fix": "Parametrize across all backends: 'Given empty string \"\", When TokenizerFactory.create(\"{backend}\").encode(\"\") is called, Then returns empty list [].' Test with tiktoken, tokenizers, and sentencepiece."
+    },
+    {
+      "criterion": "AC-006",
+      "text": "Given empty token list [], When BaseTokenizer.decode() is called, Then returns empty string \"\"",
+      "testable": false,
+      "issues": [
+        "CRITICAL: BaseTokenizer is abstract — same issue as AC-005.",
+        "HIGH: Should be parametrized across all 3 backends. Some backends may return a non-empty string for empty input.",
+        "MINOR: verify with concrete instance."
+      ],
+      "suggested_fix": "Parametrize across backends: 'Given empty token list [], When TokenizerFactory.create(\"{backend}\").decode([]) is called, Then returns empty string \"\".'"
+    },
+    {
+      "criterion": "AC-007",
+      "text": "Given text with special tokens (e.g., <|endoftext|>), When tokenized and detokenized, Then the special token is preserved as a single token ID",
+      "testable": false,
+      "issues": [
+        "CRITICAL: <|endoftext|> is a GPT-2/tiktoken-specific special token. sentencepiece and HuggingFace tokenizers do not recognize it unless explicitly configured in their special_tokens map.",
+        "HIGH: Pipeline.md Section 3 requires support for BOS, EOS, PAD, and UNK special tokens. Testing only <|endoftext|> covers only a fraction of the required special token support.",
+        "HIGH: The AC doesn't specify whether this applies to all backends or just tiktoken. Each backend has different special token mechanisms.",
+        "MEDIUM: The phrase 'preserved as a single token ID' — the AC should verify the token ID value, not just that it's a single token."
+      ],
+      "suggested_fix": "Split into multiple ACs: (1) tiktoken-specific: <|endoftext|> is preserved as a single token with known ID. (2) tokenizers: custom special token (e.g., [BOS]) is preserved after configure. (3) Add ACs for BOS, EOS, PAD, UNK per pipeline.md spec. Use Config dataclass to pass special_tokens."
+    },
+    {
+      "criterion": "AC-008",
+      "text": "Given TokenizerFactory.create(\"sentencepiece\"), When .encode(text) is called, Then the backend type is SentencePieceProcessor",
+      "testable": false,
+      "issues": [
+        "BLOCKING: sentencepiece is NOT in pyproject.toml dependencies. Cannot import SentencePieceProcessor without adding it.",
+        "HIGH: The check should be on the wrapper class (e.g., isinstance(tokenizer, SentencePieceTokenizer)) not the raw library type. The BaseTokenizer wraps backends; exposing raw library types breaks the abstraction.",
+        "MEDIUM: sentencepiece.SentencePieceProcessor is trained from a .model file — creating an instance without a trained model file will fail. The AC needs to specify how the test creates the sentencepiece tokenizer (with what model file or training data).",
+        "MINOR: 'When .encode(text) is called' — the encode call is irrelevant to the type check. This AC tests construction, not encoding."
+      ],
+      "suggested_fix": "Change to: 'Given TokenizerFactory.create(\"sentencepiece\", model_path=\"...\") or trained on sample data, When constructed, Then the result is an instance of SentencePieceTokenizer (the BaseTokenizer subclass for sentencepiece).' Add sentencepiece to pyproject.toml. Remove the encode() invocation from the type-check AC."
+    }
+  ],
+  "infrastructure_readiness": [
+    {
+      "requirement": "pyproject.toml: tiktoken dependency",
+      "status": "MISSING",
+      "location": "pyproject.toml",
+      "notes": "tiktoken is not listed in any dependency group. Must be added, likely to a new [project.optional-dependencies] tokenize or preprocess group."
+    },
+    {
+      "requirement": "pyproject.toml: tokenizers (HuggingFace) dependency",
+      "status": "MISSING",
+      "location": "pyproject.toml",
+      "notes": "HuggingFace tokenizers library is not listed in pyproject.toml. Must be added."
+    },
+    {
+      "requirement": "pyproject.toml: sentencepiece dependency",
+      "status": "MISSING",
+      "location": "pyproject.toml",
+      "notes": "sentencepiece is not listed. Note: sentencepiece requires a C++ compilation on install; verify macOS compatibility. May need to pre-download or build wheel."
+    },
+    {
+      "requirement": "tests/fixtures/tokenizer_data.py",
+      "status": "MISSING",
+      "location": "tests/fixtures/",
+      "notes": "Does not exist yet. Must be created per pattern from preprocess_data.py. Should contain: sample_ascii_text, sample_non_ascii_text, sample_financial_text (with $, tickers), sample_text_with_special_tokens, sample_multi_sentence_text."
+    },
+    {
+      "requirement": "tests/conftest.py: register tokenizer_data plugin",
+      "status": "MISSING",
+      "location": "tests/conftest.py",
+      "notes": "Must add \"tests.fixtures.tokenizer_data\" to the pytest_plugins list in conftest.py, following the established pattern for all fixture modules."
+    },
+    {
+      "requirement": "Import path consistency: pipeline.md tokenizer path",
+      "status": "MISMATCH",
+      "location": "docs/context/pipeline.md vs ticket spec",
+      "notes": "Pipeline.md documents: from src.preprocess.tokenizer import TokenizerFactory. Ticket specifies: src/preprocess/tokenizer_factory.py. These conflict. Pipeline.md is the authoritative architecture doc. Either rename the file to tokenizer.py or update pipeline.md. This must be resolved before implementation."
+    },
+    {
+      "requirement": "Existing exception hierarchy: TokenizerError",
+      "status": "MISSING",
+      "location": "src/preprocess/exceptions.py",
+      "notes": "Ticket 4's exceptions.py defines PreprocessingError (base), LanguageFilterError, FusionError. Ticket 5 needs a TokenizerError(PreprocessingError) class. AC-004 currently uses bare ValueError instead."
+    },
+    {
+      "requirement": "Existing integration with FusedRecord dataclass",
+      "status": "INCOMPLETE",
+      "location": "src/preprocess/fusion.py",
+      "notes": "FusedRecord has structured fields (ticker, date, market_data with numeric OHLCV, news_articles list). The tokenizer accepts only text: str. No contract exists for how FusedRecord → text. This blocks integration. Is it a concatenation? JSON dump? Only text fields?"
+    },
+    {
+      "requirement": "tkinter fixture discovery pattern",
+      "status": "EXISTS",
+      "location": "tests/conftest.py",
+      "notes": "Pattern is well-established: register fixture modules in pytest_plugins, create fixture files with @pytest.fixture decorators. Ticket 5 should follow the same pattern."
+    },
+    {
+      "requirement": "Streaming/lazy-evaluation infrastructure",
+      "status": "EXISTS",
+      "location": "tests/fixtures/tracking_iterable.py",
+      "notes": "TrackingIterable factory fixture exists for lazy-evaluation tests. Ticket 5 may need streaming support (e.g., encode_many) if following Ticket 4 patterns. Currently no streaming method is specified."
+    }
+  ],
+  "coverage_analysis": {
+    "happy_path": {
+      "status": "MISSING",
+      "details": "AC-001 covers basic tiktoken encode (happy path), AC-002 covers decode roundtrip (happy path), AC-008 covers sentencepiece construction. However: (1) tokenizers (HuggingFace) has ZERO happy-path coverage. (2) No AC covers train-from-scratch workflow. (3) No AC covers saving/loading tokenizers. (4) No AC covers batch encoding."
+    },
+    "error_cases": {
+      "status": "INCOMPLETE",
+      "details": "AC-004 covers unknown backend error. Missing error cases: (1) None/non-string input to encode(). (2) Non-list input to decode(). (3) Token IDs out of vocabulary range. (4) sentencepiece model file not found. (5) Invalid special_tokens config. (6) tokenizers training on empty data."
+    },
+    "edge_cases": {
+      "status": "INCOMPLETE",
+      "details": "AC-005 (empty string) and AC-006 (empty list) cover basic edge cases. Missing edge cases: (1) Very long text (>100K tokens). (2) Text with only whitespace. (3) Text with only special characters. (4) Text with Unicode surrogates. (5) Mixed-script text (Latin + CJK + Arabic). (6) Text containing only numbers. (7) Text with null bytes. (8) Extremely large vocab_size (e.g., >1M)."
+    }
+  },
+  "design_analysis": [
+    {
+      "issue": "BLOCKING: 'Fused analysis text' undefined input contract",
+      "severity": "BLOCKING",
+      "detail": "The ticket title says 'tokenization for fused analysis text' and ACs reference encode(text). But FusedRecord has structured fields: ticker (str), date (str), market_data (MarketData with numeric OHLCV + timestamp), news_articles (list of dicts with title/source/url/summary), warnings. The tokenizer takes a single string. No specification exists for how FusedRecord → string. Is it: (a) concatenation of news titles and summaries? (b) JSON dump of entire record? (c) formatted template with all fields? (d) only text fields? Downstream tickets 6-7 depend on this contract."
+    },
+    {
+      "issue": "BLOCKING: tiktoken API incompatibility with vocab_size parameter",
+      "severity": "BLOCKING",
+      "detail": "tiktoken.get_encoding('cl100k_base') uses FIXED, pre-trained BPE encodings. It does NOT support training custom tokenizers or specifying a vocab_size. The ticket API TokenizerFactory.create('tiktoken', vocab_size=8192) will silently ignore vocab_size (confusing) or fail. The API should use encoding_name for tiktoken and vocab_size only for trainable backends (tokenizers, sentencepiece)."
+    },
+    {
+      "issue": "BLOCKING: Import path mismatch with pipeline.md",
+      "severity": "BLOCKING",
+      "detail": "Pipeline.md (Section 3 Usage, line 89): from src.preprocess.tokenizer import TokenizerFactory. Ticket specifies: src/preprocess/tokenizer_factory.py. These must be reconciled. Changing pipeline.md requires updating all cross-references. Changing the ticket requires updating the file spec."
+    },
+    {
+      "issue": "BLOCKING: Missing 3 critical dependencies in pyproject.toml",
+      "severity": "BLOCKING",
+      "detail": "tiktoken, tokenizers, and sentencepiece are all absent from pyproject.toml. The preprocess optional-dependencies group only has: ftfy, langdetect, nltk, regex. These must be added before any implementation can start."
+    },
+    {
+      "issue": "HIGH: tokenizers (HuggingFace) has zero AC coverage",
+      "severity": "HIGH",
+      "detail": "The ticket specs 3 backends but only tiktoken (AC-001, AC-003) and sentencepiece (AC-008) have dedicated ACs. tokenizers (HuggingFace) is the most capable backend (trainable BPE, configurable special tokens, production-grade), yet no AC tests it. All behavioral ACs (encode, decode, empty input, special tokens) should be parametrized across all 3 backends."
+    },
+    {
+      "issue": "HIGH: Exception hierarchy inconsistent with Ticket 4 patterns",
+      "severity": "HIGH",
+      "detail": "Ticket 4 established: PreprocessingError (base) → LanguageFilterError, FusionError. Ticket 5 AC-004 uses bare ValueError instead of a TokenizerError(PreprocessingError). All preprocessing exceptions should live in src/preprocess/exceptions.py and inherit from PreprocessingError."
+    },
+    {
+      "issue": "HIGH: Special token coverage incomplete vs pipeline.md requirements",
+      "severity": "HIGH",
+      "detail": "Pipeline.md Section 3: 'Support for special tokens (BOS, EOS, PAD, UNK)'. AC-007 only tests <|endoftext|> (GPT-2 style). Missing: PAD token handling (critical for batch training), BOS/EOS for sequence generation, UNK for out-of-vocabulary handling. The TokenizerConfig dataclass has special_tokens field but no AC exercises it."
+    },
+    {
+      "issue": "MEDIUM: No saved/loaded tokenizer workflow",
+      "severity": "MEDIUM",
+      "detail": "Pipeline.md says: 'Vocab files saved alongside tokenized data'. Training a tokenizer produces model files (sentencepiece .model, tokenizers .json). The ticket has no AC for save/load lifecycle. Downstream tickets (6-7) will need to load pre-trained tokenizers, not retrain them every time."
+    },
+    {
+      "issue": "MEDIUM: Vocab size choice (8192) inconsistent with model expectations",
+      "severity": "MEDIUM",
+      "detail": "Architecture doc: GPT-2 uses 50257 vocab, BERT uses 30522. The ticket hardcodes vocab_size=8192 for custom tokenizer training. While reasonable for from-scratch training on limited financial data, the ticket should document why 8192 was chosen and how model-specific vocab sizes would override it. GPT-2 fine-tuning (Ticket 6) would need the standard 50257 GPT-2 vocab, not a custom 8192 tokenizer."
+    },
+    {
+      "issue": "MEDIUM: No output format defined for tokenized data",
+      "severity": "MEDIUM",
+      "detail": "Pipeline.md data flow: 'tokenized data → data/processed/ → training-ready'. What format are tokens saved in? Parquet? JSON? PyTorch tensors (.pt)? No AC or spec defines the output contract. Downstream tickets need to know the data format to load it."
+    },
+    {
+      "issue": "MEDIUM: AC-003 vocab_size() semantics ambiguous",
+      "severity": "MEDIUM",
+      "detail": "'Returns a positive integer' — does it return the CONFIGURED value (8192) or the ACTUAL encoding vocab size (which may differ for pre-trained encodings)? For tokenizers with train=True, the actual vocab may be less than the requested size. The specification must clarify which."
+    },
+    {
+      "issue": "MEDIUM: No streaming/batch encoding support",
+      "severity": "MEDIUM",
+      "detail": "Ticket 4 established streaming patterns (encode_many, validate_many, etc.) with lazy-evaluation tests. Pipeline.md requires streaming for large datasets. The ticket has no encode_many() method or batch-processing support. This is likely needed for production use in downstream tickets."
+    },
+    {
+      "issue": "LOW: AC-002 references abstract BaseTokenizer.decode()",
+      "severity": "LOW",
+      "detail": "BaseTokenizer is an ABC (abstract base class). You cannot instantiate or call methods on it directly. The AC should reference the concrete instance: e.g., tokenizer = TokenizerFactory.create('tiktoken', encoding='cl100k_base'); tokenizer.decode(tokens)."
+    },
+    {
+      "issue": "LOW: AC-008 type check on raw library class breaks abstraction",
+      "severity": "LOW",
+      "detail": "isinstance check against SentencePieceProcessor exposes the raw library type instead of the BaseTokenizer wrapper. Should check against the wrapper class (e.g., SentencePieceTokenizer) to maintain abstraction."
+    },
+    {
+      "issue": "LOW: AC-007 'preserved as a single token ID' — no value assertion",
+      "severity": "LOW",
+      "detail": "Should assert the specific token ID (e.g., 50256 for <|endoftext|> in GPT-2) not just 'a single token'. Also should verify that len(encode('<|endoftext|>')) == 1."
+    }
+  ],
+  "verdict": "NEEDS_REVISION",
+  "blocking_issues": [
+    "DEFINITION: 'Fused analysis text' is undefined — no contract for how structured FusedRecord (ticker, date, market_data with numeric OHLCV, news_articles list) is converted to input text string for the tokenizer. This blocks all downstream integration.",
+    "API DESIGN: TokenizerFactory.create('tiktoken', vocab_size=8192) is incompatible with tiktoken — tiktoken uses pre-defined fixed BPE encodings (cl100k_base, p50k_base) and does not accept a vocab_size parameter. The API must distinguish between trainable backends (tokenizers, sentencepiece) and fixed-encoding backends (tiktoken).",
+    "IMPORT PATH: Pipeline.md documents from src.preprocess.tokenizer import TokenizerFactory but ticket specifies src/preprocess/tokenizer_factory.py. Must be reconciled before implementation.",
+    "DEPENDENCIES: tiktoken, tokenizers, and sentencepiece are all missing from pyproject.toml. Implementation cannot start until dependencies are declared.",
+    "BACKEND GAP: tokenizers (HuggingFace) has zero AC coverage despite being one of 3 specified backends. All behavioral ACs must be parametrized across all backends.",
+    "EXCEPTIONS: AC-004 uses bare ValueError. Must use TokenizerError(PreprocessingError) for consistency with Ticket 4's exception hierarchy.",
+    "SPECIAL TOKENS: Pipeline.md requires BOS, EOS, PAD, UNK support but AC-007 only tests <|endoftext|>. PAD token handling is critical for model training.",
+    "OUTPUT FORMAT: No specification for how tokenized data is persisted. Pipeline.md shows 'tokenized data → data/processed/ → training-ready' but format (tensor, JSON, Arrow?) is undefined.",
+    "STREAMING: No batch encoding (encode_many) is specified, violating the streaming pattern established in Ticket 4 and required by pipeline.md for large datasets.",
+    "VOCAB SIZE: AC-003 does not specify whether vocab_size() returns the configured or actual vocab size. Different backends may have different actual vs. requested sizes."
+  ],
+  "recommendations": [
+    "1. Define a TokenizationInput protocol: specify how FusedRecord → text. Recommendation: concatenate news_articles titles+summaries with ticker as prefix. Document in pipeline.md.",
+    "2. Split tiktoken API: use encoding_name parameter instead of vocab_size for tiktoken (e.g., create('tiktoken', encoding='cl100k_base')). Keep vocab_size only for tokenizers and sentencepiece.",
+    "3. Reconcile import path: rename file to tokenizer.py (matching pipeline.md) OR update pipeline.md to tokenizer_factory.py. The former is safer (less doc drift).",
+    "4. Add all 3 dependencies to pyproject.toml under a tokenize optional-dependencies group, or extend the preprocess group.",
+    "5. Add ACs for tokenizers (HuggingFace) parametrized across all backends using @pytest.mark.parametrize.",
+    "6. Add TokenizerError to src/preprocess/exceptions.py: class TokenizerError(PreprocessingError): pass",
+    "7. Expand special token ACs: add tests for PAD (critical for batch padding), BOS/EOS (for generation), UNK (for OOV handling).",
+    "8. Define output format: recommend saving tokenized data as PyTorch .pt files (tensor of token IDs with attention_mask) matching model/training/ expectations.",
+    "9. Add encode_many() streaming method with lazy-evaluation test using existing TrackingIterable fixture.",
+    "10. Clarify vocab_size() semantics: returns actual encoding vocab size (not configured), except for tokenizers where it returns the trained vocab size."
+  ]
+}

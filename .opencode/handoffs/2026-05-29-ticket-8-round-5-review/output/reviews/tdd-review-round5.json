@@ -1,0 +1,208 @@
+{
+  "ac_validation": [
+    {
+      "criterion": "AC-01",
+      "text": "Given 10 TradingSignal objects (buy/sell/hold mix), When ReportGenerator.generate() is called, Then returns ReportResult whose text report contains all 10 ticker symbols from src.generate.config.TICKERS, json is a valid parseable JSON string, and html contains <table> and </html> tags",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-02",
+      "text": "Given 10 TradingSignal objects with known tickers, When text report is inspected, Then each ticker symbol, signal label, and confidence value appears in the output",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-03",
+      "text": "Given 10 TradingSignal objects, When JSON report is parsed, Then it is valid JSON with a signals array containing entries that each have all 6 TradingSignal fields: ticker, signal, confidence, sentiment_score, market_return, and rationale",
+      "testable": true,
+      "issues": [
+        "The 6 fields listed match TradingSignal dataclass exactly — ticker, signal, confidence, sentiment_score, market_return, rationale. ✅"
+      ],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-04",
+      "text": "Given 3 ValidationWarning objects with varying categories, When ReportGenerator.generate() is called with warnings included, Then all three formats contain warning content: text has a 'Warnings' section, JSON has a warnings key with 3 entries, HTML has warning content in a styled warning section below the table",
+      "testable": true,
+      "issues": [
+        "\"styled warning section below the table\" is minimally ambiguous — test can verify `<div class=\"warning\">` appears after `</table>` in HTML string"
+      ],
+      "suggested_fix": "No fix needed — testing approach is clear: check substring positions in HTML"
+    },
+    {
+      "criterion": "AC-05",
+      "text": "Given an empty list of TradingSignal objects, When ReportGenerator.generate() is called, Then ValueError is raised with a descriptive message",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-06",
+      "text": "Given None as ReportInput, When ReportGenerator.generate() is called, Then TypeError is raised with a descriptive message",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-07",
+      "text": "Given TradingSignal objects where some have market_return=None, When the text and HTML reports are inspected, Then those entries show 'N/A' for the market return",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-08",
+      "text": "Given a ReportResult, When report_id is inspected, Then it is an 8-character hex string matching ^[0-9a-f]{8}$",
+      "testable": true,
+      "issues": [],
+      "suggested_fix": null
+    },
+    {
+      "criterion": "AC-09",
+      "text": "Given a generated HTML report, When parsed by Python's html.parser, Then it is well-formed HTML (no unclosed tags, parseable without error)",
+      "testable": true,
+      "issues": [
+        "Previous issue M1 (html.parser leniency, no tag balance validation) is now resolved — the ticket includes a `_WellFormednessChecker` helper class with void-element awareness and a tag stack"
+      ],
+      "suggested_fix": "No fix needed — testing note with helper class is provided in the ticket"
+    },
+    {
+      "criterion": "AC-10",
+      "text": "Given 10 TradingSignal objects, When all three formats are inspected, Then the number of data lines in the text format (excluding the preamble: Report header, blank line, column headers, and separator line) equals the length of the signals array in JSON and equals the number of <tr> rows in HTML (excluding the header row)",
+      "testable": true,
+      "issues": [
+        "Preamble description lists 4 items but the text format actually has 6 lines of preamble (missing the '=' decorative separator and blank line before column headers). Test implementation should count lines between '-'*69 separator and '='*60 footer (or end-of-string if no warnings) rather than hardcoding preamble line count."
+      ],
+      "suggested_fix": "Minor — implementers can parse lines between the column separator line and the footer divider for robust counting"
+    },
+    {
+      "criterion": "AC-11",
+      "text": "Given an empty string or malformed string as date (e.g., '' or 'not-a-date'), When run_report_generation() is called, Then ValueError is raised with a descriptive message",
+      "testable": true,
+      "issues": [
+        "Testing AC-11 through run_report_generation() requires patching os.makedirs to avoid filesystem side effects, but _validate_date() runs early in the function before any ticker processing — so no FinBertSentiment or load_fused_record mocking is needed for this AC."
+      ],
+      "suggested_fix": "No fix needed — test can patch os.makedirs and call run_report_generation(invalid_date); ValueError will be raised before any model/disk operations"
+    }
+  ],
+  "infrastructure_readiness": [
+    {
+      "requirement": "src/generate/config.py — TICKERS list",
+      "status": "MISSING",
+      "location": "src/generate/config.py (to be created)",
+      "notes": "Simple constant list — no dependencies. Straightforward to create."
+    },
+    {
+      "requirement": "src/generate/models.py — ReportInput, ReportResult dataclasses",
+      "status": "MISSING",
+      "location": "src/generate/models.py (to be created)",
+      "notes": "Imports TradingSignal from src.model.pretrained.signals and ValidationWarning from src.preprocess.validator. Both exist. Import paths are valid."
+    },
+    {
+      "requirement": "src/generate/reporter.py — ReportGenerator class",
+      "status": "MISSING",
+      "location": "src/generate/reporter.py (to be created)",
+      "notes": "Core report generation. Pure Python string formatting — no torch/external deps. Straightforward to test."
+    },
+    {
+      "requirement": "src/generate/orchestrate.py — run_report_generation, load_fused_record, _validate_date",
+      "status": "MISSING",
+      "location": "src/generate/orchestrate.py (to be created)",
+      "notes": "Orchestrates loading FusedRecords from disk, re-running sentiment+signal gen, and producing report. Depends on FinBertSentiment (torch/transformers) via sentiment analysis. Files_summary lists this as Create."
+    },
+    {
+      "requirement": "src/generate/__init__.py — Updated exports",
+      "status": "MISSING",
+      "location": "src/generate/__init__.py",
+      "notes": "Currently a placeholder. Needs __all__ with ReportInput, ReportResult, ReportGenerator, run_report_generation. Straightforward update."
+    },
+    {
+      "requirement": "src/generate/__main__.py — CLI entry point",
+      "status": "MISSING",
+      "location": "src/generate/__main__.py (to be rewritten)",
+      "notes": "Currently a placeholder that exits with error. Needs to be rewritten per the __main__ section in the ticket."
+    },
+    {
+      "requirement": "tests/fixtures/report_data.py — 8 test fixtures",
+      "status": "MISSING",
+      "location": "tests/fixtures/report_data.py (to be created)",
+      "notes": "8 fixtures specified: buy/sell/hold/no-market signals, mixed list of 10, empty list, warnings list, full ReportInput. All can use direct dataclass construction — no torch mocking needed for fixtures."
+    },
+    {
+      "requirement": "tests/conftest.py — pytest_plugins registration",
+      "status": "INCOMPLETE",
+      "location": "tests/conftest.py",
+      "notes": "Currently has 10 plugin entries. Needs 'tests.fixtures.report_data' added to the pytest_plugins list."
+    },
+    {
+      "requirement": "tests/test_report.py — ~15 tests covering all 11 ACs",
+      "status": "MISSING",
+      "location": "tests/test_report.py (to be created)",
+      "notes": "Needs to be created. ReportGenerator tests are pure Python (no torch). AC-11 requires patching os.makedirs. No MockTensor infrastructure needed (unlike Ticket 6)."
+    },
+    {
+      "requirement": "MarketData dataclass (for TradingSignal construction)",
+      "status": "EXISTS",
+      "location": "src/collect/market_data.py:44",
+      "notes": "Exists with all required fields: open, high, low, close, volume, adjusted_close, timestamp"
+    },
+    {
+      "requirement": "TradingSignal dataclass",
+      "status": "EXISTS",
+      "location": "src/model/pretrained/signals.py:10",
+      "notes": "Exists with ticker, signal, confidence, rationale, sentiment_score, market_return — all 6 fields needed by AC-03"
+    },
+    {
+      "requirement": "ValidationWarning dataclass",
+      "status": "EXISTS",
+      "location": "src/preprocess/validator.py:14",
+      "notes": "Exists with category, field, message, value — all 4 fields needed by AC-04 and serialization in JSON"
+    },
+    {
+      "requirement": "SentimentResult dataclass",
+      "status": "EXISTS",
+      "location": "src/model/pretrained/sentiment.py:37",
+      "notes": "Exists with sentiment_score, confidence, breakdown — used by orchestration's FinBertSentiment re-run"
+    },
+    {
+      "requirement": "FusedRecord dataclass",
+      "status": "EXISTS",
+      "location": "src/preprocess/fusion.py:15",
+      "notes": "Exists with ticker, date, market_data, news_articles, warnings — used by orchestration's load_fused_record"
+    },
+    {
+      "requirement": "FusedRecordWriter serialization format (for _decode_fused_record)",
+      "status": "EXISTS",
+      "location": "src/preprocess/output_writer.py",
+      "notes": "Existing _fused_record_to_dict shows serialization format. The orchestration's _decode_fused_record must reverse this. Serialization structure: market_data via field iteration, warnings as [{category, field, message, value}], news_articles as passthrough."
+    }
+  ],
+  "coverage_analysis": {
+    "happy_path": "COVERED",
+    "error_cases": "COVERED",
+    "edge_cases": "COVERED"
+  },
+  "verdict": "APPROVE",
+  "blocking_issues": [],
+  "moderate_issues": [
+    "M1 — AC-10 preamble description lists 4 items but text format has 6 preamble lines. The description says 'Report header, blank line, column headers, and separator line' but omits the '='*60 decorative separator after Report ID and the blank line before column headers. Test implementers should count data lines by parsing between the '-'*69 separator and '='*60 footer (or end-of-string if no warnings) rather than relying on the incomplete preamble list.",
+    "M2 — Orchestration imports are not fully specified. The orchestrate.py code snippet shows only `from src.generate.config import TICKERS` but the workflow body references FinBertSentiment, TradingSignalGenerator, FusedRecord, and ValidationWarning without showing their imports. While obvious from context, missing imports can cause import-order issues or circular dependency surprises during implementation. All needed types exist in the codebase, but the spec should list them explicitly.",
+    "M3 — JSON 'omit warnings if empty' behavior is specified in the format spec but not tested by any AC. AC-01 and AC-03 test the case without warnings but don't assert that the `warnings` key is absent from JSON. A subtle implementation bug (always including `warnings: []`) would pass all ACs but violate the spec. Consider adding a lightweight assertion to AC-01 or AC-03 to verify warnings key is omitted when warnings are None/empty.",
+    "M4 — HTML format spec does not define the output when warnings are absent. The template uses `{warnings_section}` which could be empty string or a commented-out placeholder. The behavior when warnings=None/[] is implied but not explicitly specified. This could lead to subtle differences between implementations. Recommend adding a note: 'When no warnings, warnings_section is an empty string — no <div> is rendered.'"
+  ],
+  "low_issues": [
+    "L1 — Sentiment column format has internal width discrepancy. Format table shows column width=12 but format `{:>+10.4f}` uses width 10. The difference (2 chars) suggests padding is applied outside the format specifier, which is unusual for fixed-width layouts. Not blocking — the test will check actual output values rather than format string internals.",
+    "L2 — `ReportGenerator.generate()` parameter named `input` shadows the built-in `input()` function. This is a code quality concern. Consider renaming to `report_input` or `data` to avoid shadowing and potential confusion.",
+    "L3 — 30-second smoke test (moved from AC to inline comment) is documented as a benchmark note but has no target test structure. Not a reviewer concern since it's intentionally not CI-enforced.",
+    "L4 — The file output paths in run_report_generation use hardcoded relative path `data/processed/reports/`. While this follows the existing pattern (FusedRecordWriter uses `data/processed/fused`), tests that exercise the orchestration layer will need to patch os.makedirs or use tmp_path to avoid filesystem pollution."
+  ],
+  "risk_assessment": {
+    "comparison_to_prior_tickets": "Significantly better-prepared than Ticket 6 (which started with 3 vague ACs and wrong dependencies). Similar quality to the approved Ticket 7 v4. All 4 moderate issues from round 4 (M1: html.parser leniency, M2: ticker source ambiguity, M3: date validation coverage, M4: missing os.makedirs) are resolved. The ticket benefits from post-mortem lessons: explicit format specs, concrete type annotations, and the well-formedness checker pattern.",
+    "mock_complexity_estimate": "LOW for ReportGenerator (pure Python string formatting — no torch/GPU/external API calls, tests use direct dataclass construction). MODERATE for orchestration layer (run_report_generation requires patching os.makedirs for file I/O and may need FinBertSentiment/load_fused_record mocks for integration tests, but AC-11 date validation can be tested by patching only os.makedirs since ValueError fires before any ticker processing). Overall easier than Ticket 6's MockTensor infrastructure.",
+    "fixture_estimate": "8 fixtures needed (buy/sell/hold/no-market signals, mixed list of 10, empty list, warnings list, full ReportInput). All use direct dataclass construction (TradingSignal, ValidationWarning). No torch mocking needed. Similar pattern to signal_data.py from Ticket 7."
+  },
+  "summary": "Round 5 review of Ticket 8 (Multi-Format Report Generation) finds all 11 acceptance criteria testable with concrete inputs and outputs. All 4 moderate issues from round 4 have been resolved: (1) AC-09 now includes a _WellFormednessChecker helper with void-element-aware tag stack, (2) AC-01 explicitly references src.generate.config.TICKERS, (3) AC-11 tests both empty string AND malformed date strings, and (4) os.makedirs is specified for file output directory creation. The format specs for text/JSON/HTML are complete and internally consistent with the TradingSignal/ValidationWarning data types. The two-step orchestration design (existing per-ticker pipeline → batch report generation) is sound, with FusedRecord as the data contract between steps. Dependencies [Ticket 4, Ticket 6, Ticket 7] are correct. Error handling covers all required paths (empty signals → ValueError, None input → TypeError, invalid date → ValueError, missing FusedRecord → FileNotFoundError). Mock complexity is LOW for ReportGenerator and MODERATE for orchestration, manageable with standard patching. Verdict: APPROVE with 4 moderate and 4 low non-blocking issues."
+}
